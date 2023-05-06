@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -19,18 +17,8 @@ import jakarta.persistence.UniqueConstraint;
 public class Ticket {
 
     @Id
-    @Column(nullable = false, updatable = false)
-    @SequenceGenerator(
-        name = "primary_sequence",
-        sequenceName = "primary_sequence",
-        allocationSize = 1,
-        initialValue = 10000
-    )
-    @GeneratedValue(
-        strategy = GenerationType.SEQUENCE,
-        generator = "primary_sequence"
-    )
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @OneToOne(mappedBy = "ticket", fetch = FetchType.LAZY)
     private Reservation reservation;
@@ -47,11 +35,11 @@ public class Ticket {
     @JoinColumn(name = "seat_id", nullable = false)
     private Seat seat;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(final Long id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
