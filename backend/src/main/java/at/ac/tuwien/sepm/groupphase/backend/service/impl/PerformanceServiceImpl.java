@@ -35,11 +35,11 @@ public class PerformanceServiceImpl implements PerformanceService {
 
     //TODO: constutor injection
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private OrderRepository orderRepository;
-    private PerformanceRepository performanceRepository;
-    private UserRepository userRepository;
-    private NotUserRepository notUserRepository;
-    private OrderMapper orderMapper;
+    private final OrderRepository orderRepository;
+    private final PerformanceRepository performanceRepository;
+    private final UserRepository userRepository;
+    private final NotUserRepository notUserRepository;
+    private final OrderMapper orderMapper;
 
     public PerformanceServiceImpl(OrderRepository orderRepository, PerformanceRepository performanceRepository, UserRepository userRepository, NotUserRepository notUserRepository, OrderMapper orderMapper) {
         this.orderRepository = orderRepository;
@@ -70,6 +70,7 @@ public class PerformanceServiceImpl implements PerformanceService {
         order.setCancelled(false);
         order.setOrderTs(LocalDateTime.now());
 
+        //Seats
         for (CartSeatDto cartSeatDto : cartDto.getSeats()) {
             Ticket ticket = new Ticket();
             Optional<Performance> performanceOptional = performanceRepository.findById(performanceId);
@@ -85,11 +86,18 @@ public class PerformanceServiceImpl implements PerformanceService {
             tickets.add(ticket);
         }
 
+        //Standing
         for (int i = 0; i < cartDto.getStanding(); i++) {
             Ticket ticket = new Ticket();
             ticket.setOrder(order);
             tickets.add(ticket);
+            Optional<Performance> performanceOptional = performanceRepository.findById(performanceId);
+            if (performanceOptional.isEmpty()) {
+                throw new FatalException("Performance cannot be null");
+            }
+            ticket.setPerformance(performanceOptional.get());
         }
+
         BigDecimal price = new BigDecimal(0);
         //TODO: add prices
 
@@ -101,6 +109,9 @@ public class PerformanceServiceImpl implements PerformanceService {
         transaction.setOrder(order);
         transaction.setDeductedAmount(price);
         Set<Transaction> transactionSet = new HashSet<>();
+        if (order.getTransactions() != null) {
+            transactionSet = order.getTransactions();
+        }
         transactionSet.add(transaction);
 
         order.setTransactions(transactionSet);
@@ -110,6 +121,9 @@ public class PerformanceServiceImpl implements PerformanceService {
         //Saving Order in PaymentDetail
         PaymentDetail paymentDetail = user.getPaymentDetails().iterator().next();
         Set<Order> orders = new HashSet<>();
+        if (paymentDetail.getOrders() != null) {
+            orders = paymentDetail.getOrders();
+        }
         orders.add(order);
         paymentDetail.setOrders(orders);
 
