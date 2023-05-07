@@ -1,6 +1,14 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -8,25 +16,14 @@ import java.util.Set;
 //TODO: replace this class with a correct ApplicationUser Entity implementation
 @Entity
 public class ApplicationUser {
+
     @Id
-    @Column(nullable = false, updatable = false)
-    @SequenceGenerator(
-        name = "primary_sequence",
-        sequenceName = "primary_sequence",
-        allocationSize = 1,
-        initialValue = 10000
-    )
-    @GeneratedValue(
-        strategy = GenerationType.SEQUENCE,
-        generator = "primary_sequence"
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(nullable = false)
     private Boolean admin;
-
     @Column(nullable = false)
     private String firstName;
-
     @Column(nullable = false)
     private String lastName;
     @Column(nullable = false)
@@ -64,6 +61,7 @@ public class ApplicationUser {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "location_id")
     )
+
     private Set<Location> locations;
 
     public Integer getId() {
@@ -86,6 +84,7 @@ public class ApplicationUser {
         this.password = password;
         this.admin = admin;
     }
+
     public void setAdmin(final Boolean admin) {
         this.admin = admin;
     }
