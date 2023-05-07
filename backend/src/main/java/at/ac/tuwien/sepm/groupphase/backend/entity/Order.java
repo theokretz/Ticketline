@@ -42,7 +42,7 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private ApplicationUser user;
 
     @OneToMany(mappedBy = "order")
     private Set<Ticket> tickets;
@@ -98,11 +98,11 @@ public class Order {
         this.paymentDetail = paymentDetail;
     }
 
-    public User getUser() {
+    public ApplicationUser getUser() {
         return user;
     }
 
-    public void setUser(final User user) {
+    public void setUser(final ApplicationUser user) {
         this.user = user;
     }
 

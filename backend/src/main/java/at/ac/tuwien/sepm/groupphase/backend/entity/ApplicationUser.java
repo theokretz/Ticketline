@@ -1,6 +1,15 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -86,6 +95,7 @@ public class ApplicationUser {
         this.password = password;
         this.admin = admin;
     }
+
     public void setAdmin(final Boolean admin) {
         this.admin = admin;
     }
