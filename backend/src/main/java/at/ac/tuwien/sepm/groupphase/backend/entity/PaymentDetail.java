@@ -37,7 +37,7 @@ public class PaymentDetail {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private ApplicationUser user;
 
     public Integer getId() {
         return id;
@@ -87,11 +87,11 @@ public class PaymentDetail {
         this.orders = orders;
     }
 
-    public User getUser() {
+    public ApplicationUser getUser() {
         return user;
     }
 
-    public void setUser(final User user) {
+    public void setUser(final ApplicationUser user) {
         this.user = user;
     }
 
