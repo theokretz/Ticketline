@@ -12,15 +12,18 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Seat;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
+import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.OrderRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.PerformanceService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -31,17 +34,20 @@ import java.util.Set;
 public class PerformanceServiceImpl implements PerformanceService {
 
     //TODO: constutor injection
-    @Autowired
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private OrderRepository orderRepository;
-    @Autowired
     private PerformanceRepository performanceRepository;
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private NotUserRepository notUserRepository;
-    @Autowired
     private OrderMapper orderMapper;
+
+    public PerformanceServiceImpl(OrderRepository orderRepository, PerformanceRepository performanceRepository, UserRepository userRepository, NotUserRepository notUserRepository, OrderMapper orderMapper) {
+        this.orderRepository = orderRepository;
+        this.performanceRepository = performanceRepository;
+        this.userRepository = userRepository;
+        this.notUserRepository = notUserRepository;
+        this.orderMapper = orderMapper;
+    }
 
     @Transactional
     @Override
@@ -54,7 +60,7 @@ public class PerformanceServiceImpl implements PerformanceService {
 
         Optional<ApplicationUser> optonalUser = notUserRepository.findById(userDto.getId());
         if (optonalUser.isEmpty()) {
-            //TODO: exception
+            throw new FatalException("User cannot be null");
         }
         ApplicationUser user = optonalUser.get();
 
@@ -68,8 +74,7 @@ public class PerformanceServiceImpl implements PerformanceService {
             Ticket ticket = new Ticket();
             Optional<Performance> performanceOptional = performanceRepository.findById(performanceId);
             if (performanceOptional.isEmpty()) {
-                //TODO: exception
-
+                throw new FatalException("Performance cannot be null");
             }
             ticket.setPerformance(performanceOptional.get());
             Seat seat = new Seat();
