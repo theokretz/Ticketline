@@ -2,7 +2,9 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartSeatDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.OrderMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
@@ -38,15 +40,22 @@ public class PerformanceServiceImpl implements PerformanceService {
 
     @Autowired
     private NotUserRepository notUserRepository;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Transactional
     @Override
-    public Order buyTickets(CartDto cartDto, int performanceId, UserDto userDto) {
+    public OrderDto buyTickets(CartDto cartDto, int performanceId, UserDto userDto) {
         //TODO: validation
 
-        //   ApplicationUser user = userRepository.findUserByEmail(userDto.getEmail());
+        // ApplicationUser user = userRepository.findUserByEmail(userDto.getEmail());
+        // geht nicht weil ich in Test den user mit notUserRepository speichere
+        // wenn login implementiert dann UserRepository zu interface machen
 
         Optional<ApplicationUser> optonalUser = notUserRepository.findById(userDto.getId());
+        if (optonalUser.isEmpty()) {
+            //TODO: exception
+        }
         ApplicationUser user = optonalUser.get();
 
         Set<Ticket> tickets = new HashSet<>();
@@ -100,8 +109,7 @@ public class PerformanceServiceImpl implements PerformanceService {
         paymentDetail.setOrders(orders);
 
 
-        //TODO: save order
         orderRepository.save(order);
-        return order;
+        return orderMapper.orderToDto(order);
     }
 }
