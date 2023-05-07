@@ -13,7 +13,7 @@ public class UserMapper {
         return user;
     }
 
-    public UserDto applicationUserToDtoUserToDto(ApplicationUser user) {
+    public UserDto applicationUserToDto(ApplicationUser user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
         dto.setAdmin(user.getAdmin());
