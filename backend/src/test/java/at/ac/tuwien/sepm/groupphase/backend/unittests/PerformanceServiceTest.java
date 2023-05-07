@@ -2,13 +2,13 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartSeatDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Hall;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.repository.EventRepository;
@@ -144,10 +144,10 @@ public class PerformanceServiceTest {
         cartDto.setStanding(1);
 
 
-        Order order = performanceService.buyTickets(cartDto, performance.getId(), userDto);
+        OrderDto order = performanceService.buyTickets(cartDto, performance.getId(), userDto);
         assertThat(order)
             .isNotNull()
-            .extracting("id", "tickets", "transactions", "paymentDetail", "deliveryAdress")
-            .contains(order.getId(), order.getTickets(), order.getTransactions(), paymentDetail, location);
+            .extracting("id", "tickets", "transactions", "paymentDetail", "deliveryAdress", "cancelled")
+            .contains(order.getId(), order.getTickets(), order.getTransactions(), paymentDetail, location, false);
     }
 }
