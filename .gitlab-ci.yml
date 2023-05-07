@@ -19,6 +19,24 @@ test-backend:
     - cd backend
     - mvn -B clean install
 
+unit-test:
+  stage: test
+  script:
+    - cd backend
+    - mvn clean test
+
+unit-report:
+  stage: test
+  script:
+    - cd backend
+    - mvn verify
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+        - target/failsafe-reports/TEST-*.xml
+
 test-frontend:
   stage: test
   image: registry.reset.inso-w.at/pub/docker/node-non-root-18
