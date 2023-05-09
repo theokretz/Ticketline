@@ -1,11 +1,17 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
+import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
+
+import java.util.Set;
+
 public class CartSeatDto {
 
     int id;
     int row;
     int number;
-    int sectorId;
+    private Set<Ticket> tickets;
+    private Sector sector;
 
     public int getId() {
         return id;
@@ -27,11 +33,19 @@ public class CartSeatDto {
         this.row = row;
     }
 
-    public void setSectorId(int sectorId) {
-        this.sectorId = sectorId;
+    public Set<Ticket> getTickets() {
+        return tickets;
     }
 
-    public int getSectorId() {
-        return sectorId;
+    public void setTickets(Set<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
+    public Sector getSector() {
+        return sector;
+    }
+
+    public void setSector(Sector sector) {
+        this.sector = sector;
     }
 }

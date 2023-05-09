@@ -3,17 +3,16 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 import java.util.List;
 
 public class CartDto {
-
-    int standing;
+    int id;
 
     List<CartSeatDto> seats;
 
-    public int getStanding() {
-        return standing;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setStanding(int standing) {
-        this.standing = standing;
+    public int getId() {
+        return id;
     }
 
     public List<CartSeatDto> getSeats() {

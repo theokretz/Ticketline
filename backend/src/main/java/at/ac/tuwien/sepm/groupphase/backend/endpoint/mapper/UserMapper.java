@@ -2,18 +2,18 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.lang.invoke.MethodHandles;
 
 @Component
 public class UserMapper {
-
-    public ApplicationUser dtoToApplicationUser(UserDto userDto) {
-        ApplicationUser user = new ApplicationUser();
-        user.setId(userDto.getId());
-        return user;
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public UserDto applicationUserToDto(ApplicationUser user) {
+        LOGGER.trace("applicationUserToDto({})", user);
         UserDto dto = new UserDto();
         dto.setId(user.getId());
         dto.setAdmin(user.getAdmin());
