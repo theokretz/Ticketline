@@ -4,6 +4,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartSeatDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.SeatMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Event;
@@ -11,12 +12,20 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Hall;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
+import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Seat;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
+import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.EventRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.HallRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PaymentDetailRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceSectorRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SeatRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SectorRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.PerformanceService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -27,15 +36,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
@@ -67,6 +79,17 @@ public class PerformanceServiceTest {
     @Autowired
     private PaymentDetailRepository paymentDetailRepository;
 
+    @Autowired
+    private SectorRepository sectorRepository;
+
+    @Autowired
+    private PerformanceSectorRepository performanceSectorRepository;
+
+    @Autowired
+    private SeatRepository seatRepository;
+
+    @Autowired
+    private SeatMapper seatMapper;
     private Performance performance;
     private ApplicationUser user;
     private Location location;
@@ -74,15 +97,26 @@ public class PerformanceServiceTest {
     private PaymentDetail paymentDetail;
     private Set<PaymentDetail> paymentDetailSet;
     private UserDto userDto;
+    private Event event;
+    private Hall hall;
+    private Sector standingSector;
+    private Sector seatedSector;
+    private PerformanceSector standingPerformanceSector;
+    private PerformanceSector seatedPerformanceSector;
+    private Seat standingSeat;
+    private Seat seatedSeat;
+    private CartSeatDto cartSeatDtoSeated;
+    private CartSeatDto cartSeatDtoStanding;
+    private CartDto cartDto;
 
     @BeforeAll
     public void beforeAll() {
-        Event event = new Event();
+        event = new Event();
         event.setName("The Eras Tour");
         event.setLength(Duration.ZERO);
         eventRepository.save(event);
 
-        this.location = new Location();
+        location = new Location();
         location.setCity("Vienna");
         location.setCountry("Austria");
         location.setPostalCode(1120);
@@ -91,7 +125,7 @@ public class PerformanceServiceTest {
         locationSet.add(location);
         locationRepository.save(location);
 
-        Hall hall = new Hall();
+        hall = new Hall();
         hall.setName("Halle 1");
         hall.setLocation(location);
         hallRepository.save(hall);
@@ -100,17 +134,17 @@ public class PerformanceServiceTest {
         this.performance.setDatetime(LocalDateTime.now());
         this.performance.setEvent(event);
         this.performance.setHall(hall);
-        performanceRepository.save(performance);
+        this.performanceRepository.save(performance);
 
         this.user = new ApplicationUser();
         this.user.setEmail("hallo@123");
-        user.setAdmin(false);
-        user.setFirstName("Theo");
-        user.setLastName("Kretz");
-        user.setPassword("Password");
-        user.setLocked(false);
-        user.setSalt("asdjaslkdjaös");
-        user.setPoints(10000);
+        this.user.setAdmin(false);
+        this.user.setFirstName("Theo");
+        this.user.setLastName("Kretz");
+        this.user.setPassword("Password");
+        this.user.setLocked(false);
+        this.user.setSalt("asdjaslkdjaös");
+        this.user.setPoints(10000);
 
         paymentDetail = new PaymentDetail();
         paymentDetail.setCvv(222);
@@ -129,25 +163,95 @@ public class PerformanceServiceTest {
 
         userDto = new UserDto();
         userDto = userMapper.applicationUserToDto(user);
+
+        standingSector = new Sector();
+        standingSector.setHall(hall);
+        standingSector.setName("Standing Sector 1");
+        standingSector.setStanding(true);
+        sectorRepository.save(standingSector);
+
+        seatedSector = new Sector();
+        seatedSector.setStanding(false);
+        seatedSector.setName("Seated Sector 1");
+        seatedSector.setHall(hall);
+        sectorRepository.save(seatedSector);
+
+        standingPerformanceSector = new PerformanceSector();
+        standingPerformanceSector.setPerformance(performance);
+        standingPerformanceSector.setSector(standingSector);
+        standingPerformanceSector.setPrice(BigDecimal.valueOf(100.0));
+        standingPerformanceSector.setPointsReward(100);
+        performanceSectorRepository.save(standingPerformanceSector);
+
+        seatedPerformanceSector = new PerformanceSector();
+        seatedPerformanceSector.setPerformance(performance);
+        seatedPerformanceSector.setSector(seatedSector);
+        seatedPerformanceSector.setPrice(BigDecimal.valueOf(50.0));
+        seatedPerformanceSector.setPointsReward(50);
+        performanceSectorRepository.save(seatedPerformanceSector);
+
+        Set<PerformanceSector> performanceSectorSet = new HashSet<>();
+        performanceSectorSet.add(standingPerformanceSector);
+        performanceSectorSet.add(seatedPerformanceSector);
+
+        seatedSector.setPerformanceSectors(performanceSectorSet);
+        standingSector.setPerformanceSectors(performanceSectorSet);
+
+        standingSeat = new Seat();
+        standingSeat.setSector(standingSector);
+        standingSeat.setRow(5);
+        standingSeat.setNumber(5);
+        seatRepository.save(standingSeat);
+
+        seatedSeat = new Seat();
+        seatedSeat.setNumber(1);
+        seatedSeat.setRow(1);
+        seatedSeat.setSector(seatedSector);
+        seatRepository.save(seatedSeat);
+
+        cartSeatDtoSeated = new CartSeatDto();
+        cartSeatDtoStanding = new CartSeatDto();
+        cartSeatDtoSeated = seatMapper.seatToCartSeatDto(seatedSeat);
+        cartSeatDtoStanding = seatMapper.seatToCartSeatDto(standingSeat);
+        cartDto = new CartDto();
+        List<CartSeatDto> seatList = new ArrayList<>();
+        seatList.add(cartSeatDtoSeated);
+        seatList.add(cartSeatDtoStanding);
+        cartDto.setSeats(seatList);
     }
 
     @Test
     public void buyValidTicketsReturnCorrectOrder() {
-
-        CartSeatDto cartSeatDto = new CartSeatDto();
-        cartSeatDto.setRow(1);
-        cartSeatDto.setNumber(1);
-        CartDto cartDto = new CartDto();
-        List<CartSeatDto> seatList = new ArrayList<>();
-        seatList.add(cartSeatDto);
-        cartDto.setSeats(seatList);
-        cartDto.setStanding(1);
-
-
         OrderDto order = performanceService.buyTickets(cartDto, performance.getId(), userDto);
         assertThat(order)
             .isNotNull()
             .extracting("id", "tickets", "transactions", "paymentDetail", "deliveryAdress", "cancelled")
             .contains(order.getId(), order.getTickets(), order.getTransactions(), paymentDetail, location, false);
+    }
+
+    @Test
+    public void buyTicketsWithNullUserShouldThrow() {
+        assertThrows(FatalException.class, () -> performanceService.buyTickets(cartDto, performance.getId(), null));
+    }
+
+    @Test
+    public void buyTicketsWithInvalidUserShouldThrow() {
+        UserDto userDto2 = new UserDto();
+        assertThrows(FatalException.class, () -> performanceService.buyTickets(cartDto, performance.getId(), userDto2));
+    }
+
+    @Test
+    public void buyValidTicketsShouldReturnRightPrice() {
+        OrderDto orderDto = performanceService.buyTickets(cartDto, performance.getId(), userDto);
+        Transaction transaction = new Transaction();
+        Set<Transaction> transactionSet = orderDto.getTransactions();
+        for (Transaction trans : transactionSet) {
+            if (Objects.equals(trans.getOrder().getId(), orderDto.getId())) {
+                transaction = trans;
+            }
+        }
+        assertThat(transaction.getDeductedAmount())
+            .isNotNull()
+            .isEqualTo(BigDecimal.valueOf(150.0));
     }
 }
