@@ -74,5 +74,21 @@ public class News {
         this.event = event;
     }
 
+    @Override
+    public String toString() {
+        return "News{"
+            +
+            "id=" + id
+            +
+            ", title='" + title + '\''
+            +
+            ", content='" + content + '\''
+            +
+            ", publicationDate=" + publicationDate
+            +
+            ", event=" + event
+            +
+            '}';
+    }
 }
 

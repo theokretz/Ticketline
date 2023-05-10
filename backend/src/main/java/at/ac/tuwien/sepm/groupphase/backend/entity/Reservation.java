@@ -74,4 +74,14 @@ public class Reservation {
         this.user = user;
     }
 
+    @Override
+    public String toString() {
+        return "Reservation{"
+            + "id=" + id
+            + ", expirationTs=" + expirationTs
+            + ", cart=" + cart
+            + ", ticket=" + ticket
+            + ", user=" + user
+            + '}';
+    }
 }

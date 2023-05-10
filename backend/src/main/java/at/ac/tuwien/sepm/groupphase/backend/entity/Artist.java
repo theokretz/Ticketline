@@ -54,4 +54,16 @@ public class Artist {
         this.events = events;
     }
 
+    @Override
+    public String toString() {
+        return "Artist{"
+            +
+            "id=" + id
+            +
+            ", name='" + name + '\''
+            +
+            ", events=" + events
+            +
+            '}';
+    }
 }

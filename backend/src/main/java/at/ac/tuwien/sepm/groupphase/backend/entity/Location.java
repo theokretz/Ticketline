@@ -66,4 +66,20 @@ public class Location {
         this.country = country;
     }
 
+    @Override
+    public String toString() {
+        return "Location{"
+            +
+            "id=" + id
+            +
+            ", postalCode=" + postalCode
+            +
+            ", street='" + street + '\''
+            +
+            ", city='" + city + '\''
+            +
+            ", country='" + country + '\''
+            +
+            '}';
+    }
 }

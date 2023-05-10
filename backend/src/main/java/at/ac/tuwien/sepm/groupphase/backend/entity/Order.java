@@ -121,5 +121,25 @@ public class Order {
         this.transactions = transactions;
     }
 
+    @Override
+    public String toString() {
+        return "Order{"
+            + "id=" + id
+            + ", orderTs=" + orderTs
+            + ", cancelled=" + cancelled
+            + ", merchandiseOrdered=" + merchandiseOrdered
+            +
+            ", deliveryAdress=" + deliveryAdress
+            +
+            ", paymentDetail=" + paymentDetail
+            +
+            ", user=" + user
+            +
+            ", tickets=" + tickets
+            +
+            ", transactions=" + transactions
+            +
+            '}';
+    }
 }
 

@@ -76,4 +76,14 @@ public class Seat {
         this.sector = sector;
     }
 
+    @Override
+    public String toString() {
+        return "Seat{"
+            + "id=" + id
+            + ", row=" + row
+            + ", number=" + number
+            + ", tickets=" + tickets
+            + ", sector=" + sector
+            + '}';
+    }
 }

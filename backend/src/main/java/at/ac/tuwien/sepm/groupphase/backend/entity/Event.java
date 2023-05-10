@@ -93,4 +93,24 @@ public class Event {
         this.performances = performances;
     }
 
+    @Override
+    public String toString() {
+        return "Event{"
+            +
+            "id=" + id
+            +
+            ", name='" + name + '\''
+            +
+            ", type='" + type + '\''
+            +
+            ", length=" + length
+            +
+            ", description='" + description + '\''
+            +
+            ", artists=" + artists
+            +
+            ", performances=" + performances
+            +
+            '}';
+    }
 }

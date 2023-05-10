@@ -96,5 +96,17 @@ public class PaymentDetail {
         this.user = user;
     }
 
+    @Override
+    public String toString() {
+        return "PaymentDetail{"
+            + "id=" + id
+            + ", cardNumber=" + cardNumber
+            + ", cardHolder='" + cardHolder + '\''
+            + ", cvv=" + cvv
+            + ", expirationDate=" + expirationDate
+            + ", orders=" + orders
+            + ", user=" + user
+            + '}';
+    }
 }
 

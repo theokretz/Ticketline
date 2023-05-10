@@ -86,5 +86,17 @@ public class Performance {
         this.sectors = sectors;
     }
 
+    @Override
+    public String toString() {
+        return "Performance{"
+            +
+            "id=" + id
+            + ", datetime=" + datetime
+            + ", event=" + event
+            + ", hall=" + hall
+            + ", tickets=" + tickets
+            + ", sectors=" + sectors
+            + '}';
+    }
 }
 

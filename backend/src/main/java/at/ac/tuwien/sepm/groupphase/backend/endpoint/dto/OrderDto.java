@@ -93,4 +93,28 @@ public class OrderDto {
         return transactions;
     }
 
+    @Override
+    public String toString() {
+        return "OrderDto{"
+            +
+            "id=" + id
+            +
+            ", orderTs=" + orderTs
+            +
+            ", cancelled=" + cancelled
+            +
+            ", merchandiseOrdered=" + merchandiseOrdered
+            +
+            ", deliveryAdress=" + deliveryAdress
+            +
+            ", paymentDetail=" + paymentDetail
+            +
+            ", user=" + user
+            +
+            ", tickets=" + tickets
+            +
+            ", transactions=" + transactions
+            +
+            '}';
+    }
 }

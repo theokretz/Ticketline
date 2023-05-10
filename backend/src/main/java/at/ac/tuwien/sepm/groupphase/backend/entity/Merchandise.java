@@ -71,5 +71,21 @@ public class Merchandise {
         this.merchandiseMerchandiseOrdereds = merchandiseMerchandiseOrdereds;
     }
 
+    @Override
+    public String toString() {
+        return "Merchandise{"
+            +
+            "id=" + id
+            +
+            ", price=" + price
+            +
+            ", pointsPrice=" + pointsPrice
+            +
+            ", pointsReward=" + pointsReward
+            +
+            ", merchandiseMerchandiseOrdereds=" + merchandiseMerchandiseOrdereds
+            +
+            '}';
+    }
 }
 

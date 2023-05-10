@@ -52,4 +52,21 @@ public class CartSeatDto {
     public void setSector(Sector sector) {
         this.sector = sector;
     }
+
+    @Override
+    public String toString() {
+        return "CartSeatDto{"
+            +
+            "id=" + id
+            +
+            ", row=" + row
+            +
+            ", number=" + number
+            +
+            ", tickets=" + tickets
+            +
+            ", sector=" + sector
+            +
+            '}';
+    }
 }

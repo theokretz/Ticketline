@@ -73,4 +73,20 @@ public class Hall {
         this.sectors = sectors;
     }
 
+    @Override
+    public String toString() {
+        return "Hall{"
+            +
+            "id=" + id
+            +
+            ", name='" + name + '\''
+            +
+            ", location=" + location
+            +
+            ", performances=" + performances
+            +
+            ", sectors=" + sectors
+            +
+            '}';
+    }
 }
