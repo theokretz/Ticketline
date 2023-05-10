@@ -15,7 +15,9 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Seat;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
+import at.ac.tuwien.sepm.groupphase.backend.exception.DtoException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.EventRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.HallRepository;
@@ -26,6 +28,7 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceSectorRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SeatRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SectorRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.PerformanceService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -56,202 +59,220 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class PerformanceServiceTest {
 
 
-    @Autowired
-    private PerformanceRepository performanceRepository;
+  @Autowired
+  private PerformanceRepository performanceRepository;
 
-    @Autowired
-    private PerformanceService performanceService;
+  @Autowired
+  private PerformanceService performanceService;
 
-    @Autowired
-    private EventRepository eventRepository;
+  @Autowired
+  private EventRepository eventRepository;
 
-    @Autowired
-    private HallRepository hallRepository;
+  @Autowired
+  private HallRepository hallRepository;
 
-    @Autowired
-    private NotUserRepository NotUserRepository;
-    @Autowired
-    private LocationRepository locationRepository;
+  @Autowired
+  private NotUserRepository NotUserRepository;
+  @Autowired
+  private LocationRepository locationRepository;
 
-    @Autowired
-    private UserMapper userMapper;
+  @Autowired
+  private UserMapper userMapper;
 
-    @Autowired
-    private PaymentDetailRepository paymentDetailRepository;
+  @Autowired
+  private PaymentDetailRepository paymentDetailRepository;
 
-    @Autowired
-    private SectorRepository sectorRepository;
+  @Autowired
+  private SectorRepository sectorRepository;
 
-    @Autowired
-    private PerformanceSectorRepository performanceSectorRepository;
+  @Autowired
+  private PerformanceSectorRepository performanceSectorRepository;
 
-    @Autowired
-    private SeatRepository seatRepository;
+  @Autowired
+  private SeatRepository seatRepository;
 
-    @Autowired
-    private SeatMapper seatMapper;
-    private Performance performance;
-    private ApplicationUser user;
-    private Location location;
-    private Set<Location> locationSet;
-    private PaymentDetail paymentDetail;
-    private Set<PaymentDetail> paymentDetailSet;
-    private UserDto userDto;
-    private Event event;
-    private Hall hall;
-    private Sector standingSector;
-    private Sector seatedSector;
-    private PerformanceSector standingPerformanceSector;
-    private PerformanceSector seatedPerformanceSector;
-    private Seat standingSeat;
-    private Seat seatedSeat;
-    private CartSeatDto cartSeatDtoSeated;
-    private CartSeatDto cartSeatDtoStanding;
-    private CartDto cartDto;
+  @Autowired
+  private TicketRepository ticketRepository;
+  @Autowired
+  private SeatMapper seatMapper;
 
-    @BeforeAll
-    public void beforeAll() {
-        event = new Event();
-        event.setName("The Eras Tour");
-        event.setLength(Duration.ZERO);
-        eventRepository.save(event);
+  private Performance performance;
+  private ApplicationUser user;
+  private Location location;
+  private Set<Location> locationSet;
+  private PaymentDetail paymentDetail;
+  private Set<PaymentDetail> paymentDetailSet;
+  private UserDto userDto;
+  private Event event;
+  private Hall hall;
+  private Sector standingSector;
+  private Sector seatedSector;
+  private PerformanceSector standingPerformanceSector;
+  private PerformanceSector seatedPerformanceSector;
+  private Seat standingSeat;
+  private Seat seatedSeat;
+  private CartSeatDto cartSeatDtoSeated;
+  private CartSeatDto cartSeatDtoStanding;
+  private CartDto cartDto;
+  private Ticket standingTicket;
+  private Ticket seatedTicket;
 
-        location = new Location();
-        location.setCity("Vienna");
-        location.setCountry("Austria");
-        location.setPostalCode(1120);
-        location.setStreet("Straße 1");
-        locationSet = new HashSet<>();
-        locationSet.add(location);
-        locationRepository.save(location);
+  @BeforeAll
+  public void beforeAll() {
+    event = new Event();
+    event.setName("The Eras Tour");
+    event.setLength(Duration.ZERO);
+    eventRepository.save(event);
 
-        hall = new Hall();
-        hall.setName("Halle 1");
-        hall.setLocation(location);
-        hallRepository.save(hall);
+    location = new Location();
+    location.setCity("Vienna");
+    location.setCountry("Austria");
+    location.setPostalCode(1120);
+    location.setStreet("Straße 1");
+    locationSet = new HashSet<>();
+    locationSet.add(location);
+    locationRepository.save(location);
 
-        this.performance = new Performance();
-        this.performance.setDatetime(LocalDateTime.now());
-        this.performance.setEvent(event);
-        this.performance.setHall(hall);
-        this.performanceRepository.save(performance);
+    hall = new Hall();
+    hall.setName("Halle 1");
+    hall.setLocation(location);
+    hallRepository.save(hall);
 
-        this.user = new ApplicationUser();
-        this.user.setEmail("hallo@123");
-        this.user.setAdmin(false);
-        this.user.setFirstName("Theo");
-        this.user.setLastName("Kretz");
-        this.user.setPassword("Password");
-        this.user.setLocked(false);
-        this.user.setSalt("asdjaslkdjaös");
-        this.user.setPoints(10000);
+    this.performance = new Performance();
+    this.performance.setDatetime(LocalDateTime.now());
+    this.performance.setEvent(event);
+    this.performance.setHall(hall);
+    this.performanceRepository.save(performance);
 
-        paymentDetail = new PaymentDetail();
-        paymentDetail.setCvv(222);
-        paymentDetail.setCardHolder("hallo");
-        paymentDetail.setCardNumber(23123131);
-        paymentDetail.setExpirationDate(LocalDate.now());
-        paymentDetail.setUser(user);
+    this.user = new ApplicationUser();
+    this.user.setEmail("hallo@123");
+    this.user.setAdmin(false);
+    this.user.setFirstName("Theo");
+    this.user.setLastName("Kretz");
+    this.user.setPassword("Password");
+    this.user.setLocked(false);
+    this.user.setSalt("asdjaslkdjaös");
+    this.user.setPoints(10000);
 
-        paymentDetailSet = new HashSet<>();
-        paymentDetailSet.add(paymentDetail);
-        user.setPaymentDetails(paymentDetailSet);
-        user.setLocations(locationSet);
+    paymentDetail = new PaymentDetail();
+    paymentDetail.setCvv(222);
+    paymentDetail.setCardHolder("hallo");
+    paymentDetail.setCardNumber(23123131);
+    paymentDetail.setExpirationDate(LocalDate.now());
+    paymentDetail.setUser(user);
 
-        NotUserRepository.save(user);
-        paymentDetailRepository.save(paymentDetail);
+    paymentDetailSet = new HashSet<>();
+    paymentDetailSet.add(paymentDetail);
+    user.setPaymentDetails(paymentDetailSet);
+    user.setLocations(locationSet);
 
-        userDto = new UserDto();
-        userDto = userMapper.applicationUserToDto(user);
+    NotUserRepository.save(user);
+    paymentDetailRepository.save(paymentDetail);
 
-        standingSector = new Sector();
-        standingSector.setHall(hall);
-        standingSector.setName("Standing Sector 1");
-        standingSector.setStanding(true);
-        sectorRepository.save(standingSector);
+    userDto = new UserDto();
+    userDto = userMapper.applicationUserToDto(user);
 
-        seatedSector = new Sector();
-        seatedSector.setStanding(false);
-        seatedSector.setName("Seated Sector 1");
-        seatedSector.setHall(hall);
-        sectorRepository.save(seatedSector);
+    standingSector = new Sector();
+    standingSector.setHall(hall);
+    standingSector.setName("Standing Sector 1");
+    standingSector.setStanding(true);
+    sectorRepository.save(standingSector);
 
-        standingPerformanceSector = new PerformanceSector();
-        standingPerformanceSector.setPerformance(performance);
-        standingPerformanceSector.setSector(standingSector);
-        standingPerformanceSector.setPrice(BigDecimal.valueOf(100.0));
-        standingPerformanceSector.setPointsReward(100);
-        performanceSectorRepository.save(standingPerformanceSector);
+    seatedSector = new Sector();
+    seatedSector.setStanding(false);
+    seatedSector.setName("Seated Sector 1");
+    seatedSector.setHall(hall);
+    sectorRepository.save(seatedSector);
 
-        seatedPerformanceSector = new PerformanceSector();
-        seatedPerformanceSector.setPerformance(performance);
-        seatedPerformanceSector.setSector(seatedSector);
-        seatedPerformanceSector.setPrice(BigDecimal.valueOf(50.0));
-        seatedPerformanceSector.setPointsReward(50);
-        performanceSectorRepository.save(seatedPerformanceSector);
+    standingPerformanceSector = new PerformanceSector();
+    standingPerformanceSector.setPerformance(performance);
+    standingPerformanceSector.setSector(standingSector);
+    standingPerformanceSector.setPrice(BigDecimal.valueOf(100.0));
+    standingPerformanceSector.setPointsReward(100);
+    performanceSectorRepository.save(standingPerformanceSector);
 
-        Set<PerformanceSector> performanceSectorSet = new HashSet<>();
-        performanceSectorSet.add(standingPerformanceSector);
-        performanceSectorSet.add(seatedPerformanceSector);
+    seatedPerformanceSector = new PerformanceSector();
+    seatedPerformanceSector.setPerformance(performance);
+    seatedPerformanceSector.setSector(seatedSector);
+    seatedPerformanceSector.setPrice(BigDecimal.valueOf(50.0));
+    seatedPerformanceSector.setPointsReward(50);
+    performanceSectorRepository.save(seatedPerformanceSector);
 
-        seatedSector.setPerformanceSectors(performanceSectorSet);
-        standingSector.setPerformanceSectors(performanceSectorSet);
+    Set<PerformanceSector> performanceSectorSet = new HashSet<>();
+    performanceSectorSet.add(standingPerformanceSector);
+    performanceSectorSet.add(seatedPerformanceSector);
 
-        standingSeat = new Seat();
-        standingSeat.setSector(standingSector);
-        standingSeat.setRow(5);
-        standingSeat.setNumber(5);
-        seatRepository.save(standingSeat);
+    seatedSector.setPerformanceSectors(performanceSectorSet);
+    standingSector.setPerformanceSectors(performanceSectorSet);
 
-        seatedSeat = new Seat();
-        seatedSeat.setNumber(1);
-        seatedSeat.setRow(1);
-        seatedSeat.setSector(seatedSector);
-        seatRepository.save(seatedSeat);
 
-        cartSeatDtoSeated = new CartSeatDto();
-        cartSeatDtoStanding = new CartSeatDto();
-        cartSeatDtoSeated = seatMapper.seatToCartSeatDto(seatedSeat);
-        cartSeatDtoStanding = seatMapper.seatToCartSeatDto(standingSeat);
-        cartDto = new CartDto();
-        List<CartSeatDto> seatList = new ArrayList<>();
-        seatList.add(cartSeatDtoSeated);
-        seatList.add(cartSeatDtoStanding);
-        cartDto.setSeats(seatList);
+    standingSeat = new Seat();
+    standingSeat.setSector(standingSector);
+    standingSeat.setRow(5);
+    standingSeat.setNumber(5);
+    seatRepository.save(standingSeat);
+
+    seatedSeat = new Seat();
+    seatedSeat.setNumber(1);
+    seatedSeat.setRow(1);
+    seatedSeat.setSector(seatedSector);
+    seatRepository.save(seatedSeat);
+
+
+    seatedTicket = new Ticket();
+    seatedTicket.setSeat(seatedSeat);
+    seatedTicket.setPerformance(performance);
+    ticketRepository.save(seatedTicket);
+
+    standingTicket = new Ticket();
+    standingTicket.setSeat(standingSeat);
+    standingTicket.setPerformance(performance);
+    ticketRepository.save(standingTicket);
+
+    cartSeatDtoSeated = new CartSeatDto();
+    cartSeatDtoStanding = new CartSeatDto();
+    cartSeatDtoSeated = seatMapper.seatToCartSeatDto(seatedSeat);
+    cartSeatDtoStanding = seatMapper.seatToCartSeatDto(standingSeat);
+    cartDto = new CartDto();
+    List<CartSeatDto> seatList = new ArrayList<>();
+    seatList.add(cartSeatDtoSeated);
+    seatList.add(cartSeatDtoStanding);
+    cartDto.setSeats(seatList);
+  }
+
+  @Test
+  public void buyValidTicketsReturnCorrectOrder() {
+
+    OrderDto order = performanceService.buyTickets(cartDto, performance.getId(), userDto);
+    assertThat(order)
+        .isNotNull()
+        .extracting("id", "tickets", "transactions", "paymentDetail", "deliveryAdress", "cancelled")
+        .contains(order.getId(), order.getTickets(), order.getTransactions(), paymentDetail, location, false);
+  }
+
+  @Test
+  public void buyTicketsWithNullUserShouldThrow() {
+    assertThrows(DtoException.class, () -> performanceService.buyTickets(cartDto, performance.getId(), null));
+  }
+
+  @Test
+  public void buyTicketsWithInvalidUserShouldThrow() {
+    UserDto userDto2 = new UserDto();
+    assertThrows(FatalException.class, () -> performanceService.buyTickets(cartDto, performance.getId(), userDto2));
+  }
+
+  @Test
+  public void buyValidTicketsShouldReturnRightPrice() {
+    OrderDto orderDto = performanceService.buyTickets(cartDto, performance.getId(), userDto);
+    Transaction transaction = new Transaction();
+    Set<Transaction> transactionSet = orderDto.getTransactions();
+    for (Transaction trans : transactionSet) {
+      if (Objects.equals(trans.getOrder().getId(), orderDto.getId())) {
+        transaction = trans;
+      }
     }
-
-    @Test
-    public void buyValidTicketsReturnCorrectOrder() {
-        OrderDto order = performanceService.buyTickets(cartDto, performance.getId(), userDto);
-        assertThat(order)
-            .isNotNull()
-            .extracting("id", "tickets", "transactions", "paymentDetail", "deliveryAdress", "cancelled")
-            .contains(order.getId(), order.getTickets(), order.getTransactions(), paymentDetail, location, false);
-    }
-
-    @Test
-    public void buyTicketsWithNullUserShouldThrow() {
-        assertThrows(FatalException.class, () -> performanceService.buyTickets(cartDto, performance.getId(), null));
-    }
-
-    @Test
-    public void buyTicketsWithInvalidUserShouldThrow() {
-        UserDto userDto2 = new UserDto();
-        assertThrows(FatalException.class, () -> performanceService.buyTickets(cartDto, performance.getId(), userDto2));
-    }
-
-    @Test
-    public void buyValidTicketsShouldReturnRightPrice() {
-        OrderDto orderDto = performanceService.buyTickets(cartDto, performance.getId(), userDto);
-        Transaction transaction = new Transaction();
-        Set<Transaction> transactionSet = orderDto.getTransactions();
-        for (Transaction trans : transactionSet) {
-            if (Objects.equals(trans.getOrder().getId(), orderDto.getId())) {
-                transaction = trans;
-            }
-        }
-        assertThat(transaction.getDeductedAmount())
-            .isNotNull()
-            .isEqualTo(BigDecimal.valueOf(150.0));
-    }
+    assertThat(transaction.getDeductedAmount())
+        .isNotNull()
+        .isEqualTo(new BigDecimal("150.00"));
+  }
 }

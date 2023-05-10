@@ -15,6 +15,7 @@ public class SeatMapper {
     public CartSeatDto seatToCartSeatDto(Seat seat) {
         LOGGER.trace("seatToCartSeatDto({})", seat);
         CartSeatDto cartSeatDto = new CartSeatDto();
+        cartSeatDto.setId(seat.getId());
         cartSeatDto.setNumber(seat.getNumber());
         cartSeatDto.setRow(seat.getRow());
         cartSeatDto.setSector(seat.getSector());
@@ -27,6 +28,7 @@ public class SeatMapper {
     public Seat cartSeatDtoToSeat(CartSeatDto cartSeatDto) {
         LOGGER.trace("cartSeatDtoToSeat({})", cartSeatDto);
         Seat seat = new Seat();
+        seat.setId(cartSeatDto.getId());
         seat.setNumber(cartSeatDto.getNumber());
         seat.setRow(cartSeatDto.getRow());
         seat.setSector(cartSeatDto.getSector());

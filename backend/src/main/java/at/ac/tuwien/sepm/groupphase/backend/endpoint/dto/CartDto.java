@@ -4,8 +4,9 @@ import java.util.List;
 
 public class CartDto {
     int id;
-
     List<CartSeatDto> seats;
+    PerformanceDto performanceDto;
+
 
     public void setId(int id) {
         this.id = id;

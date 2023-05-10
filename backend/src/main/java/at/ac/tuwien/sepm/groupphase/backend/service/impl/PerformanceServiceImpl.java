@@ -11,19 +11,22 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Seat;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
+import at.ac.tuwien.sepm.groupphase.backend.exception.DtoException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.OrderRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SeatRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.TransactionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.PerformanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,11 +47,13 @@ public class PerformanceServiceImpl implements PerformanceService {
     private final OrderMapper orderMapper;
     private final TransactionRepository transactionRepository;
     private final SeatMapper seatMapper;
+    private final TicketRepository ticketRepository;
+    private final SeatRepository seatRepository;
 
-
+    @Autowired
     public PerformanceServiceImpl(OrderRepository orderRepository, PerformanceRepository performanceRepository, UserRepository userRepository,
                                   NotUserRepository notUserRepository, OrderMapper orderMapper, TransactionRepository transactionRepository,
-                                  SeatMapper seatMapper) {
+                                  SeatMapper seatMapper, TicketRepository ticketRepository, SeatRepository seatRepository) {
         this.orderRepository = orderRepository;
         this.performanceRepository = performanceRepository;
         this.userRepository = userRepository;
@@ -56,6 +61,8 @@ public class PerformanceServiceImpl implements PerformanceService {
         this.orderMapper = orderMapper;
         this.transactionRepository = transactionRepository;
         this.seatMapper = seatMapper;
+        this.ticketRepository = ticketRepository;
+        this.seatRepository = seatRepository;
     }
 
     @Transactional
@@ -67,37 +74,46 @@ public class PerformanceServiceImpl implements PerformanceService {
         // wenn login implementiert dann UserRepository zu interface machen
 
         if (cartDto == null) {
-            throw new FatalException("Cart cannot be null");
+            throw new DtoException("Cart cannot be null");
         }
         if (userDto == null) {
-            throw new FatalException("User cannot be null");
+            throw new DtoException("User cannot be null");
         }
+
         Optional<ApplicationUser> optionalApplicationUser = notUserRepository.findById(userDto.getId());
         if (optionalApplicationUser.isEmpty()) {
             throw new FatalException("Could not find User");
         }
         ApplicationUser user = optionalApplicationUser.get();
 
-        Set<Ticket> tickets = new HashSet<>();
+        //performance
+        Performance performance = performanceRepository.findPerformanceById(performanceId);
+        if (performance == null) {
+            throw new FatalException("Could not find Performance");
+        }
+
+        //create order
         Order order = new Order();
         order.setUser(user);
         order.setCancelled(false);
         order.setOrderTs(LocalDateTime.now());
+        order.setDeliveryAdress(userDto.getLocations().iterator().next());
+        order.setPaymentDetail(userDto.getPaymentDetails().iterator().next());
+        orderRepository.save(order);
 
-        //Seats
+        Set<Ticket> tickets = new HashSet<>();
+        //Tickets
         for (CartSeatDto cartSeatDto : cartDto.getSeats()) {
-            Ticket ticket = new Ticket();
-            Optional<Performance> performanceOptional = performanceRepository.findById(performanceId);
-            if (performanceOptional.isEmpty()) {
-                throw new FatalException("Could not find Performance");
+            Ticket ticket = ticketRepository.findTicketBySeatId(cartSeatDto.getId());
+            if (ticket == null) {
+                throw new FatalException("Could not find Ticket");
             }
-            ticket.setPerformance(performanceOptional.get());
-            Seat seat = seatMapper.cartSeatDtoToSeat(cartSeatDto);
-            ticket.setSeat(seat);
+
             ticket.setOrder(order);
             tickets.add(ticket);
         }
 
+        //Price
         BigDecimal price = new BigDecimal(0);
         boolean help = false;
         for (Ticket ticket : tickets) {
@@ -128,8 +144,7 @@ public class PerformanceServiceImpl implements PerformanceService {
 
 
         order.setTransactions(transactionSet);
-        order.setDeliveryAdress(userDto.getLocations().iterator().next());
-        order.setPaymentDetail(userDto.getPaymentDetails().iterator().next());
+
 
         //Saving Order in PaymentDetail
         PaymentDetail paymentDetail = user.getPaymentDetails().iterator().next();
@@ -141,7 +156,6 @@ public class PerformanceServiceImpl implements PerformanceService {
         paymentDetail.setOrders(orders);
 
 
-        orderRepository.save(order);
         transactionRepository.save(transaction);
         return orderMapper.orderToDto(order);
     }
