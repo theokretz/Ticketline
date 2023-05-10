@@ -4,9 +4,7 @@ import java.util.List;
 
 public class CartDto {
     int id;
-    List<CartSeatDto> seats;
-    PerformanceDto performanceDto;
-
+    List<CartTicketDto> tickets;
 
     public void setId(int id) {
         this.id = id;
@@ -16,12 +14,12 @@ public class CartDto {
         return id;
     }
 
-    public List<CartSeatDto> getSeats() {
-        return seats;
+    public List<CartTicketDto> getTickets() {
+        return tickets;
     }
 
-    public void setSeats(List<CartSeatDto> seats) {
-        this.seats = seats;
+    public void setTickets(List<CartTicketDto> tickets) {
+        this.tickets = tickets;
     }
 
     @Override
@@ -30,9 +28,7 @@ public class CartDto {
             +
             "id=" + id
             +
-            ", seats=" + seats
-            +
-            ", performanceDto=" + performanceDto
+            ", seats=" + tickets
             +
             '}';
     }

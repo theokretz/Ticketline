@@ -4,7 +4,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepm.groupphase.backend.service.PerformanceService;
+import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
@@ -23,25 +23,25 @@ import java.lang.invoke.MethodHandles;
 
 
 @RestController
-@RequestMapping(value = "/api/v1/performances")
-public class PerformanceEndpoint {
-    private final PerformanceService performanceService;
+@RequestMapping(value = "/api/v1/bookings")
+public class BookingEndpoint {
+    private final OrderService orderService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
-    public PerformanceEndpoint(PerformanceService performanceService) {
-        this.performanceService = performanceService;
+    public BookingEndpoint(OrderService orderService) {
+        this.orderService = orderService;
     }
 
     @Secured("ROLE_USER")
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Buy Tickets from Cart", security = @SecurityRequirement(name = "apiKey"))
-    public OrderDto buyTickets(@RequestBody CartDto cartDto, int performanceId, UserDto userDto) {
-        LOGGER.info("POST /api/v1/bookings  cart: {}, performanceId{}, user: {}", cartDto, performanceId, userDto);
+    public OrderDto buyTickets(@RequestBody CartDto cartDto, UserDto userDto) {
+        LOGGER.info("POST /api/v1/bookings  cart: {}, user: {}", cartDto, userDto);
         try {
-            return this.performanceService.buyTickets(cartDto, performanceId, userDto);
+            return this.orderService.buyTickets(cartDto, userDto);
         } catch (NotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }

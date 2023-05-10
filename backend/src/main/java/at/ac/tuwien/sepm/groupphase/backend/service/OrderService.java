@@ -6,16 +6,15 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
 
 
 /**
- * The interface Performance service.
+ * The interface Order service.
  */
-public interface PerformanceService {
+public interface OrderService {
     /**
      * Buy tickets returns order dto.
      *
-     * @param cartDto       the cart dto
-     * @param performanceId the performance id
-     * @param userDto       the user dto
+     * @param cartDto the cart dto
+     * @param userDto the user dto
      * @return the order dto
      */
-    OrderDto buyTickets(CartDto cartDto, int performanceId, UserDto userDto);
+    OrderDto buyTickets(CartDto cartDto, UserDto userDto);
 }

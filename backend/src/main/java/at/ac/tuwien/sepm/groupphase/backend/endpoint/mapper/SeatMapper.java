@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartSeatDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SeatDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Seat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,28 +12,28 @@ import java.lang.invoke.MethodHandles;
 public class SeatMapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public CartSeatDto seatToCartSeatDto(Seat seat) {
-        LOGGER.trace("seatToCartSeatDto({})", seat);
-        CartSeatDto cartSeatDto = new CartSeatDto();
-        cartSeatDto.setId(seat.getId());
-        cartSeatDto.setNumber(seat.getNumber());
-        cartSeatDto.setRow(seat.getRow());
-        cartSeatDto.setSector(seat.getSector());
+    public SeatDto seatToDto(Seat seat) {
+        LOGGER.trace("SeatDto({})", seat);
+        SeatDto seatDto = new SeatDto();
+        seatDto.setId(seat.getId());
+        seatDto.setNumber(seat.getNumber());
+        seatDto.setRow(seat.getRow());
+        seatDto.setSector(seat.getSector());
         if (seat.getTickets() != null) {
-            cartSeatDto.setTickets(seat.getTickets());
+            seatDto.setTickets(seat.getTickets());
         }
-        return cartSeatDto;
+        return seatDto;
     }
 
-    public Seat cartSeatDtoToSeat(CartSeatDto cartSeatDto) {
-        LOGGER.trace("cartSeatDtoToSeat({})", cartSeatDto);
+    public Seat dtoToSeat(SeatDto seatDto) {
+        LOGGER.trace("dtoToSeat({})", seatDto);
         Seat seat = new Seat();
-        seat.setId(cartSeatDto.getId());
-        seat.setNumber(cartSeatDto.getNumber());
-        seat.setRow(cartSeatDto.getRow());
-        seat.setSector(cartSeatDto.getSector());
-        if (cartSeatDto.getTickets() != null) {
-            seat.setTickets(cartSeatDto.getTickets());
+        seat.setId(seatDto.getId());
+        seat.setNumber(seatDto.getNumber());
+        seat.setRow(seatDto.getRow());
+        seat.setSector(seatDto.getSector());
+        if (seatDto.getTickets() != null) {
+            seat.setTickets(seatDto.getTickets());
         }
         return seat;
     }
