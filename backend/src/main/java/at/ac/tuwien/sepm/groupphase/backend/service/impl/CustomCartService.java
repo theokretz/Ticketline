@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,11 +38,11 @@ public class CustomCartService implements CartService {
         this.ticketRepository = ticketRepository;
         this.notUserRepository = notUserRepository;
         this.reservationRepository = reservationRepository;
-        ;
     }
 
     @Override
     public List<CartTicketDto> getCart(Integer userId) {
+        LOGGER.debug("Get Cart of User {}", userId);
         Optional<ApplicationUser> optionalApplicationUser = notUserRepository.findById(userId);
         if (optionalApplicationUser.isEmpty()) {
             throw new NotFoundException("Could not find User");
@@ -53,6 +54,17 @@ public class CustomCartService implements CartService {
         for (Reservation r : reservationSet) {
             if (r.getCart()) {
                 Ticket ticket = r.getTicket();
+                int seatRow = ticket.getSeat().getRow();
+                int seatNumber = ticket.getSeat().getNumber();
+                String sectorName = ticket.getSeat().getSector().getName();
+                boolean standing = ticket.getSeat().getSector().getStanding();
+                LocalDateTime date = ticket.getPerformance().getDatetime();
+                String eventName = ticket.getPerformance().getEvent().getName();
+                String hallName = ticket.getPerformance().getHall().getName();
+                String locationCity = ticket.getPerformance().getHall().getLocation().getCity();
+                String locationStreet = ticket.getPerformance().getHall().getLocation().getStreet();
+
+                //price
                 BigDecimal price = new BigDecimal(-1);
                 for (PerformanceSector perfSector : ticket.getSeat().getSector().getPerformanceSectors()) {
                     if (perfSector.getPerformance() == ticket.getPerformance()) {
@@ -65,15 +77,15 @@ public class CustomCartService implements CartService {
 
                 CartTicketDto cartTicketDto = CartTicketDto.CartTicketDtoBuilder.aCartTicketDto()
                     .withId(ticket.getId())
-                    .withSeatRow(ticket.getSeat().getRow())
-                    .withSeatNumber(ticket.getSeat().getNumber())
-                    .withSectorName(ticket.getSeat().getSector().getName())
-                    .withStanding(ticket.getSeat().getSector().getStanding())
-                    .withDate(ticket.getPerformance().getDatetime())
-                    .withEventName(ticket.getPerformance().getEvent().getName())
-                    .withHallName(ticket.getPerformance().getHall().getName())
-                    .withLocationCity(ticket.getPerformance().getHall().getLocation().getCity())
-                    .withLocationStreet(ticket.getPerformance().getHall().getLocation().getStreet())
+                    .withSeatRow(seatRow)
+                    .withSeatNumber(seatNumber)
+                    .withSectorName(sectorName)
+                    .withStanding(standing)
+                    .withDate(date)
+                    .withEventName(eventName)
+                    .withHallName(hallName)
+                    .withLocationCity(locationCity)
+                    .withLocationStreet(locationStreet)
                     .withPrice(price)
                     .build();
                 tickets.add(cartTicketDto);
