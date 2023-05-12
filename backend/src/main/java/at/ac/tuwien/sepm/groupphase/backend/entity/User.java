@@ -190,5 +190,124 @@ public class User {
         this.locations = locations;
     }
 
-}
 
+    public static final class UserBuilder {
+        private Integer id;
+        private Boolean admin;
+        private String firstName;
+        private String lastName;
+        private String email;
+        private String password;
+        private String salt;
+        private Integer points;
+        private String passwordResetToken;
+        private LocalDateTime passwordResetTs;
+        private Boolean locked;
+        private Set<Order> orders;
+        private Set<PaymentDetail> paymentDetails;
+        private Set<Reservation> reservations;
+        private Set<Location> locations;
+
+        private UserBuilder() {
+        }
+
+        public static UserBuilder aUser() {
+            return new UserBuilder();
+        }
+
+        public UserBuilder withId(final Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public UserBuilder withAdmin(final Boolean admin) {
+            this.admin = admin;
+            return this;
+        }
+
+        public UserBuilder withFirstName(final String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public UserBuilder withLastName(final String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public UserBuilder withEmail(final String email) {
+            this.email = email;
+            return this;
+        }
+
+        public UserBuilder withPassword(final String password) {
+            this.password = password;
+            return this;
+        }
+
+        public UserBuilder withSalt(final String salt) {
+            this.salt = salt;
+            return this;
+        }
+
+        public UserBuilder withPoints(final Integer points) {
+            this.points = points;
+            return this;
+        }
+
+        public UserBuilder withPasswordResetToken(final String passwordResetToken) {
+            this.passwordResetToken = passwordResetToken;
+            return this;
+        }
+
+        public UserBuilder withPasswordResetTs(final LocalDateTime passwordResetTs) {
+            this.passwordResetTs = passwordResetTs;
+            return this;
+        }
+
+        public UserBuilder withLocked(final Boolean locked) {
+            this.locked = locked;
+            return this;
+        }
+
+        public UserBuilder withOrders(final Set<Order> orders) {
+            this.orders = orders;
+            return this;
+        }
+
+        public UserBuilder withPaymentDetails(final Set<PaymentDetail> paymentDetails) {
+            this.paymentDetails = paymentDetails;
+            return this;
+        }
+
+        public UserBuilder withReservations(final Set<Reservation> reservations) {
+            this.reservations = reservations;
+            return this;
+        }
+
+        public UserBuilder withLocations(final Set<Location> locations) {
+            this.locations = locations;
+            return this;
+        }
+
+        public User build() {
+            User user = new User();
+            user.setId(id);
+            user.setAdmin(admin);
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setEmail(email);
+            user.setPassword(password);
+            user.setSalt(salt);
+            user.setPoints(points);
+            user.setPasswordResetToken(passwordResetToken);
+            user.setPasswordResetTs(passwordResetTs);
+            user.setLocked(locked);
+            user.setOrders(orders);
+            user.setPaymentDetails(paymentDetails);
+            user.setReservations(reservations);
+            user.setLocations(locations);
+            return user;
+        }
+    }
+}

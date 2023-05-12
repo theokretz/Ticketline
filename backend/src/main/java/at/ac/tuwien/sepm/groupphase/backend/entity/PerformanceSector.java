@@ -76,5 +76,55 @@ public class PerformanceSector {
         this.sector = sector;
     }
 
+
+    public static final class PerformanceSectorBuilder {
+        private Integer id;
+        private BigDecimal price;
+        private Integer pointsReward;
+        private Performance performance;
+        private Sector sector;
+
+        private PerformanceSectorBuilder() {
+        }
+
+        public static PerformanceSectorBuilder aPerformanceSector() {
+            return new PerformanceSectorBuilder();
+        }
+
+        public PerformanceSectorBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public PerformanceSectorBuilder withPrice(BigDecimal price) {
+            this.price = price;
+            return this;
+        }
+
+        public PerformanceSectorBuilder withPointsReward(Integer pointsReward) {
+            this.pointsReward = pointsReward;
+            return this;
+        }
+
+        public PerformanceSectorBuilder withPerformance(Performance performance) {
+            this.performance = performance;
+            return this;
+        }
+
+        public PerformanceSectorBuilder withSector(Sector sector) {
+            this.sector = sector;
+            return this;
+        }
+
+        public PerformanceSector build() {
+            PerformanceSector performanceSector = new PerformanceSector();
+            performanceSector.setId(id);
+            performanceSector.setPrice(price);
+            performanceSector.setPointsReward(pointsReward);
+            performanceSector.setPerformance(performance);
+            performanceSector.setSector(sector);
+            return performanceSector;
+        }
+    }
 }
 

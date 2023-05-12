@@ -66,4 +66,55 @@ public class Location {
         this.country = country;
     }
 
+
+    public static final class LocationBuilder {
+        private Integer id;
+        private Integer postalCode;
+        private String street;
+        private String city;
+        private String country;
+
+        private LocationBuilder() {
+        }
+
+        public static LocationBuilder aLocation() {
+            return new LocationBuilder();
+        }
+
+        public LocationBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public LocationBuilder withPostalCode(Integer postalCode) {
+            this.postalCode = postalCode;
+            return this;
+        }
+
+        public LocationBuilder withStreet(String street) {
+            this.street = street;
+            return this;
+        }
+
+        public LocationBuilder withCity(String city) {
+            this.city = city;
+            return this;
+        }
+
+        public LocationBuilder withCountry(String country) {
+            this.country = country;
+            return this;
+        }
+
+        public Location build() {
+            Location location = new Location();
+            location.setId(id);
+            location.setPostalCode(postalCode);
+            location.setStreet(street);
+            location.setCity(city);
+            location.setCountry(country);
+            return location;
+        }
+    }
+
 }
