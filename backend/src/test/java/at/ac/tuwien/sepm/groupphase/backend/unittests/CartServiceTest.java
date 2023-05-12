@@ -2,7 +2,6 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.SeatMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
@@ -13,24 +12,22 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Seat;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
-import at.ac.tuwien.sepm.groupphase.backend.exception.DtoException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.EventRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.HallRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.OrderRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PaymentDetailRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceSectorRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ReservationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SeatRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SectorRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
-import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
+import at.ac.tuwien.sepm.groupphase.backend.service.CartService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -44,20 +41,19 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class OrderServiceTest {
+public class CartServiceTest {
 
     @Autowired
     private OrderRepository orderRepository;
@@ -66,7 +62,7 @@ public class OrderServiceTest {
     private PerformanceRepository performanceRepository;
 
     @Autowired
-    private OrderService orderService;
+    private CartService cartService;
 
     @Autowired
     private EventRepository eventRepository;
@@ -75,7 +71,7 @@ public class OrderServiceTest {
     private HallRepository hallRepository;
 
     @Autowired
-    private NotUserRepository NotUserRepository;
+    private at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository NotUserRepository;
     @Autowired
     private LocationRepository locationRepository;
 
@@ -98,6 +94,8 @@ public class OrderServiceTest {
     private TicketRepository ticketRepository;
     @Autowired
     private SeatMapper seatMapper;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     private Performance performance;
     private ApplicationUser user;
@@ -119,6 +117,8 @@ public class OrderServiceTest {
     private CartDto cartDto;
     private Ticket standingTicket;
     private Ticket seatedTicket;
+    private Reservation reservation1;
+    private Reservation reservation2;
 
     @BeforeAll
     public void beforeAll() {
@@ -245,43 +245,25 @@ public class OrderServiceTest {
         ticketList.add(cartTicketDtoSeated);
         ticketList.add(cartTicketDtoStanding);
         cartDto.setTickets(ticketList);
+
+        reservation1 = new Reservation();
+        reservation2 = new Reservation();
+        reservation1.setUser(user);
+        reservation1.setExpirationTs(OffsetDateTime.now());
+        reservation1.setCart(true);
+        reservation1.setTicket(seatedTicket);
+        reservationRepository.save(reservation1);
+
+        reservation2.setUser(user);
+        reservation2.setExpirationTs(OffsetDateTime.now());
+        reservation2.setCart(true);
+        reservation2.setTicket(standingTicket);
+        reservationRepository.save(reservation2);
     }
 
     @Test
-    public void buyValidTicketsReturnCorrectOrder() {
-
-        OrderDto order = orderService.buyTickets(cartDto, userDto);
-        // Order orderRep = orderRepository.getReferenceById(order.getId());
-        assertThat(order)
-            .isNotNull()
-            .extracting("id", "tickets", "transactions", "paymentDetail", "deliveryAdress", "cancelled")
-            .contains(order.getId(), order.getTickets(), order.getTransactions(), paymentDetail, location, false);
-    }
-
-    @Test
-    public void buyTicketsWithNullUserShouldThrow() {
-        assertThrows(DtoException.class, () -> orderService.buyTickets(cartDto, null));
-    }
-
-    @Test
-    public void buyTicketsWithInvalidUserShouldThrow() {
-        UserDto userDto2 = new UserDto();
-        assertThrows(NotFoundException.class, () -> orderService.buyTickets(cartDto, userDto2));
-    }
-
-    @Test
-    public void buyValidTicketsShouldReturnRightPrice() {
-        OrderDto orderDto = orderService.buyTickets(cartDto, userDto);
-        Transaction transaction = new Transaction();
-        Set<Transaction> transactionSet = orderDto.getTransactions();
-        for (Transaction trans : transactionSet) {
-            if (Objects.equals(trans.getOrder().getId(), orderDto.getId())) {
-                transaction = trans;
-            }
-        }
-
-        assertThat(transaction.getDeductedAmount())
-            .isNotNull()
-            .isEqualTo(new BigDecimal("150.00"));
+    public void getCartShouldReturnTickets() {
+        List<CartTicketDto> list = cartService.getCart(user.getId());
+        assertThat(list).isNotEmpty();
     }
 }
