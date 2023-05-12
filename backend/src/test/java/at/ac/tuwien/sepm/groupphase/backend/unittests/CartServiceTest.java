@@ -123,21 +123,22 @@ public class CartServiceTest {
     @BeforeAll
     public void beforeAll() {
         event = new Event();
-        event.setName("The Eras Tour");
+        event.setName("The Eras Tour 2");
         event.setLength(Duration.ZERO);
         eventRepository.save(event);
 
         location = new Location();
         location.setCity("Vienna");
         location.setCountry("Austria");
-        location.setPostalCode(1120);
-        location.setStreet("Straße 1");
+        location.setPostalCode(1130);
+        location.setStreet("Straße 2");
+
         locationSet = new HashSet<>();
         locationSet.add(location);
         locationRepository.save(location);
 
         hall = new Hall();
-        hall.setName("Halle 1");
+        hall.setName("Halle 2");
         hall.setLocation(location);
         hallRepository.save(hall);
 
@@ -148,18 +149,18 @@ public class CartServiceTest {
         this.performanceRepository.save(performance);
 
         this.user = new ApplicationUser();
-        this.user.setEmail("hallo@123");
+        this.user.setEmail("hallo@12334");
         this.user.setAdmin(false);
-        this.user.setFirstName("Theo");
-        this.user.setLastName("Kretz");
+        this.user.setFirstName("Vanesa");
+        this.user.setLastName("Besheva");
         this.user.setPassword("Password");
         this.user.setLocked(false);
-        this.user.setSalt("asdjaslkdjaös");
+        this.user.setSalt("asdjaslkdjaösasd");
         this.user.setPoints(10000);
 
         paymentDetail = new PaymentDetail();
         paymentDetail.setCvv(222);
-        paymentDetail.setCardHolder("hallo");
+        paymentDetail.setCardHolder("hallo2");
         paymentDetail.setCardNumber(23123131);
         paymentDetail.setExpirationDate(LocalDate.now());
         paymentDetail.setUser(user);
