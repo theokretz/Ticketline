@@ -212,13 +212,13 @@ public class CartServiceTest {
 
         standingSeat = new Seat();
         standingSeat.setSector(standingSector);
-        standingSeat.setRow(5);
-        standingSeat.setNumber(5);
+        standingSeat.setRow(6);
+        standingSeat.setNumber(6);
         seatRepository.save(standingSeat);
 
         seatedSeat = new Seat();
-        seatedSeat.setNumber(1);
-        seatedSeat.setRow(1);
+        seatedSeat.setNumber(2);
+        seatedSeat.setRow(2);
         seatedSeat.setSector(seatedSector);
         seatRepository.save(seatedSeat);
 
