@@ -45,7 +45,7 @@ public class CartEndpoint {
         try {
             return cartService.getCart(userId);
         } catch (NotFoundException e) {
-            LOGGER.info("Unable to buy Tickets: " + e.getMessage());
+            LOGGER.info("Unable to get cart: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
