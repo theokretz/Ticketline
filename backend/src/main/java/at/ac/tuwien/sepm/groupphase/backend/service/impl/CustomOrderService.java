@@ -15,7 +15,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
 import at.ac.tuwien.sepm.groupphase.backend.exception.DtoException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.OrderRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceRepository;
@@ -34,11 +34,12 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public class CustomOrderService implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final OrderRepository orderRepository;
     private final PerformanceRepository performanceRepository;
@@ -51,9 +52,9 @@ public class OrderServiceImpl implements OrderService {
     private final SeatRepository seatRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, PerformanceRepository performanceRepository, UserRepository userRepository,
-                            NotUserRepository notUserRepository, OrderMapper orderMapper, TransactionRepository transactionRepository,
-                            SeatMapper seatMapper, TicketRepository ticketRepository, SeatRepository seatRepository) {
+    public CustomOrderService(OrderRepository orderRepository, PerformanceRepository performanceRepository, UserRepository userRepository,
+                              NotUserRepository notUserRepository, OrderMapper orderMapper, TransactionRepository transactionRepository,
+                              SeatMapper seatMapper, TicketRepository ticketRepository, SeatRepository seatRepository) {
         this.orderRepository = orderRepository;
         this.performanceRepository = performanceRepository;
         this.userRepository = userRepository;
@@ -69,10 +70,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto buyTickets(CartDto cartDto, UserDto userDto) {
         LOGGER.debug("Buy Tickets from Cart {}, UserDto: {}", cartDto, userDto);
-        // ApplicationUser user = userRepository.findUserByEmail(userDto.getEmail());
-        // geht nicht weil ich in Test den user mit notUserRepository speichere
-        // wenn login implementiert dann UserRepository zu interface machen
-
         if (cartDto == null) {
             throw new DtoException("Cart cannot be null");
         }
@@ -80,9 +77,14 @@ public class OrderServiceImpl implements OrderService {
             throw new DtoException("User cannot be null");
         }
 
+        // ApplicationUser user = userRepository.findUserByEmail(userDto.getEmail());
+        // geht nicht weil ich in Test den user mit notUserRepository speichere
+        // wenn login implementiert dann UserRepository zu interface machen
+
+
         Optional<ApplicationUser> optionalApplicationUser = notUserRepository.findById(userDto.getId());
         if (optionalApplicationUser.isEmpty()) {
-            throw new FatalException("Could not find User");
+            throw new NotFoundException("Could not find User");
         }
         ApplicationUser user = optionalApplicationUser.get();
 
@@ -92,6 +94,7 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
         order.setCancelled(false);
         order.setOrderTs(LocalDateTime.now());
+        //TODO: Nullpointer?
         order.setDeliveryAdress(userDto.getLocations().iterator().next());
         order.setPaymentDetail(userDto.getPaymentDetails().iterator().next());
         orderRepository.save(order);
@@ -99,9 +102,9 @@ public class OrderServiceImpl implements OrderService {
         Set<Ticket> tickets = new HashSet<>();
         //Tickets
         for (CartTicketDto cartTicketDto : cartDto.getTickets()) {
-            Ticket ticket = ticketRepository.findTicketBySeatId(cartTicketDto.getSeat().getId());
+            Ticket ticket = ticketRepository.findTicketById(cartTicketDto.getId());
             if (ticket == null) {
-                throw new FatalException("Could not find Ticket");
+                throw new NotFoundException("Could not find Ticket");
             }
 
             ticket.setOrder(order);
@@ -116,7 +119,7 @@ public class OrderServiceImpl implements OrderService {
             Performance performance = ticket.getPerformance();
             Set<PerformanceSector> performanceSectors = sector.getPerformanceSectors();
             for (PerformanceSector perfSector : performanceSectors) {
-                if (perfSector.getPerformance().getId() == performance.getId() && !help && perfSector.getSector() == sector) {
+                if (Objects.equals(perfSector.getPerformance().getId(), performance.getId()) && !help && perfSector.getSector() == sector) {
                     price = price.add(perfSector.getPrice());
                     help = true;
                 }
@@ -153,6 +156,6 @@ public class OrderServiceImpl implements OrderService {
 
 
         transactionRepository.save(transaction);
-        return orderMapper.orderToDto(order);
+        return orderMapper.orderToOrderDto(order);
     }
 }

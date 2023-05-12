@@ -10,10 +10,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     /**
-     * Find ticket by seat id.
+     * Find ticket by id.
      *
-     * @param id the id of the seat
+     * @param id the id of the ticket
      * @return the ticket
      */
-    Ticket findTicketBySeatId(Integer id);
+    Ticket findTicketById(Integer id);
 }

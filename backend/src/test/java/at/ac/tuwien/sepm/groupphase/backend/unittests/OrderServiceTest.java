@@ -18,7 +18,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
 import at.ac.tuwien.sepm.groupphase.backend.exception.DtoException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.EventRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.HallRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
@@ -231,8 +231,12 @@ public class OrderServiceTest {
 
         cartTicketDtoSeated = new CartTicketDto();
         cartTicketDtoStanding = new CartTicketDto();
-        cartTicketDtoSeated.setSeat(seatMapper.seatToDto(seatedSeat));
-        cartTicketDtoStanding.setSeat(seatMapper.seatToDto(standingSeat));
+        cartTicketDtoSeated.setId(seatedSeat.getId());
+        cartTicketDtoSeated.setSeatNumber(seatedSeat.getNumber());
+        cartTicketDtoSeated.setSeatRow(seatedSeat.getRow());
+        cartTicketDtoStanding.setId(standingSeat.getId());
+        cartTicketDtoStanding.setSeatNumber(standingSeat.getNumber());
+        cartTicketDtoStanding.setSeatRow(standingSeat.getRow());
         cartDto = new CartDto();
         List<CartTicketDto> ticketList = new ArrayList<>();
         ticketList.add(cartTicketDtoSeated);
@@ -258,7 +262,7 @@ public class OrderServiceTest {
     @Test
     public void buyTicketsWithInvalidUserShouldThrow() {
         UserDto userDto2 = new UserDto();
-        assertThrows(FatalException.class, () -> orderService.buyTickets(cartDto, userDto2));
+        assertThrows(NotFoundException.class, () -> orderService.buyTickets(cartDto, userDto2));
     }
 
     @Test
@@ -271,6 +275,7 @@ public class OrderServiceTest {
                 transaction = trans;
             }
         }
+
         assertThat(transaction.getDeductedAmount())
             .isNotNull()
             .isEqualTo(new BigDecimal("150.00"));

@@ -61,7 +61,6 @@ public class ApplicationUser {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "location_id")
     )
-
     private Set<Location> locations;
 
     public Integer getId() {
