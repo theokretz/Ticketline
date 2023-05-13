@@ -1,0 +1,35 @@
+#grid-container {
+  display: grid;
+  grid-auto-flow: row;
+  column-gap: 5px;
+  row-gap: 5px;
+}
+#grid-container > * {
+  display: contents;
+}
+
+.spot {
+  height: 2rem;
+  width: 1.5rem;
+}
+
+.seat {
+  border: 1px solid black;
+  border-radius: 0 0 10px 10px;
+}
+
+.reserved {
+  background-color: gray;
+}
+
+.seat:hover:not(.reserved):not(.legend) {
+  background-color: #ffcab5;
+}
+
+.selected {
+  background-color: #ff7641;
+}
+
+#selected-container {
+  width: 18rem;
+}
