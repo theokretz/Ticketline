@@ -75,6 +75,7 @@ public class Ticket {
         this.seat = seat;
     }
 
+
     @Override
     public String toString() {
         return "Ticket{"
@@ -84,6 +85,56 @@ public class Ticket {
             + ", performance=" + performance
             + ", seat=" + seat
             + '}';
+    }
+
+    public static final class TicketBuilder {
+        private Integer id;
+        private Reservation reservation;
+        private Order order;
+        private Performance performance;
+        private Seat seat;
+
+        private TicketBuilder() {
+        }
+
+        public static TicketBuilder aTicket() {
+            return new TicketBuilder();
+        }
+
+        public TicketBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public TicketBuilder withReservation(Reservation reservation) {
+            this.reservation = reservation;
+            return this;
+        }
+
+        public TicketBuilder withOrder(Order order) {
+            this.order = order;
+            return this;
+        }
+
+        public TicketBuilder withPerformance(Performance performance) {
+            this.performance = performance;
+            return this;
+        }
+
+        public TicketBuilder withSeat(Seat seat) {
+            this.seat = seat;
+            return this;
+        }
+
+        public Ticket build() {
+            Ticket ticket = new Ticket();
+            ticket.setId(id);
+            ticket.setReservation(reservation);
+            ticket.setOrder(order);
+            ticket.setPerformance(performance);
+            ticket.setSeat(seat);
+            return ticket;
+        }
     }
 }
 

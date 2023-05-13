@@ -10,7 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -21,7 +21,7 @@ public class Reservation {
     private Integer id;
 
     @Column(nullable = false)
-    private OffsetDateTime expirationTs;
+    private LocalDateTime expirationTs;
 
     @Column(nullable = false)
     private Boolean cart;
@@ -42,11 +42,11 @@ public class Reservation {
         this.id = id;
     }
 
-    public OffsetDateTime getExpirationTs() {
+    public LocalDateTime getExpirationTs() {
         return expirationTs;
     }
 
-    public void setExpirationTs(final OffsetDateTime expirationTs) {
+    public void setExpirationTs(final LocalDateTime expirationTs) {
         this.expirationTs = expirationTs;
     }
 
@@ -74,6 +74,7 @@ public class Reservation {
         this.user = user;
     }
 
+
     @Override
     public String toString() {
         return "Reservation{"
@@ -83,5 +84,56 @@ public class Reservation {
             + ", ticket=" + ticket
             + ", user=" + user
             + '}';
+    }
+
+
+    public static final class ReservationBuilder {
+        private Integer id;
+        private LocalDateTime expirationTs;
+        private Boolean cart;
+        private Ticket ticket;
+        private ApplicationUser user;
+
+        private ReservationBuilder() {
+        }
+
+        public static ReservationBuilder aReservation() {
+            return new ReservationBuilder();
+        }
+
+        public ReservationBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public ReservationBuilder withExpirationTs(LocalDateTime expirationTs) {
+            this.expirationTs = expirationTs;
+            return this;
+        }
+
+        public ReservationBuilder withCart(Boolean cart) {
+            this.cart = cart;
+            return this;
+        }
+
+        public ReservationBuilder withTicket(Ticket ticket) {
+            this.ticket = ticket;
+            return this;
+        }
+
+        public ReservationBuilder withUser(ApplicationUser user) {
+            this.user = user;
+            return this;
+        }
+
+        public Reservation build() {
+            Reservation reservation = new Reservation();
+            reservation.setId(id);
+            reservation.setExpirationTs(expirationTs);
+            reservation.setCart(cart);
+            reservation.setTicket(ticket);
+            reservation.setUser(user);
+            return reservation;
+        }
     }
 }

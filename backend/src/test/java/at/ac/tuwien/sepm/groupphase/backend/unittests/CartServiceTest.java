@@ -3,7 +3,6 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.SeatMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Event;
@@ -41,7 +40,6 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -92,8 +90,7 @@ public class CartServiceTest {
 
     @Autowired
     private TicketRepository ticketRepository;
-    @Autowired
-    private SeatMapper seatMapper;
+
     @Autowired
     private ReservationRepository reservationRepository;
 
@@ -250,13 +247,13 @@ public class CartServiceTest {
         reservation1 = new Reservation();
         reservation2 = new Reservation();
         reservation1.setUser(user);
-        reservation1.setExpirationTs(OffsetDateTime.now());
+        reservation1.setExpirationTs(LocalDateTime.now());
         reservation1.setCart(true);
         reservation1.setTicket(seatedTicket);
         reservationRepository.save(reservation1);
 
         reservation2.setUser(user);
-        reservation2.setExpirationTs(OffsetDateTime.now());
+        reservation2.setExpirationTs(LocalDateTime.now());
         reservation2.setCart(true);
         reservation2.setTicket(standingTicket);
         reservationRepository.save(reservation2);

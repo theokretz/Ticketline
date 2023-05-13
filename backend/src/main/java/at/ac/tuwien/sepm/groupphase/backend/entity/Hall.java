@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -73,6 +74,7 @@ public class Hall {
         this.sectors = sectors;
     }
 
+
     @Override
     public String toString() {
         return "Hall{"
@@ -88,5 +90,55 @@ public class Hall {
             ", sectors=" + sectors
             +
             '}';
+    }
+
+    public static final class HallBuilder {
+        private Integer id;
+        private String name;
+        private Location location;
+        private Set<Performance> performances;
+        private Set<Sector> sectors;
+
+        private HallBuilder() {
+        }
+
+        public static HallBuilder aHall() {
+            return new HallBuilder();
+        }
+
+        public HallBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public HallBuilder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public HallBuilder withLocation(Location location) {
+            this.location = location;
+            return this;
+        }
+
+        public HallBuilder withPerformances(Set<Performance> performances) {
+            this.performances = performances;
+            return this;
+        }
+
+        public HallBuilder withSectors(Set<Sector> sectors) {
+            this.sectors = sectors;
+            return this;
+        }
+
+        public Hall build() {
+            Hall hall = new Hall();
+            hall.setId(id);
+            hall.setName(name);
+            hall.setLocation(location);
+            hall.setPerformances(performances);
+            hall.setSectors(sectors);
+            return hall;
+        }
     }
 }

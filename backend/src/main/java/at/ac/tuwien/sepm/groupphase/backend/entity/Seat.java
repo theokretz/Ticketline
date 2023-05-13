@@ -23,10 +23,10 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, unique = true, name = "\"row\"")
+    @Column(nullable = false, name = "\"row\"")
     private Integer row;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private Integer number;
 
     @OneToMany(mappedBy = "seat")
@@ -76,6 +76,7 @@ public class Seat {
         this.sector = sector;
     }
 
+
     @Override
     public String toString() {
         return "Seat{"
@@ -85,5 +86,62 @@ public class Seat {
             + ", tickets=" + tickets
             + ", sector=" + sector
             + '}';
+    }
+
+    public static final class SeatBuilder {
+        private Integer id;
+        private Integer row;
+        private Integer number;
+        private Set<Ticket> tickets;
+        private Sector sector;
+
+
+        private SeatBuilder() {
+        }
+
+        public static SeatBuilder aSeat() {
+            return new SeatBuilder();
+        }
+
+
+        public SeatBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+
+        public SeatBuilder withRow(Integer row) {
+            this.row = row;
+            return this;
+        }
+
+
+        public SeatBuilder withNumber(Integer number) {
+            this.number = number;
+            return this;
+        }
+
+
+        public SeatBuilder withTickets(Set<Ticket> tickets) {
+            this.tickets = tickets;
+            return this;
+        }
+
+
+        public SeatBuilder withSector(Sector sector) {
+            this.sector = sector;
+            return this;
+        }
+
+
+        public Seat build() {
+            Seat seat = new Seat();
+            seat.setId(id);
+            seat.setRow(row);
+            seat.setNumber(number);
+            seat.setTickets(tickets);
+            seat.setSector(sector);
+            return seat;
+        }
     }
 }

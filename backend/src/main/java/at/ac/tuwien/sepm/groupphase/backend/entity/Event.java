@@ -93,6 +93,7 @@ public class Event {
         this.performances = performances;
     }
 
+
     @Override
     public String toString() {
         return "Event{"
@@ -112,5 +113,69 @@ public class Event {
             ", performances=" + performances
             +
             '}';
+    }
+
+    public static final class EventBuilder {
+        private Integer id;
+        private String name;
+        private String type;
+        private Duration length;
+        private String description;
+        private Set<Artist> artists;
+        private Set<Performance> performances;
+
+        private EventBuilder() {
+        }
+
+        public static EventBuilder aEvent() {
+            return new EventBuilder();
+        }
+
+        public EventBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public EventBuilder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public EventBuilder withType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public EventBuilder withLength(Duration length) {
+            this.length = length;
+            return this;
+        }
+
+        public EventBuilder withDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public EventBuilder withArtists(Set<Artist> artists) {
+            this.artists = artists;
+            return this;
+        }
+
+        public EventBuilder withPerformances(Set<Performance> performances) {
+            this.performances = performances;
+            return this;
+        }
+
+        public Event build() {
+            Event event = new Event();
+            event.setId(id);
+            event.setName(name);
+            event.setType(type);
+            event.setLength(length);
+            event.setDescription(description);
+            event.setArtists(artists);
+            event.setPerformances(performances);
+            return event;
+        }
     }
 }

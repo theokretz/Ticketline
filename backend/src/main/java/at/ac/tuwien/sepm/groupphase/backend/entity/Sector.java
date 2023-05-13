@@ -84,6 +84,7 @@ public class Sector {
         this.performanceSectors = performanceSectors;
     }
 
+
     @Override
     public String toString() {
         return "Sector{"
@@ -94,6 +95,64 @@ public class Sector {
             + ", hall=" + hall
             + ", performanceSectors=" + performanceSectors
             + '}';
+    }
+
+    public static final class SectorBuilder {
+
+        private Integer id;
+        private String name;
+        private Boolean standing;
+        private Set<Seat> seats;
+        private Hall hall;
+        private Set<PerformanceSector> performanceSectors;
+
+        private SectorBuilder() {
+        }
+
+        public static SectorBuilder aSector() {
+            return new SectorBuilder();
+        }
+
+        public SectorBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public SectorBuilder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public SectorBuilder withStanding(Boolean standing) {
+            this.standing = standing;
+            return this;
+        }
+
+        public SectorBuilder withSeats(Set<Seat> seats) {
+            this.seats = seats;
+            return this;
+        }
+
+        public SectorBuilder withHall(Hall hall) {
+            this.hall = hall;
+            return this;
+        }
+
+        public SectorBuilder withPerformanceSectors(Set<PerformanceSector> performanceSectors) {
+            this.performanceSectors = performanceSectors;
+            return this;
+        }
+
+        public Sector build() {
+            Sector sector = new Sector();
+            sector.setId(id);
+            sector.setName(name);
+            sector.setStanding(standing);
+            sector.setSeats(seats);
+            sector.setHall(hall);
+            sector.setPerformanceSectors(performanceSectors);
+            return sector;
+        }
     }
 }
 
