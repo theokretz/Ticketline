@@ -5,7 +5,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 
-describe('AuthService', () => {
+describe('PerformanceService', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
       imports: [

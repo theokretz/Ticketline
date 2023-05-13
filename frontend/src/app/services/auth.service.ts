@@ -1,21 +1,19 @@
-import {Injectable} from '@angular/core';
-import {AuthRequest} from '../dtos/auth-request';
-import {Observable} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
-import {tap} from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { AuthRequest } from '../dtos/auth-request';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { tap } from 'rxjs/operators';
 // @ts-ignore
 import jwt_decode from 'jwt-decode';
-import {Globals} from '../global/globals';
+import { Globals } from '../global/globals';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
   private authBaseUri: string = this.globals.backendUri + '/authentication';
 
-  constructor(private httpClient: HttpClient, private globals: Globals) {
-  }
+  constructor(private httpClient: HttpClient, private globals: Globals) {}
 
   /**
    * Login in the user. If it was successful, a valid JWT token will be stored
@@ -23,18 +21,20 @@ export class AuthService {
    * @param authRequest User data
    */
   loginUser(authRequest: AuthRequest): Observable<string> {
-    return this.httpClient.post(this.authBaseUri, authRequest, {responseType: 'text'})
-      .pipe(
-        tap((authResponse: string) => this.setToken(authResponse))
-      );
+    return this.httpClient
+      .post(this.authBaseUri, authRequest, { responseType: 'text' })
+      .pipe(tap((authResponse: string) => this.setToken(authResponse)));
   }
-
 
   /**
    * Check if a valid JWT token is saved in the localStorage
    */
   isLoggedIn() {
-    return !!this.getToken() && (this.getTokenExpirationDate(this.getToken()).valueOf() > new Date().valueOf());
+    return (
+      !!this.getToken() &&
+      this.getTokenExpirationDate(this.getToken()).valueOf() >
+        new Date().valueOf()
+    );
   }
 
   logoutUser() {
@@ -67,7 +67,6 @@ export class AuthService {
   }
 
   private getTokenExpirationDate(token: string): Date {
-
     const decoded: any = jwt_decode(token);
     if (decoded.exp === undefined) {
       return null;
@@ -77,5 +76,4 @@ export class AuthService {
     date.setUTCSeconds(decoded.exp);
     return date;
   }
-
 }
