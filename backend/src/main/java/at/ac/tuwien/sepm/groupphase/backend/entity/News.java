@@ -74,5 +74,55 @@ public class News {
         this.event = event;
     }
 
+
+    public static final class NewsBuilder {
+        private Integer id;
+        private String title;
+        private String content;
+        private LocalDate publicationDate;
+        private Event event;
+
+        private NewsBuilder() {
+        }
+
+        public static NewsBuilder aNews() {
+            return new NewsBuilder();
+        }
+
+        public NewsBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public NewsBuilder withTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public NewsBuilder withContent(String content) {
+            this.content = content;
+            return this;
+        }
+
+        public NewsBuilder withPublicationDate(LocalDate publicationDate) {
+            this.publicationDate = publicationDate;
+            return this;
+        }
+
+        public NewsBuilder withEvent(Event event) {
+            this.event = event;
+            return this;
+        }
+
+        public News build() {
+            News news = new News();
+            news.setId(id);
+            news.setTitle(title);
+            news.setContent(content);
+            news.setPublicationDate(publicationDate);
+            news.setEvent(event);
+            return news;
+        }
+    }
 }
 

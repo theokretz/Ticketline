@@ -14,4 +14,13 @@ public interface PerformanceSectorRepository extends JpaRepository<PerformanceSe
      * @return list of al performance sector entries that match the performance id
      */
     List<PerformanceSector> findAllByPerformanceId(int performanceId);
+
+    /**
+     * find performanceSector by sector and performance id.
+     *
+     * @param sectorId      id of the sector
+     * @param performanceId id of the performance
+     * @return the looked up performanceSector
+     */
+    PerformanceSector findBySectorIdAndPerformanceId(Integer sectorId, Integer performanceId);
 }

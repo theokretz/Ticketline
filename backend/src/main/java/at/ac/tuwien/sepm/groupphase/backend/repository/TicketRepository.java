@@ -34,4 +34,27 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
         List<Integer> ids = simpleTickets.stream().map(SimpleTicketDto::getId).collect(Collectors.toList());
         return this.findAllByIds(ids);
     }
+
+    /**
+     * Find all tickets without an order associated.
+     *
+     * @return the ticket list
+     */
+    List<Ticket> findAllByOrderIsNull();
+
+    /**
+     * Find all tickets without an order or reservation associated.
+     *
+     * @return the ticket list
+     */
+    List<Ticket> findAllByOrderIsNullAndReservationIsNull();
+
+    /**
+     * Find all tickets matching the id.
+     *
+     * @param id the ticket id
+     * @return the ticket list
+     */
+    @EntityGraph(attributePaths = {"performance", "seat", "seat.sector"})
+    List<Ticket> findByOrderId(Integer id);
 }
