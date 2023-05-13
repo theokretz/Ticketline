@@ -94,27 +94,6 @@ public class Event {
     }
 
 
-    @Override
-    public String toString() {
-        return "Event{"
-            +
-            "id=" + id
-            +
-            ", name='" + name + '\''
-            +
-            ", type='" + type + '\''
-            +
-            ", length=" + length
-            +
-            ", description='" + description + '\''
-            +
-            ", artists=" + artists
-            +
-            ", performances=" + performances
-            +
-            '}';
-    }
-
     public static final class EventBuilder {
         private Integer id;
         private String name;

@@ -75,23 +75,6 @@ public class Hall {
     }
 
 
-    @Override
-    public String toString() {
-        return "Hall{"
-            +
-            "id=" + id
-            +
-            ", name='" + name + '\''
-            +
-            ", location=" + location
-            +
-            ", performances=" + performances
-            +
-            ", sectors=" + sectors
-            +
-            '}';
-    }
-
     public static final class HallBuilder {
         private Integer id;
         private String name;

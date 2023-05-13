@@ -193,43 +193,7 @@ public class ApplicationUser {
     public void setLocations(final Set<Location> locations) {
         this.locations = locations;
     }
-
-    @Override
-    public String toString() {
-        return "ApplicationUser{"
-            +
-            "id=" + id
-            +
-            ", admin=" + admin
-            +
-            ", firstName='" + firstName + '\''
-            +
-            ", lastName='" + lastName + '\''
-            +
-            ", email='" + email + '\''
-            +
-            ", password='" + password + '\''
-            +
-            ", salt='" + salt + '\''
-            +
-            ", points=" + points
-            +
-            ", passwordResetToken='" + passwordResetToken + '\''
-            +
-            ", passwordResetTs=" + passwordResetTs
-            +
-            ", locked=" + locked
-            +
-            ", orders=" + orders
-            +
-            ", paymentDetails=" + paymentDetails
-            +
-            ", reservations=" + reservations
-            +
-            ", locations=" + locations
-            +
-            '}';
-    }
+    
 
     public static final class UserBuilder {
         private Integer id;

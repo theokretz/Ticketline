@@ -119,6 +119,7 @@ public class OrderServiceTest {
     private CartDto cartDto;
     private Ticket standingTicket;
     private Ticket seatedTicket;
+    private CartDto cartDto2;
 
     @BeforeAll
     public void beforeAll() {
@@ -148,6 +149,7 @@ public class OrderServiceTest {
         this.performanceRepository.save(performance);
 
         this.user = new ApplicationUser();
+        this.user.setId(1);
         this.user.setEmail("hallo@123");
         this.user.setAdmin(false);
         this.user.setFirstName("Theo");
@@ -244,34 +246,36 @@ public class OrderServiceTest {
         List<CartTicketDto> ticketList = new ArrayList<>();
         ticketList.add(cartTicketDtoSeated);
         ticketList.add(cartTicketDtoStanding);
+        cartDto.setUserId(1);
         cartDto.setTickets(ticketList);
+
+        cartDto2 = new CartDto();
+        cartDto2.setUserId(999);
     }
 
     @Test
     public void buyValidTicketsReturnCorrectOrder() {
 
-        OrderDto order = orderService.buyTickets(cartDto, userDto);
-        // Order orderRep = orderRepository.getReferenceById(order.getId());
+        OrderDto order = orderService.buyTickets(cartDto);
         assertThat(order)
             .isNotNull()
-            .extracting("id", "tickets", "transactions", "paymentDetail", "deliveryAdress", "cancelled")
-            .contains(order.getId(), order.getTickets(), order.getTransactions(), paymentDetail, location, false);
+            .extracting("id", "tickets", "transactions.id", "paymentDetail", "deliveryAdress.id", "cancelled")
+            .contains(order.getId(), order.getTickets(), order.getTransactions(), paymentDetail.getId(), location.getId(), false);
     }
 
     @Test
-    public void buyTicketsWithNullUserShouldThrow() {
-        assertThrows(DtoException.class, () -> orderService.buyTickets(cartDto, null));
+    public void buyTicketsWithNullCartDtoShouldThrow() {
+        assertThrows(DtoException.class, () -> orderService.buyTickets(null));
     }
 
     @Test
     public void buyTicketsWithInvalidUserShouldThrow() {
-        UserDto userDto2 = new UserDto();
-        assertThrows(NotFoundException.class, () -> orderService.buyTickets(cartDto, userDto2));
+        assertThrows(NotFoundException.class, () -> orderService.buyTickets(cartDto2));
     }
 
     @Test
     public void buyValidTicketsShouldReturnRightPrice() {
-        OrderDto orderDto = orderService.buyTickets(cartDto, userDto);
+        OrderDto orderDto = orderService.buyTickets(cartDto);
         Transaction transaction = new Transaction();
         Set<Transaction> transactionSet = orderDto.getTransactions();
         for (Transaction trans : transactionSet) {

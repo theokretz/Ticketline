@@ -3,15 +3,15 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 import java.util.List;
 
 public class CartDto {
-    private int id;
+    private Integer userId;
     private List<CartTicketDto> tickets;
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
     public List<CartTicketDto> getTickets() {
@@ -26,7 +26,7 @@ public class CartDto {
     public String toString() {
         return "CartDto{"
             +
-            "id=" + id
+            "id=" + userId
             +
             ", seats=" + tickets
             +

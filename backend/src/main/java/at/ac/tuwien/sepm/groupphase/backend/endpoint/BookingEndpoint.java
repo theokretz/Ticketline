@@ -2,7 +2,6 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,10 +37,10 @@ public class BookingEndpoint {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Buy Tickets from Cart", security = @SecurityRequirement(name = "apiKey"))
-    public OrderDto buyTickets(@RequestBody CartDto cartDto, UserDto userDto) {
-        LOGGER.info("POST /api/v1/bookings  cart: {}, user: {}", cartDto, userDto);
+    public OrderDto buyTickets(@RequestBody CartDto cartDto) {
+        LOGGER.info("POST /api/v1/bookings  cart: {}", cartDto);
         try {
-            return this.orderService.buyTickets(cartDto, userDto);
+            return this.orderService.buyTickets(cartDto);
         } catch (NotFoundException e) {
             LOGGER.info("Unable to buy Tickets: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);

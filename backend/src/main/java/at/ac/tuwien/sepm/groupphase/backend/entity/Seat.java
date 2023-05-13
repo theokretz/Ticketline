@@ -77,17 +77,6 @@ public class Seat {
     }
 
 
-    @Override
-    public String toString() {
-        return "Seat{"
-            + "id=" + id
-            + ", row=" + row
-            + ", number=" + number
-            + ", tickets=" + tickets
-            + ", sector=" + sector
-            + '}';
-    }
-
     public static final class SeatBuilder {
         private Integer id;
         private Integer row;

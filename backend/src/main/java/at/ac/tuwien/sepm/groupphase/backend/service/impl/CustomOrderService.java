@@ -3,7 +3,6 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.OrderMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.SeatMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
@@ -35,7 +34,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -68,13 +66,10 @@ public class CustomOrderService implements OrderService {
 
     @Transactional
     @Override
-    public OrderDto buyTickets(CartDto cartDto, UserDto userDto) {
-        LOGGER.debug("Buy Tickets from Cart {}, UserDto: {}", cartDto, userDto);
+    public OrderDto buyTickets(CartDto cartDto) {
+        LOGGER.debug("Buy Tickets from Cart {}", cartDto);
         if (cartDto == null) {
             throw new DtoException("Cart cannot be null");
-        }
-        if (userDto == null) {
-            throw new DtoException("User cannot be null");
         }
 
         // ApplicationUser user = userRepository.findUserByEmail(userDto.getEmail());
@@ -82,11 +77,10 @@ public class CustomOrderService implements OrderService {
         // wenn login implementiert dann UserRepository zu interface machen
 
 
-        Optional<ApplicationUser> optionalApplicationUser = notUserRepository.findById(userDto.getId());
-        if (optionalApplicationUser.isEmpty()) {
+        ApplicationUser user = notUserRepository.findApplicationUserById(cartDto.getUserId());
+        if (user == null) {
             throw new NotFoundException("Could not find User");
         }
-        ApplicationUser user = optionalApplicationUser.get();
 
 
         //create order
@@ -95,8 +89,8 @@ public class CustomOrderService implements OrderService {
         order.setCancelled(false);
         order.setOrderTs(LocalDateTime.now());
         //TODO: Nullpointer?
-        order.setDeliveryAdress(userDto.getLocations().iterator().next());
-        order.setPaymentDetail(userDto.getPaymentDetails().iterator().next());
+        order.setDeliveryAdress(user.getLocations().iterator().next());
+        order.setPaymentDetail(user.getPaymentDetails().iterator().next());
         orderRepository.save(order);
 
         Set<Ticket> tickets = new HashSet<>();

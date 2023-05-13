@@ -76,17 +76,6 @@ public class Ticket {
     }
 
 
-    @Override
-    public String toString() {
-        return "Ticket{"
-            + "id=" + id
-            + ", reservation=" + reservation
-            + ", order=" + order
-            + ", performance=" + performance
-            + ", seat=" + seat
-            + '}';
-    }
-
     public static final class TicketBuilder {
         private Integer id;
         private Reservation reservation;

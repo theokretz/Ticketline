@@ -75,18 +75,6 @@ public class Reservation {
     }
 
 
-    @Override
-    public String toString() {
-        return "Reservation{"
-            + "id=" + id
-            + ", expirationTs=" + expirationTs
-            + ", cart=" + cart
-            + ", ticket=" + ticket
-            + ", user=" + user
-            + '}';
-    }
-
-
     public static final class ReservationBuilder {
         private Integer id;
         private LocalDateTime expirationTs;
