@@ -3,8 +3,8 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 import java.util.List;
 
 public class CartDto {
-    int id;
-    List<CartTicketDto> tickets;
+    private int id;
+    private List<CartTicketDto> tickets;
 
     public void setId(int id) {
         this.id = id;

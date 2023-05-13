@@ -9,21 +9,21 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 public class UserDto {
-    int id;
-    boolean admin;
-    String firstName;
-    String lastName;
-    String email;
-    String password;
-    String salt;
-    Integer points;
-    String passwordResetToken;
-    LocalDateTime passwordResetTs;
-    Boolean locked;
-    Set<Order> orders;
-    Set<PaymentDetail> paymentDetails;
-    Set<Reservation> reservations;
-    Set<Location> locations;
+    private int id;
+    private boolean admin;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
+    private String salt;
+    private Integer points;
+    private String passwordResetToken;
+    private LocalDateTime passwordResetTs;
+    private Boolean locked;
+    private Set<Order> orders;
+    private Set<PaymentDetail> paymentDetails;
+    private Set<Reservation> reservations;
+    private Set<Location> locations;
 
     public void setId(int id) {
         this.id = id;

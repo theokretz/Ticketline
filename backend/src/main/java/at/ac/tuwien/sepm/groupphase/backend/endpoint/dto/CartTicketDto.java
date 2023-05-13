@@ -6,17 +6,17 @@ import java.time.LocalDateTime;
 
 public class CartTicketDto {
 
-    Integer id;
-    int seatRow;
-    int seatNumber;
-    String sectorName;
-    boolean standing;
-    LocalDateTime date;
-    String eventName;
-    String hallName;
-    String locationCity;
-    String locationStreet;
-    BigDecimal price;
+    private Integer id;
+    private int seatRow;
+    private int seatNumber;
+    private String sectorName;
+    private boolean standing;
+    private LocalDateTime date;
+    private String eventName;
+    private String hallName;
+    private String locationCity;
+    private String locationStreet;
+    private BigDecimal price;
 
     public Integer getId() {
         return id;
@@ -107,17 +107,17 @@ public class CartTicketDto {
     }
 
     public static final class CartTicketDtoBuilder {
-        Integer id;
-        int seatRow;
-        int seatNumber;
-        String sectorName;
-        boolean standing;
-        LocalDateTime date;
-        String eventName;
-        String hallName;
-        String locationCity;
-        String locationStreet;
-        BigDecimal price;
+        private Integer id;
+        private int seatRow;
+        private int seatNumber;
+        private String sectorName;
+        private boolean standing;
+        private LocalDateTime date;
+        private String eventName;
+        private String hallName;
+        private String locationCity;
+        private String locationStreet;
+        private BigDecimal price;
 
         private CartTicketDtoBuilder() {
         }

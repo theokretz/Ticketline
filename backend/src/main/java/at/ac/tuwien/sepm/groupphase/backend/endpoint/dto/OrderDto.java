@@ -11,15 +11,15 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 public class OrderDto {
-    Integer id;
-    LocalDateTime orderTs;
-    Boolean cancelled;
-    Set<MerchandiseOrdered> merchandiseOrdered;
-    Location deliveryAdress;
-    PaymentDetail paymentDetail;
-    ApplicationUser user;
-    Set<Ticket> tickets;
-    Set<Transaction> transactions;
+    private Integer id;
+    private LocalDateTime orderTs;
+    private Boolean cancelled;
+    private Set<MerchandiseOrdered> merchandiseOrdered;
+    private Location deliveryAdress;
+    private PaymentDetail paymentDetail;
+    private ApplicationUser user;
+    private Set<Ticket> tickets;
+    private Set<Transaction> transactions;
 
     public void setId(Integer id) {
         this.id = id;

@@ -6,11 +6,11 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import java.util.Set;
 
 public class SeatDto {
-    Integer id;
-    Integer row;
-    Integer number;
-    Set<Ticket> tickets;
-    Sector sector;
+    private Integer id;
+    private Integer row;
+    private Integer number;
+    private Set<Ticket> tickets;
+    private Sector sector;
 
 
     public Integer getId() {
