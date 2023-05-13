@@ -61,5 +61,48 @@ public class Transaction {
         this.order = order;
     }
 
+    public static final class TransactionBuilder {
+        private Integer id;
+        private BigDecimal deductedAmount;
+        private Integer deductedPoints;
+        private Order order;
+
+        private TransactionBuilder() {
+        }
+
+        public static TransactionBuilder aTransaction() {
+            return new TransactionBuilder();
+        }
+
+        public TransactionBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public TransactionBuilder withDeductedAmount(BigDecimal deductedAmount) {
+            this.deductedAmount = deductedAmount;
+            return this;
+        }
+
+        public TransactionBuilder withDeductedPoints(Integer deductedPoints) {
+            this.deductedPoints = deductedPoints;
+            return this;
+        }
+
+        public TransactionBuilder withOrder(Order order) {
+            this.order = order;
+            return this;
+        }
+
+        public Transaction build() {
+            Transaction transaction = new Transaction();
+            transaction.setId(id);
+            transaction.setDeductedAmount(deductedAmount);
+            transaction.setDeductedPoints(deductedPoints);
+            transaction.setOrder(order);
+            return transaction;
+        }
+    }
+
 }
 

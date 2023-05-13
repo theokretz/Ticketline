@@ -34,7 +34,7 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_adress_id", nullable = false)
-    private Location deliveryAdress;
+    private Location deliveryAddress;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_detail_id", nullable = false)
@@ -82,12 +82,12 @@ public class Order {
         this.merchandiseOrdered = merchandiseOrdered;
     }
 
-    public Location getDeliveryAdress() {
-        return deliveryAdress;
+    public Location getDeliveryAddress() {
+        return deliveryAddress;
     }
 
-    public void setDeliveryAdress(final Location deliveryAdress) {
-        this.deliveryAdress = deliveryAdress;
+    public void setDeliveryAddress(final Location deliveryAdress) {
+        this.deliveryAddress = deliveryAdress;
     }
 
     public PaymentDetail getPaymentDetail() {
@@ -120,6 +120,82 @@ public class Order {
 
     public void setTransactions(final Set<Transaction> transactions) {
         this.transactions = transactions;
+    }
+
+
+    public static final class OrderBuilder {
+        private Integer id;
+        private LocalDateTime orderTs;
+        private Boolean cancelled;
+        private Set<MerchandiseOrdered> merchandiseOrdered;
+        private Location deliveryAdress;
+        private PaymentDetail paymentDetail;
+        private User user;
+        private Set<Ticket> tickets;
+        private Set<Transaction> transactions;
+
+        public OrderBuilder setId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public OrderBuilder setOrderTs(LocalDateTime orderTs) {
+            this.orderTs = orderTs;
+            return this;
+        }
+
+        public OrderBuilder setCancelled(Boolean cancelled) {
+            this.cancelled = cancelled;
+            return this;
+        }
+
+        public OrderBuilder setMerchandiseOrdered(Set<MerchandiseOrdered> merchandiseOrdered) {
+            this.merchandiseOrdered = merchandiseOrdered;
+            return this;
+        }
+
+        public OrderBuilder setDeliveryAdress(Location deliveryAdress) {
+            this.deliveryAdress = deliveryAdress;
+            return this;
+        }
+
+        public OrderBuilder setPaymentDetail(PaymentDetail paymentDetail) {
+            this.paymentDetail = paymentDetail;
+            return this;
+        }
+
+        public OrderBuilder setUser(User user) {
+            this.user = user;
+            return this;
+        }
+
+        public OrderBuilder setTickets(Set<Ticket> tickets) {
+            this.tickets = tickets;
+            return this;
+        }
+
+        public OrderBuilder setTransactions(Set<Transaction> transactions) {
+            this.transactions = transactions;
+            return this;
+        }
+
+        public static OrderBuilder aOrder() {
+            return new OrderBuilder();
+        }
+
+        public Order build() {
+            Order order = new Order();
+            order.setId(this.id);
+            order.setOrderTs(this.orderTs);
+            order.setCancelled(this.cancelled);
+            order.setMerchandiseOrdered(this.merchandiseOrdered);
+            order.setDeliveryAddress(this.deliveryAdress);
+            order.setPaymentDetail(this.paymentDetail);
+            order.setUser(this.user);
+            order.setTickets(this.tickets);
+            order.setTransactions(this.transactions);
+            return order;
+        }
     }
 
 }
