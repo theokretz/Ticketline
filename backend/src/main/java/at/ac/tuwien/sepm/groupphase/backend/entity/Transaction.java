@@ -70,6 +70,7 @@ public class Transaction {
             + ", order=" + order
             + '}';
     }
+
     public static final class TransactionBuilder {
         private Integer id;
         private BigDecimal deductedAmount;

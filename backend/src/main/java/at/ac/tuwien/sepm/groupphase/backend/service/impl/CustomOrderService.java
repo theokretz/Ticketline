@@ -89,7 +89,7 @@ public class CustomOrderService implements OrderService {
         order.setCancelled(false);
         order.setOrderTs(LocalDateTime.now());
         //TODO: Nullpointer?
-        order.setDeliveryAdress(user.getLocations().iterator().next());
+        order.setDeliveryAddress(user.getLocations().iterator().next());
         order.setPaymentDetail(user.getPaymentDetails().iterator().next());
         orderRepository.save(order);
 

@@ -159,6 +159,7 @@ public class Merchandise {
             return merchandise;
         }
     }
+
     @Override
     public String toString() {
         return "Merchandise{"

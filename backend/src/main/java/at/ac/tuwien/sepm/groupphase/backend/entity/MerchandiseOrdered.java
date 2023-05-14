@@ -121,6 +121,8 @@ public class MerchandiseOrdered {
             return merchandiseOrdered;
         }
     }
+
+
     @Override
     public String toString() {
         return "MerchandiseOrdered{"

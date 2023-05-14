@@ -85,8 +85,8 @@ public class Order {
         return deliveryAddress;
     }
 
-    public void setDeliveryAddress(final Location deliveryAdress) {
-        this.deliveryAddress = deliveryAdress;
+    public void setDeliveryAddress(final Location deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 
     public PaymentDetail getPaymentDetail() {
@@ -127,9 +127,9 @@ public class Order {
         private LocalDateTime orderTs;
         private Boolean cancelled;
         private Set<MerchandiseOrdered> merchandiseOrdered;
-        private Location deliveryAdress;
+        private Location deliveryAddress;
         private PaymentDetail paymentDetail;
-        private User user;
+        private ApplicationUser user;
         private Set<Ticket> tickets;
         private Set<Transaction> transactions;
 
@@ -153,8 +153,8 @@ public class Order {
             return this;
         }
 
-        public OrderBuilder setDeliveryAdress(Location deliveryAdress) {
-            this.deliveryAdress = deliveryAdress;
+        public OrderBuilder setDeliveryAddress(Location deliveryAddress) {
+            this.deliveryAddress = deliveryAddress;
             return this;
         }
 
@@ -163,7 +163,7 @@ public class Order {
             return this;
         }
 
-        public OrderBuilder setUser(User user) {
+        public OrderBuilder setUser(ApplicationUser user) {
             this.user = user;
             return this;
         }
@@ -188,7 +188,7 @@ public class Order {
             order.setOrderTs(this.orderTs);
             order.setCancelled(this.cancelled);
             order.setMerchandiseOrdered(this.merchandiseOrdered);
-            order.setDeliveryAddress(this.deliveryAdress);
+            order.setDeliveryAddress(this.deliveryAddress);
             order.setPaymentDetail(this.paymentDetail);
             order.setUser(this.user);
             order.setTickets(this.tickets);

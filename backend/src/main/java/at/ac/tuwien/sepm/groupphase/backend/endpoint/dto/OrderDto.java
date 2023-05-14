@@ -15,7 +15,7 @@ public class OrderDto {
     private LocalDateTime orderTs;
     private Boolean cancelled;
     private Set<MerchandiseOrdered> merchandiseOrdered;
-    private Location deliveryAdress;
+    private Location deliveryAddress;
     private PaymentDetail paymentDetail;
     private ApplicationUser user;
     private Set<Ticket> tickets;
@@ -53,12 +53,12 @@ public class OrderDto {
         return merchandiseOrdered;
     }
 
-    public void setDeliveryAdress(Location deliveryAdress) {
-        this.deliveryAdress = deliveryAdress;
+    public void setDeliveryAddress(Location deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 
-    public Location getDeliveryAdress() {
-        return deliveryAdress;
+    public Location getDeliveryAddress() {
+        return deliveryAddress;
     }
 
     public void setPaymentDetail(PaymentDetail paymentDetail) {
@@ -105,7 +105,7 @@ public class OrderDto {
             +
             ", merchandiseOrdered=" + merchandiseOrdered
             +
-            ", deliveryAdress=" + deliveryAdress
+            ", deliveryAddress=" + deliveryAddress
             +
             ", paymentDetail=" + paymentDetail
             +

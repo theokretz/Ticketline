@@ -259,7 +259,7 @@ public class OrderServiceTest {
     OrderDto order = orderService.buyTickets(cartDto);
     assertThat(order)
         .isNotNull()
-        .extracting("id", "tickets", "transactions", "paymentDetail", "deliveryAdress.id", "cancelled")
+        .extracting("id", "tickets", "transactions", "paymentDetail", "deliveryAddress.id", "cancelled")
         .contains(order.getId(), order.getTickets(), order.getTransactions(), paymentDetail.getId(), location.getId(), false);
   }
 
