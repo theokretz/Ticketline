@@ -11,12 +11,10 @@
           <div
             *ngFor="let ticket of row"
             class="spot"
-            [ngClass]="{
-              seat: ticket !== null,
-              reserved: ticket !== null && ticket.reserved,
-              selected: isTicketSelected(ticket)
-            }"
+            [ngClass]="getTicketClasses(ticket)"
             (click)="toggleTicket(ticket)"
+            (mouseenter)="hoverTicket(ticket)"
+            (mouseleave)="hoverSectorId = null"
           ></div>
         </div>
       </div>
@@ -45,8 +43,27 @@
 
       <ul>
         <li *ngFor="let ticket of selectedTickets">
-          Row {{ ticket.row }} - Seat {{ ticket.number }}, Sector
-          {{ getSectorName(ticket) }}: {{ getPrice(ticket) }}€
+          <span *ngIf="isTicketStanding(ticket); else seat">
+            Ticket Standing Sector
+            {{ getSectorName(ticket) }}: {{ getPrice(ticket) }}€
+            <button
+              class="btn btn-primary btn-sm"
+              [ngClass]="{ disabled: !canAddStandingTicket(ticket.sectorId) }"
+              (click)="addStandingTicket(ticket.sectorId)"
+            >
+              Add another
+            </button>
+            <button
+              class="btn btn-danger btn-sm"
+              (click)="removeTicketFromSelected(ticket)"
+            >
+              Remove
+            </button>
+          </span>
+          <ng-template #seat>
+            Row {{ ticket.row }} - Seat {{ ticket.number }}, Sector
+            {{ getSectorName(ticket) }}: {{ getPrice(ticket) }}€
+          </ng-template>
         </li>
       </ul>
     </div>

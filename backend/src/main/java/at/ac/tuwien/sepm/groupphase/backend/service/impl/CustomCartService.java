@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.TicketMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.User;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -64,38 +67,57 @@ public class CustomCartService implements CartService {
                 conflictMsg.add("Ticket " + ticket.getId() + " not found");
             }
             throw new ConflictException("At least one ticket does not exist", conflictMsg);
-
-
         }
+
         List<Reservation> reserved = new ArrayList<>();
+        Map<Integer, List<Ticket>> ticketsBySector = new HashMap<>();
         for (Ticket ticket : foundTickets) {
-
-            if (ticket.getOrder() == null) {
-                if (ticket.getReservation() == null || ticket.getReservation().getExpirationTs().isBefore(LocalDateTime.now())) {
-                    Integer id = ticket.getReservation() == null ? null : ticket.getReservation().getId();
-                    Reservation reservation = Reservation.ReservationBuilder.aReservation()
-                        .withId(id)
-                        .withTicket(ticket)
-                        .withCart(true)
-                        .withExpirationTs(LocalDateTime.now().plusMinutes(15))
-                        .withUser(user.get())
-                        .build();
-                    reserved.add(reservation);
-                } else {
-                    conflictMsg.add("Ticket: " + ticket.getId() + " already has a reservation");
+            // check if ticket is already reserved or bought
+            if (ticket.getOrder() != null || !(ticket.getReservation() == null || ticket.getReservation().getExpirationTs().isBefore(LocalDateTime.now()))) {
+                // if ticket cannot be reserved, check if it is standing
+                Sector sector = ticket.getSeat().getSector();
+                if (sector.getStanding()) {
+                    // if ticket is standing, find any ticket in the same sector that is not reserved or bought and reserve it
+                    if (!ticketsBySector.containsKey(sector.getId())) {
+                        // if no ticket in this sector has been fetched, find all tickets in this sector
+                        List<Ticket> sectorTickets = ticketRepository.findBySeatSectorId(sector.getId());
+                        ticketsBySector.put(sector.getId(), sectorTickets);
+                    }
+                    // find any ticket in this sector that is not reserved or bought
+                    Optional<Ticket> availableTicket = ticketsBySector.get(sector.getId()).stream().filter(t ->
+                        t.getOrder() == null
+                            && (t.getReservation() == null || t.getReservation().getExpirationTs().isBefore(LocalDateTime.now()))
+                    ).findFirst();
+                    if (availableTicket.isPresent()) {
+                        // if such a ticket exists, reserve it
+                        addTicketToReserved(user.get(), reserved, availableTicket.get());
+                        ticketsBySector.get(sector.getId()).remove(availableTicket.get());
+                        continue;
+                    }
                 }
-            } else {
-                conflictMsg.add("Ticket:" + ticket.getId() + " already has been bought");
+                conflictMsg.add("Ticket: " + ticket.getId() + " cannot be reserved, because it is already reserved or bought");
+                continue;
             }
-
-            if (conflictMsg.size() > 0) {
-                throw new ConflictException("At least one ticket is already reserved or bought", conflictMsg);
-
-            }
-
+            addTicketToReserved(user.get(), reserved, ticket);
+        }
+        if (conflictMsg.size() > 0) {
+            throw new ConflictException("At least one ticket is already reserved or bought", conflictMsg);
         }
         LOGGER.info("reserving tickets {}", tickets);
         reservationRepository.saveAll(reserved);
         return reserved;
     }
+
+    private void addTicketToReserved(User user, List<Reservation> reserved, Ticket ticket) {
+        Integer id = ticket.getReservation() == null ? null : ticket.getReservation().getId();
+        Reservation reservation = Reservation.ReservationBuilder.aReservation()
+            .withId(id)
+            .withTicket(ticket)
+            .withCart(true)
+            .withExpirationTs(LocalDateTime.now().plusMinutes(15))
+            .withUser(user)
+            .build();
+        reserved.add(reservation);
+    }
+
 }

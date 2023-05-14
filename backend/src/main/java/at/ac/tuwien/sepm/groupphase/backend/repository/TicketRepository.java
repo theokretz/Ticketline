@@ -20,7 +20,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      * @param ids the ticket ids
      * @return the ticket list
      */
-    @EntityGraph(attributePaths = {"reservation"})
+    @EntityGraph(attributePaths = {"reservation", "seat", "seat.sector"})
     @Query("SELECT t FROM Ticket t WHERE t.id IN :ids")
     List<Ticket> findAllByIds(@Param("ids") List<Integer> ids);
 
@@ -48,6 +48,15 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      * @return the ticket list
      */
     List<Ticket> findAllByOrderIsNullAndReservationIsNull();
+
+    /**
+     * Find all tickets that are in the sector with the given sector id.
+     *
+     * @param id the sector id
+     * @return the ticket list
+     */
+    @EntityGraph(attributePaths = {"performance", "seat", "seat.sector"})
+    List<Ticket> findBySeatSectorId(Integer id);
 
     /**
      * Find all tickets matching the id.
