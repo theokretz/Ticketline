@@ -108,5 +108,70 @@ public class PaymentDetail {
             + ", user=" + user
             + '}';
     }
+
+    public static final class PaymentDetailBuilder {
+        private Integer id;
+        private Integer cardNumber;
+        private String cardHolder;
+        private Integer cvv;
+        private LocalDate expirationDate;
+        private Set<Order> orders;
+        private ApplicationUser user;
+
+        private PaymentDetailBuilder() {
+        }
+
+        public static PaymentDetailBuilder aPaymentDetail() {
+            return new PaymentDetailBuilder();
+        }
+
+        public PaymentDetailBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public PaymentDetailBuilder withCardNumber(Integer cardNumber) {
+            this.cardNumber = cardNumber;
+            return this;
+        }
+
+        public PaymentDetailBuilder withCardHolder(String cardHolder) {
+            this.cardHolder = cardHolder;
+            return this;
+        }
+
+        public PaymentDetailBuilder withCvv(Integer cvv) {
+            this.cvv = cvv;
+            return this;
+        }
+
+        public PaymentDetailBuilder withExpirationDate(LocalDate expirationDate) {
+            this.expirationDate = expirationDate;
+            return this;
+        }
+
+        public PaymentDetailBuilder withOrders(Set<Order> orders) {
+            this.orders = orders;
+            return this;
+        }
+
+        public PaymentDetailBuilder withUser(ApplicationUser user) {
+            this.user = user;
+            return this;
+        }
+
+        public PaymentDetail build() {
+            PaymentDetail paymentDetail = new PaymentDetail();
+            paymentDetail.setId(id);
+            paymentDetail.setCardNumber(cardNumber);
+            paymentDetail.setCardHolder(cardHolder);
+            paymentDetail.setCvv(cvv);
+            paymentDetail.setExpirationDate(expirationDate);
+            paymentDetail.setOrders(orders);
+            paymentDetail.setUser(user);
+            return paymentDetail;
+        }
+    }
+
 }
 

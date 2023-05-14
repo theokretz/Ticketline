@@ -71,6 +71,56 @@ public class MerchandiseOrdered {
         this.merchandise = merchandise;
     }
 
+
+    public static final class MerchandiseOrderedBuilder {
+        private Integer id;
+        private Integer quantity;
+        private Boolean points;
+        private Order order;
+        private Merchandise merchandise;
+
+        public MerchandiseOrderedBuilder() {
+        }
+
+        public static MerchandiseOrderedBuilder aMerchandiseOrdered() {
+            return new MerchandiseOrderedBuilder();
+        }
+
+        public MerchandiseOrderedBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public MerchandiseOrderedBuilder withQuantity(Integer quantity) {
+            this.quantity = quantity;
+            return this;
+        }
+
+        public MerchandiseOrderedBuilder withPoints(Boolean points) {
+            this.points = points;
+            return this;
+        }
+
+        public MerchandiseOrderedBuilder withOrder(Order order) {
+            this.order = order;
+            return this;
+        }
+
+        public MerchandiseOrderedBuilder withMerchandise(Merchandise merchandise) {
+            this.merchandise = merchandise;
+            return this;
+        }
+
+        public MerchandiseOrdered build() {
+            MerchandiseOrdered merchandiseOrdered = new MerchandiseOrdered();
+            merchandiseOrdered.setId(id);
+            merchandiseOrdered.setQuantity(quantity);
+            merchandiseOrdered.setPoints(points);
+            merchandiseOrdered.setOrder(order);
+            merchandiseOrdered.setMerchandise(merchandise);
+            return merchandiseOrdered;
+        }
+    }
     @Override
     public String toString() {
         return "MerchandiseOrdered{"

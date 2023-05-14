@@ -27,6 +27,13 @@ public class Merchandise {
     @Column(nullable = false)
     private Integer pointsReward;
 
+    @Column(nullable = false, length = 100)
+    private String title;
+
+    @Column(nullable = false, length = 1000)
+    private String description;
+
+
     @OneToMany(mappedBy = "merchandise")
     private Set<MerchandiseOrdered> merchandiseMerchandiseOrdereds;
 
@@ -71,6 +78,87 @@ public class Merchandise {
         this.merchandiseMerchandiseOrdereds = merchandiseMerchandiseOrdereds;
     }
 
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+
+    public static final class MerchandiseBuilder {
+        private Integer id;
+        private BigDecimal price;
+        private Integer pointsPrice;
+        private Integer pointsReward;
+        private String title;
+        private String description;
+        private Set<MerchandiseOrdered> merchandiseMerchandiseOrdereds;
+
+        private MerchandiseBuilder() {
+        }
+
+        public static MerchandiseBuilder aMerchandise() {
+            return new MerchandiseBuilder();
+        }
+
+        public MerchandiseBuilder withId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public MerchandiseBuilder withPrice(BigDecimal price) {
+            this.price = price;
+            return this;
+        }
+
+        public MerchandiseBuilder withPointsPrice(Integer pointsPrice) {
+            this.pointsPrice = pointsPrice;
+            return this;
+        }
+
+        public MerchandiseBuilder withPointsReward(Integer pointsReward) {
+            this.pointsReward = pointsReward;
+            return this;
+        }
+
+        public MerchandiseBuilder withTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public MerchandiseBuilder withDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public MerchandiseBuilder withMerchandiseMerchandiseOrdereds(Set<MerchandiseOrdered> merchandiseMerchandiseOrdereds) {
+            this.merchandiseMerchandiseOrdereds = merchandiseMerchandiseOrdereds;
+            return this;
+        }
+
+        public Merchandise build() {
+            Merchandise merchandise = new Merchandise();
+            merchandise.setId(id);
+            merchandise.setPrice(price);
+            merchandise.setPointsPrice(pointsPrice);
+            merchandise.setPointsReward(pointsReward);
+            merchandise.setTitle(title);
+            merchandise.setDescription(description);
+            merchandise.setMerchandiseMerchandiseOrdereds(merchandiseMerchandiseOrdereds);
+            return merchandise;
+        }
+    }
     @Override
     public String toString() {
         return "Merchandise{"

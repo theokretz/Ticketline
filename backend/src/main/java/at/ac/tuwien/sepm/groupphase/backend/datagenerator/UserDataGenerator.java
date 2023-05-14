@@ -2,22 +2,28 @@ package at.ac.tuwien.sepm.groupphase.backend.datagenerator;
 
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
+import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
+import java.util.Set;
 
 @Profile("generateData")
 @Component
+@DependsOn({"locationDataGenerator"})
 public class UserDataGenerator {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    public static final int NUMBER_OF_USERS_TO_GENERATE = 100;
+    public static final int NUMBER_OF_USERS_TO_GENERATE = 20;
     private static final String TEST_FIRST_NAME = "First Name";
     private static final String TEST_LAST_NAME = "Last Name";
     private static final String TEST_E_MAIL = "test@mail.com";
@@ -26,10 +32,12 @@ public class UserDataGenerator {
     private static final Integer TEST_POINTS = 50;
 
     private final NotUserRepository notUserRepository;
+    private final LocationRepository locationRepository;
 
 
-    public UserDataGenerator(NotUserRepository notUserRepository) {
+    public UserDataGenerator(NotUserRepository notUserRepository, LocationRepository locationRepository) {
         this.notUserRepository = notUserRepository;
+        this.locationRepository = locationRepository;
     }
 
     @PostConstruct
@@ -38,6 +46,8 @@ public class UserDataGenerator {
             LOGGER.debug("users already generated");
         } else {
             LOGGER.debug("generating {} user entries", NUMBER_OF_USERS_TO_GENERATE);
+            List<Location> location = locationRepository.findAll().subList(0, 5);
+            Set<Location> uniqueLocations = Set.copyOf(location);
             for (int i = 1; i < NUMBER_OF_USERS_TO_GENERATE; i++) {
                 ApplicationUser user = ApplicationUser.UserBuilder.aUser()
                     .withAdmin(false)
@@ -48,6 +58,7 @@ public class UserDataGenerator {
                     .withSalt(TEST_SALT + i)
                     .withPoints(TEST_POINTS + i)
                     .withLocked(false)
+                    .withLocations(uniqueLocations)
                     .build();
 
                 LOGGER.debug("saving user {}", user);

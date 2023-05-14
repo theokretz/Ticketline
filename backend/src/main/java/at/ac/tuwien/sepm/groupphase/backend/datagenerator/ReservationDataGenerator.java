@@ -22,7 +22,7 @@ import static at.ac.tuwien.sepm.groupphase.backend.datagenerator.UserDataGenerat
 
 @Profile("generateData")
 @Component
-@DependsOn({"ticketDataGenerator", "userDataGenerator"})
+@DependsOn({"ticketDataGenerator", "userDataGenerator", "orderDataGenerator"})
 public class ReservationDataGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -43,7 +43,7 @@ public class ReservationDataGenerator {
         if (reservationRepository.findAll().size() > 0) {
             LOGGER.debug("reservation already generated");
         } else {
-            List<Ticket> tickets = ticketRepository.findAll();
+            List<Ticket> tickets = ticketRepository.findAllByOrderIsNull();
             LOGGER.debug("generating reservation entries");
 
             for (int i = 1; i < tickets.size(); i++) {
