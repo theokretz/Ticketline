@@ -14,6 +14,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
 import at.ac.tuwien.sepm.groupphase.backend.exception.DtoException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.OrderRepository;
@@ -88,8 +89,14 @@ public class CustomOrderService implements OrderService {
         order.setUser(user);
         order.setCancelled(false);
         order.setOrderTs(LocalDateTime.now());
-        //TODO: Nullpointer?
+        if (!user.getLocations().iterator().hasNext()) {
+            throw new FatalException("No Location is saved for this User");
+        }
         order.setDeliveryAddress(user.getLocations().iterator().next());
+
+        if (!user.getPaymentDetails().iterator().hasNext()) {
+            throw new FatalException("No PaymentDetails are saved for this User");
+        }
         order.setPaymentDetail(user.getPaymentDetails().iterator().next());
         orderRepository.save(order);
 
