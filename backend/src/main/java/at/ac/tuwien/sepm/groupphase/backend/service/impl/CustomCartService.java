@@ -24,12 +24,12 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
 
 @Service
 public class CustomCartService implements CartService {
@@ -60,35 +60,37 @@ public class CustomCartService implements CartService {
         Set<Reservation> reservationSet = user.getReservations();
 
         for (Reservation r : reservationSet) {
-            if (r.getCart()) {
-                Ticket ticket = ticketRepository.findTicketById(r.getTicket().getId());
-
-                //price
-                BigDecimal price = new BigDecimal(-1);
-                for (PerformanceSector perfSector : ticket.getSeat().getSector().getPerformanceSectors()) {
-                    if (perfSector.getPerformance() == ticket.getPerformance()) {
-                        price = perfSector.getPrice();
-                    }
-                }
-                if (Objects.equals(price, BigDecimal.valueOf(-1))) {
-                    throw new FatalException("No Performance Sector assigned");
-                }
-
-                CartTicketDto cartTicketDto = CartTicketDto.CartTicketDtoBuilder.aCartTicketDto()
-                    .withId(ticket.getId())
-                    .withSeatRow(ticket.getSeat().getRow())
-                    .withSeatNumber(ticket.getSeat().getNumber())
-                    .withSectorName(ticket.getSeat().getSector().getName())
-                    .withStanding(ticket.getSeat().getSector().getStanding())
-                    .withDate(ticket.getPerformance().getDatetime())
-                    .withEventName(ticket.getPerformance().getEvent().getName())
-                    .withHallName(ticket.getPerformance().getHall().getName())
-                    .withLocationCity(ticket.getPerformance().getHall().getLocation().getCity())
-                    .withLocationStreet(ticket.getPerformance().getHall().getLocation().getStreet())
-                    .withPrice(price)
-                    .build();
-                tickets.add(cartTicketDto);
+            if (!r.getCart()) {
+                continue;
             }
+            Ticket ticket = ticketRepository.findTicketById(r.getTicket().getId());
+
+            //price
+            BigDecimal price = new BigDecimal(-1);
+            for (PerformanceSector perfSector : ticket.getSeat().getSector().getPerformanceSectors()) {
+                if (perfSector.getPerformance() == ticket.getPerformance()) {
+                    price = perfSector.getPrice();
+                }
+            }
+            if (Objects.equals(price, BigDecimal.valueOf(-1))) {
+                throw new FatalException("No Performance Sector assigned");
+            }
+
+            CartTicketDto cartTicketDto = CartTicketDto.CartTicketDtoBuilder.aCartTicketDto()
+                .withId(ticket.getId())
+                .withSeatRow(ticket.getSeat().getRow())
+                .withSeatNumber(ticket.getSeat().getNumber())
+                .withSectorName(ticket.getSeat().getSector().getName())
+                .withStanding(ticket.getSeat().getSector().getStanding())
+                .withDate(ticket.getPerformance().getDatetime())
+                .withEventName(ticket.getPerformance().getEvent().getName())
+                .withHallName(ticket.getPerformance().getHall().getName())
+                .withLocationCity(ticket.getPerformance().getHall().getLocation().getCity())
+                .withLocationStreet(ticket.getPerformance().getHall().getLocation().getStreet())
+                .withPrice(price)
+                .build();
+            tickets.add(cartTicketDto);
+
         }
         return tickets;
     }
