@@ -1,9 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
-import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.MerchandiseOrdered;
-import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
 
@@ -16,8 +14,8 @@ public class OrderDto {
     private Boolean cancelled;
     private Set<MerchandiseOrdered> merchandiseOrdered;
     private Location deliveryAddress;
-    private PaymentDetail paymentDetail;
-    private ApplicationUser user;
+    private SimplePaymentDetailDto paymentDetail;
+    private SimpleUserDto user;
     private Set<Ticket> tickets;
     private Set<Transaction> transactions;
 
@@ -29,92 +27,67 @@ public class OrderDto {
         return id;
     }
 
-    public void setOrderTs(LocalDateTime orderTs) {
-        this.orderTs = orderTs;
-    }
-
     public LocalDateTime getOrderTs() {
         return orderTs;
     }
 
-    public void setCancelled(Boolean cancelled) {
-        this.cancelled = cancelled;
+    public void setOrderTs(LocalDateTime orderTs) {
+        this.orderTs = orderTs;
     }
 
     public Boolean getCancelled() {
         return cancelled;
     }
 
-    public void setMerchandiseOrdered(Set<MerchandiseOrdered> merchandiseOrdered) {
-        this.merchandiseOrdered = merchandiseOrdered;
+    public void setCancelled(Boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     public Set<MerchandiseOrdered> getMerchandiseOrdered() {
         return merchandiseOrdered;
     }
 
-    public void setDeliveryAddress(Location deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
+    public void setMerchandiseOrdered(Set<MerchandiseOrdered> merchandiseOrdered) {
+        this.merchandiseOrdered = merchandiseOrdered;
     }
 
     public Location getDeliveryAddress() {
         return deliveryAddress;
     }
 
-    public void setPaymentDetail(PaymentDetail paymentDetail) {
-        this.paymentDetail = paymentDetail;
+    public void setDeliveryAddress(Location deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 
-    public PaymentDetail getPaymentDetail() {
+    public SimplePaymentDetailDto getPaymentDetail() {
         return paymentDetail;
     }
 
-    public void setUser(ApplicationUser user) {
-        this.user = user;
+    public void setPaymentDetail(SimplePaymentDetailDto paymentDetail) {
+        this.paymentDetail = paymentDetail;
     }
 
-    public ApplicationUser getUser() {
+    public SimpleUserDto getUser() {
         return user;
     }
 
-    public void setTickets(Set<Ticket> tickets) {
-        this.tickets = tickets;
+    public void setUser(SimpleUserDto user) {
+        this.user = user;
     }
 
     public Set<Ticket> getTickets() {
         return tickets;
     }
 
-    public void setTransactions(Set<Transaction> transactions) {
-        this.transactions = transactions;
+    public void setTickets(Set<Ticket> tickets) {
+        this.tickets = tickets;
     }
 
     public Set<Transaction> getTransactions() {
         return transactions;
     }
 
-    @Override
-    public String toString() {
-        return "OrderDto{"
-            +
-            "id=" + id
-            +
-            ", orderTs=" + orderTs
-            +
-            ", cancelled=" + cancelled
-            +
-            ", merchandiseOrdered=" + merchandiseOrdered
-            +
-            ", deliveryAddress=" + deliveryAddress
-            +
-            ", paymentDetail=" + paymentDetail
-            +
-            ", user=" + user
-            +
-            ", tickets=" + tickets
-            +
-            ", transactions=" + transactions
-            +
-            '}';
+    public void setTransactions(Set<Transaction> transactions) {
+        this.transactions = transactions;
     }
 }
