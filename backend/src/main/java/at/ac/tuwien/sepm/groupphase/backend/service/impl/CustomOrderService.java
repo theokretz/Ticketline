@@ -101,10 +101,15 @@ public class CustomOrderService implements OrderService {
         order.setPaymentDetail(user.getPaymentDetails().iterator().next());
 
         orderRepository.save(order);
-
-        List<CartTicketDto> ticketDtoList = cartService.getCart(userId);
-        Set<Ticket> tickets = new HashSet<>();
         List<String> conflictMsg = new ArrayList<>();
+        List<CartTicketDto> ticketDtoList = cartService.getCart(userId);
+        if (ticketDtoList.isEmpty()) {
+            conflictMsg.add("No Tickets in Cart");
+            throw new ConflictException("Cart is empty", conflictMsg);
+        }
+
+        Set<Ticket> tickets = new HashSet<>();
+
         BigDecimal price = new BigDecimal(0);
         //Tickets
         for (CartTicketDto cartTicketDto : ticketDtoList) {
