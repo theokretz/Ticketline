@@ -77,6 +77,18 @@ public class PerformanceSector {
     }
 
 
+    @Override
+    public String toString() {
+        return "PerformanceSector{"
+            +
+            "id=" + id
+            + ", price=" + price
+            + ", pointsReward=" + pointsReward
+            + ", performance=" + performance
+            + ", sector=" + sector
+            + '}';
+    }
+
     public static final class PerformanceSectorBuilder {
         private Integer id;
         private BigDecimal price;

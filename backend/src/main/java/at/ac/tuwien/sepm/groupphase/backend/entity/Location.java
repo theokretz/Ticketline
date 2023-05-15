@@ -67,6 +67,24 @@ public class Location {
     }
 
 
+    @Override
+    public String toString() {
+        return "Location{"
+            +
+            "id=" + id
+            +
+            ", postalCode=" + postalCode
+            +
+            ", street='" + street + '\''
+            +
+            ", city='" + city + '\''
+            +
+            ", country='" + country + '\''
+            +
+            '}';
+    }
+
+
     public static final class LocationBuilder {
         private Integer id;
         private Integer postalCode;
@@ -116,5 +134,4 @@ public class Location {
             return location;
         }
     }
-
 }

@@ -156,6 +156,5 @@ public class Event {
             event.setPerformances(performances);
             return event;
         }
-
     }
 }

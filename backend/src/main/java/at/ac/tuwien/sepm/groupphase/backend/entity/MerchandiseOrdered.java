@@ -121,5 +121,23 @@ public class MerchandiseOrdered {
             return merchandiseOrdered;
         }
     }
+
+
+    @Override
+    public String toString() {
+        return "MerchandiseOrdered{"
+            +
+            "id=" + id
+            +
+            ", quantity=" + quantity
+            +
+            ", points=" + points
+            +
+            ", order=" + order
+            +
+            ", merchandise=" + merchandise
+            +
+            '}';
+    }
 }
 

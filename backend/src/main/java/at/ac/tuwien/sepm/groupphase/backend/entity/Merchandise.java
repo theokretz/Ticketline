@@ -159,5 +159,22 @@ public class Merchandise {
             return merchandise;
         }
     }
+
+    @Override
+    public String toString() {
+        return "Merchandise{"
+            +
+            "id=" + id
+            +
+            ", price=" + price
+            +
+            ", pointsPrice=" + pointsPrice
+            +
+            ", pointsReward=" + pointsReward
+            +
+            ", merchandiseMerchandiseOrdereds=" + merchandiseMerchandiseOrdereds
+            +
+            '}';
+    }
 }
 

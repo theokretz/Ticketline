@@ -1,8 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.datagenerator;
 
 
+import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
-import at.ac.tuwien.sepm.groupphase.backend.entity.User;
 import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import jakarta.annotation.PostConstruct;
@@ -49,7 +49,7 @@ public class UserDataGenerator {
             List<Location> location = locationRepository.findAll().subList(0, 5);
             Set<Location> uniqueLocations = Set.copyOf(location);
             for (int i = 1; i < NUMBER_OF_USERS_TO_GENERATE; i++) {
-                User user = User.UserBuilder.aUser()
+                ApplicationUser user = ApplicationUser.UserBuilder.aUser()
                     .withAdmin(false)
                     .withFirstName(TEST_FIRST_NAME + " " + i)
                     .withLastName(TEST_LAST_NAME + " " + i)

@@ -87,6 +87,19 @@ public class Performance {
     }
 
 
+    @Override
+    public String toString() {
+        return "Performance{"
+            +
+            "id=" + id
+            + ", datetime=" + datetime
+            + ", event=" + event
+            + ", hall=" + hall
+            + ", tickets=" + tickets
+            + ", sectors=" + performanceSectors
+            + '}';
+    }
+
     public static final class PerformanceBuilder {
         private Integer id;
         private LocalDateTime datetime;

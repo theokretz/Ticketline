@@ -10,7 +10,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
-
 import java.util.Set;
 
 
@@ -86,16 +85,6 @@ public class Sector {
     }
 
 
-    @Override
-    public String toString() {
-        return "Sector{"
-            + "id=" + id
-            + ", name='" + name + '\''
-            + ", standing=" + standing
-            + ", hall=" + hall
-            + '}';
-    }
-
     public static final class SectorBuilder {
 
         private Integer id;
@@ -153,6 +142,5 @@ public class Sector {
             return sector;
         }
     }
-
 }
 

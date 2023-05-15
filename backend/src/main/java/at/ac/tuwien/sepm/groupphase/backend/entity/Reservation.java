@@ -32,7 +32,7 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private ApplicationUser user;
 
     public Integer getId() {
         return id;
@@ -66,11 +66,11 @@ public class Reservation {
         this.ticket = ticket;
     }
 
-    public User getUser() {
+    public ApplicationUser getUser() {
         return user;
     }
 
-    public void setUser(final User user) {
+    public void setUser(final ApplicationUser user) {
         this.user = user;
     }
 
@@ -80,7 +80,7 @@ public class Reservation {
         private LocalDateTime expirationTs;
         private Boolean cart;
         private Ticket ticket;
-        private User user;
+        private ApplicationUser user;
 
         private ReservationBuilder() {
         }
@@ -109,7 +109,7 @@ public class Reservation {
             return this;
         }
 
-        public ReservationBuilder withUser(User user) {
+        public ReservationBuilder withUser(ApplicationUser user) {
             this.user = user;
             return this;
         }
@@ -124,5 +124,4 @@ public class Reservation {
             return reservation;
         }
     }
-
 }

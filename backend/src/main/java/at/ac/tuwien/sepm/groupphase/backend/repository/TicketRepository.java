@@ -11,8 +11,29 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+/**
+ * The interface Ticket repository.
+ */
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
+
+    /**
+     * Find ticket by id.
+     *
+     * @param id the id of the ticket
+     * @return the ticket
+     */
+
+    @EntityGraph(attributePaths = {
+        "seat",
+        "seat.sector",
+        "performance.event",
+        "performance.hall",
+        "performance.hall.location",
+        "performance.performanceSectors",
+        "performance.performanceSectors.sector"
+    })
+    Ticket findTicketById(Integer id);
 
     /**
      * Find all tickets from a list of ticket ids.

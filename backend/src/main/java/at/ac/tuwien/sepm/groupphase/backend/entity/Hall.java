@@ -123,7 +123,5 @@ public class Hall {
             hall.setSectors(sectors);
             return hall;
         }
-
-
     }
 }

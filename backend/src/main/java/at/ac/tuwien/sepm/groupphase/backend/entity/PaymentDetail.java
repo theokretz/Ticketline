@@ -20,6 +20,7 @@ public class PaymentDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+
     @Column(nullable = false)
     private Integer cardNumber;
 
@@ -37,7 +38,7 @@ public class PaymentDetail {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private ApplicationUser user;
 
     public Integer getId() {
         return id;
@@ -87,14 +88,26 @@ public class PaymentDetail {
         this.orders = orders;
     }
 
-    public User getUser() {
+    public ApplicationUser getUser() {
         return user;
     }
 
-    public void setUser(final User user) {
+    public void setUser(final ApplicationUser user) {
         this.user = user;
     }
 
+    @Override
+    public String toString() {
+        return "PaymentDetail{"
+            + "id=" + id
+            + ", cardNumber=" + cardNumber
+            + ", cardHolder='" + cardHolder + '\''
+            + ", cvv=" + cvv
+            + ", expirationDate=" + expirationDate
+            + ", orders=" + orders
+            + ", user=" + user
+            + '}';
+    }
 
     public static final class PaymentDetailBuilder {
         private Integer id;
@@ -103,7 +116,7 @@ public class PaymentDetail {
         private Integer cvv;
         private LocalDate expirationDate;
         private Set<Order> orders;
-        private User user;
+        private ApplicationUser user;
 
         private PaymentDetailBuilder() {
         }
@@ -142,7 +155,7 @@ public class PaymentDetail {
             return this;
         }
 
-        public PaymentDetailBuilder withUser(User user) {
+        public PaymentDetailBuilder withUser(ApplicationUser user) {
             this.user = user;
             return this;
         }

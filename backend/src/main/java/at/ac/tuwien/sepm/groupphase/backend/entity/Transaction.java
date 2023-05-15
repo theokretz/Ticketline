@@ -61,6 +61,16 @@ public class Transaction {
         this.order = order;
     }
 
+    @Override
+    public String toString() {
+        return "Transaction{"
+            + "id=" + id
+            + ", deductedAmount=" + deductedAmount
+            + ", deductedPoints=" + deductedPoints
+            + ", order=" + order
+            + '}';
+    }
+
     public static final class TransactionBuilder {
         private Integer id;
         private BigDecimal deductedAmount;

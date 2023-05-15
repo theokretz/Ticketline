@@ -1,12 +1,16 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
+
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.TicketMapper;
+import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
-import at.ac.tuwien.sepm.groupphase.backend.entity.User;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ReservationRepository;
@@ -17,16 +21,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CustomCartService implements CartService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final TicketRepository ticketRepository;
@@ -43,11 +49,57 @@ public class CustomCartService implements CartService {
         this.ticketMapper = ticketMapper;
     }
 
+    @Override
+    public List<CartTicketDto> getCart(Integer userId) {
+        LOGGER.debug("Get Cart of User {}", userId);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        List<CartTicketDto> tickets = new ArrayList<>();
+        Set<Reservation> reservationSet = user.getReservations();
+
+        for (Reservation r : reservationSet) {
+            if (!r.getCart()) {
+                continue;
+            }
+            Ticket ticket = ticketRepository.findTicketById(r.getTicket().getId());
+
+            //price
+            BigDecimal price = new BigDecimal(-1);
+            for (PerformanceSector perfSector : ticket.getPerformance().getPerformanceSectors()) {
+                if (perfSector.getSector() == ticket.getSeat().getSector()) {
+                    price = perfSector.getPrice();
+                }
+            }
+            if (Objects.equals(price, BigDecimal.valueOf(-1))) {
+                throw new FatalException("No Performance Sector assigned");
+            }
+
+            CartTicketDto cartTicketDto = CartTicketDto.CartTicketDtoBuilder.aCartTicketDto()
+                .withId(ticket.getId())
+                .withSeatRow(ticket.getSeat().getRow())
+                .withSeatNumber(ticket.getSeat().getNumber())
+                .withSectorName(ticket.getSeat().getSector().getName())
+                .withStanding(ticket.getSeat().getSector().getStanding())
+                .withDate(ticket.getPerformance().getDatetime())
+                .withEventName(ticket.getPerformance().getEvent().getName())
+                .withHallName(ticket.getPerformance().getHall().getName())
+                .withLocationCity(ticket.getPerformance().getHall().getLocation().getCity())
+                .withLocationStreet(ticket.getPerformance().getHall().getLocation().getStreet())
+                .withPrice(price)
+                .build();
+            tickets.add(cartTicketDto);
+
+        }
+        return tickets;
+    }
+
 
     @Override
     public List<Reservation> reserveTickets(Integer userId, List<SimpleTicketDto> tickets) throws ConflictException {
 
-        Optional<User> user = notUserRepository.findById(userId);
+        Optional<ApplicationUser> user = notUserRepository.findById(userId);
 
         //TODO: add authentication and check if userId is the same as the logged in user
 
@@ -108,7 +160,7 @@ public class CustomCartService implements CartService {
         return reserved;
     }
 
-    private void addTicketToReserved(User user, List<Reservation> reserved, Ticket ticket) {
+    private void addTicketToReserved(ApplicationUser user, List<Reservation> reserved, Ticket ticket) {
         Integer id = ticket.getReservation() == null ? null : ticket.getReservation().getId();
         Reservation reservation = Reservation.ReservationBuilder.aReservation()
             .withId(id)

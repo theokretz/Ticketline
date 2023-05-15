@@ -1,8 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
-import at.ac.tuwien.sepm.groupphase.backend.entity.User;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ReservationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
@@ -48,7 +48,7 @@ public class ReservationDataGenerator {
 
             for (int i = 1; i < tickets.size(); i++) {
                 if (Math.random() < 0.30) {
-                    Optional<User> user = notUserRepository.findById(i % NUMBER_OF_USERS_TO_GENERATE);
+                    Optional<ApplicationUser> user = notUserRepository.findById(i % NUMBER_OF_USERS_TO_GENERATE);
                     if (user.isEmpty()) {
                         LOGGER.debug("user {} not found", i);
                         continue;

@@ -7,9 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 
+/**
+ * The interface Performance repository.
+ */
 public interface PerformanceRepository extends JpaRepository<Performance, Integer> {
-
-    /**
+    /*
      * Find a single performance entry by id.
      * with eagerLoading for hall.location, performanceSectors,
      * performanceSectors.sector.seats,performanceSectors.sector.seats,

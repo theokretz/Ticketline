@@ -66,7 +66,7 @@ public class OrderDataGenerator {
                     .setOrderTs(LocalDateTime.now())
                     .setCancelled(false)
                     .setUser(user)
-                    .setDeliveryAdress(user.getLocations().iterator().next())
+                    .setDeliveryAddress(user.getLocations().iterator().next())
                     .setPaymentDetail(user.getPaymentDetails().iterator().next())
                     .setTickets(boughtTicket)
                     .build();
