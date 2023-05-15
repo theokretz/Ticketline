@@ -7,9 +7,6 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.SeatMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
-import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
@@ -34,7 +31,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -99,21 +95,23 @@ public class CustomOrderService implements OrderService {
         order.setPaymentDetail(user.getPaymentDetails().iterator().next());
         orderRepository.save(order);
 
+
         List<CartTicketDto> ticketDtoList = cartService.getCart(userId);
         Set<Ticket> tickets = new HashSet<>();
+        BigDecimal price = new BigDecimal(0);
         //Tickets
         for (CartTicketDto cartTicketDto : ticketDtoList) {
             Ticket ticket = ticketRepository.findTicketById(cartTicketDto.getId());
             if (ticket == null) {
                 throw new NotFoundException("Could not find Ticket");
             }
-
+            price = price.add(cartTicketDto.getPrice());
             ticket.setOrder(order);
             tickets.add(ticket);
         }
 
         //Price
-        BigDecimal price = new BigDecimal(0);
+        /*
         boolean help = false;
         for (Ticket ticket : tickets) {
             Sector sector = ticket.getSeat().getSector();
@@ -126,7 +124,9 @@ public class CustomOrderService implements OrderService {
                 }
             }
             help = false;
-        }
+        }*/
+
+
         order.setTickets(tickets);
 
 

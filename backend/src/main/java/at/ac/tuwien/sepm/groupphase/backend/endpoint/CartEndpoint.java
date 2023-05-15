@@ -46,10 +46,10 @@ public class CartEndpoint {
 
     @PermitAll
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = "/cart")
+    @GetMapping(value = "/{id}/cart")
     @Operation(summary = "get cart of a user", security = @SecurityRequirement(name = "apiKey"))
-    public List<CartTicketDto> getCart(@Valid Integer userId) {
-        LOGGER.info("GET /api/v1/users/cart, userId: {}", userId);
+    public List<CartTicketDto> getCart(@Valid @PathVariable("id") Integer userId) {
+        LOGGER.info("GET /api/v1/users/{}/cart", userId);
         try {
             return cartService.getCart(userId);
         } catch (NotFoundException e) {

@@ -36,7 +36,7 @@ public class BookingEndpoint {
     }
 
     @PermitAll
-    @PostMapping
+    @PostMapping(value = "")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Buy Tickets from Cart", security = @SecurityRequirement(name = "apiKey"))
     public OrderDto buyTickets(@RequestBody Integer userId) {
