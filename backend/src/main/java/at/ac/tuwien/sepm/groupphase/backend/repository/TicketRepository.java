@@ -30,7 +30,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
         "performance.event",
         "performance.hall",
         "performance.hall.location",
-        "performance.performanceSectors"
+        "performance.performanceSectors",
+        "performance.performanceSectors.sector"
     })
     Ticket findTicketById(Integer id);
 
