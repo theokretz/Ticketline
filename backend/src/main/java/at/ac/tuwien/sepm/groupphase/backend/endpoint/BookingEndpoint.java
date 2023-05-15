@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +47,10 @@ public class BookingEndpoint {
         } catch (NotFoundException e) {
             LOGGER.info("Unable to buy Tickets: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (ConflictException e) {
+            LOGGER.info("Unable to buy tickets: " + e.getMessage());
+            HttpStatus status = HttpStatus.CONFLICT;
+            throw new ResponseStatusException(status, e.getMessage(), e);
         }
     }
 }

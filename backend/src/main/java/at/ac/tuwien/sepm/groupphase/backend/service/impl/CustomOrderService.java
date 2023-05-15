@@ -9,6 +9,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -69,7 +71,7 @@ public class CustomOrderService implements OrderService {
 
     @Transactional
     @Override
-    public OrderDto buyTickets(Integer userId) {
+    public OrderDto buyTickets(Integer userId) throws ConflictException {
         LOGGER.debug("Buy Tickets from Cart, userId: {}", userId);
 
         // ApplicationUser user = userRepository.findUserByEmail(userDto.getEmail());
@@ -102,6 +104,7 @@ public class CustomOrderService implements OrderService {
 
         List<CartTicketDto> ticketDtoList = cartService.getCart(userId);
         Set<Ticket> tickets = new HashSet<>();
+        List<String> conflictMsg = new ArrayList<>();
         BigDecimal price = new BigDecimal(0);
         //Tickets
         for (CartTicketDto cartTicketDto : ticketDtoList) {
@@ -112,15 +115,18 @@ public class CustomOrderService implements OrderService {
             }
             if (ticket.getOrder() != null) {
                 orderRepository.delete(order);
-                throw new FatalException("Ticket is already bought");
+                conflictMsg.add("Ticket " + ticket.getId() + " cannot be bought");
+                throw new ConflictException("Ticket is already bought", conflictMsg);
             }
             if (!ticket.getReservation().getCart()) {
                 orderRepository.delete(order);
-                throw new FatalException("Ticket is not in cart");
+                conflictMsg.add("Ticket " + ticket.getId() + " cannot be bought");
+                throw new ConflictException("Ticket is not in cart", conflictMsg);
             }
             if (!Objects.equals(ticket.getReservation().getUser().getId(), userId)) {
                 orderRepository.delete(order);
-                throw new FatalException("Ticket is not assigned to user");
+                conflictMsg.add("Ticket " + ticket.getId() + " cannot be bought");
+                throw new ConflictException("Ticket is not assigned to user", conflictMsg);
             }
             price = price.add(cartTicketDto.getPrice());
             ticket.setOrder(order);
