@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
 
 
@@ -11,8 +10,8 @@ public interface OrderService {
     /**
      * Buy tickets returns order dto.
      *
-     * @param cartDto the cart dto
+     * @param userId the user id
      * @return the order dto
      */
-    OrderDto buyTickets(CartDto cartDto);
+    OrderDto buyTickets(Integer userId);
 }

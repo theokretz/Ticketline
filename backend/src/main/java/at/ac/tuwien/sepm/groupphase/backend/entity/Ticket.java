@@ -75,6 +75,12 @@ public class Ticket {
         this.seat = seat;
     }
 
+    @Override
+    public String toString() {
+        return "Ticket{"
+            + "id=" + id
+            + '}';
+    }
 
     public static final class TicketBuilder {
         private Integer id;

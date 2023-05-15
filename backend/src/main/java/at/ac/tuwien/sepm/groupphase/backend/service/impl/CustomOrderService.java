@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.OrderMapper;
@@ -13,7 +12,6 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
-import at.ac.tuwien.sepm.groupphase.backend.exception.DtoException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
@@ -23,6 +21,7 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.SeatRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.TransactionRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepm.groupphase.backend.service.CartService;
 import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,7 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -49,11 +49,12 @@ public class CustomOrderService implements OrderService {
     private final SeatMapper seatMapper;
     private final TicketRepository ticketRepository;
     private final SeatRepository seatRepository;
+    private final CartService cartService;
 
     @Autowired
     public CustomOrderService(OrderRepository orderRepository, PerformanceRepository performanceRepository, UserRepository userRepository,
                               NotUserRepository notUserRepository, OrderMapper orderMapper, TransactionRepository transactionRepository,
-                              SeatMapper seatMapper, TicketRepository ticketRepository, SeatRepository seatRepository) {
+                              SeatMapper seatMapper, TicketRepository ticketRepository, SeatRepository seatRepository, CartService cartService) {
         this.orderRepository = orderRepository;
         this.performanceRepository = performanceRepository;
         this.userRepository = userRepository;
@@ -63,22 +64,20 @@ public class CustomOrderService implements OrderService {
         this.seatMapper = seatMapper;
         this.ticketRepository = ticketRepository;
         this.seatRepository = seatRepository;
+        this.cartService = cartService;
     }
 
     @Transactional
     @Override
-    public OrderDto buyTickets(CartDto cartDto) {
-        LOGGER.debug("Buy Tickets from Cart {}", cartDto);
-        if (cartDto == null) {
-            throw new DtoException("Cart cannot be null");
-        }
+    public OrderDto buyTickets(Integer userId) {
+        LOGGER.debug("Buy Tickets from Cart, userId: {}", userId);
 
         // ApplicationUser user = userRepository.findUserByEmail(userDto.getEmail());
         // geht nicht weil ich in Test den user mit notUserRepository speichere
         // wenn login implementiert dann UserRepository zu interface machen
 
 
-        ApplicationUser user = notUserRepository.findApplicationUserById(cartDto.getUserId());
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
         if (user == null) {
             throw new NotFoundException("Could not find User");
         }
@@ -100,9 +99,10 @@ public class CustomOrderService implements OrderService {
         order.setPaymentDetail(user.getPaymentDetails().iterator().next());
         orderRepository.save(order);
 
+        List<CartTicketDto> ticketDtoList = cartService.getCart(userId);
         Set<Ticket> tickets = new HashSet<>();
         //Tickets
-        for (CartTicketDto cartTicketDto : cartDto.getTickets()) {
+        for (CartTicketDto cartTicketDto : ticketDtoList) {
             Ticket ticket = ticketRepository.findTicketById(cartTicketDto.getId());
             if (ticket == null) {
                 throw new NotFoundException("Could not find Ticket");

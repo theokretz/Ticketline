@@ -13,7 +13,6 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
     @EntityGraph(attributePaths = {
         "reservations",
         "reservations.ticket",
-        "reservations.ticket.id",
         "locations",
         "paymentDetails"
     })

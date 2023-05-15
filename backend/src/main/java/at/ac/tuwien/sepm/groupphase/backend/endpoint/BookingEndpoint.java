@@ -1,16 +1,15 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,19 +27,22 @@ public class BookingEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private CartEndpoint cartEndpoint;
+
     @Autowired
-    public BookingEndpoint(OrderService orderService) {
+    public BookingEndpoint(OrderService orderService, CartEndpoint cartEndpoint) {
         this.orderService = orderService;
+        this.cartEndpoint = cartEndpoint;
     }
 
-    @Secured("ROLE_USER")
+    @PermitAll
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Buy Tickets from Cart", security = @SecurityRequirement(name = "apiKey"))
-    public OrderDto buyTickets(@RequestBody CartDto cartDto) {
-        LOGGER.info("POST /api/v1/bookings  cart: {}", cartDto);
+    public OrderDto buyTickets(@RequestBody Integer userId) {
+        LOGGER.info("POST /api/v1/bookings  cart: {}", userId);
         try {
-            return this.orderService.buyTickets(cartDto);
+            return this.orderService.buyTickets(userId);
         } catch (NotFoundException e) {
             LOGGER.info("Unable to buy Tickets: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
