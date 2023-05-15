@@ -67,8 +67,8 @@ public class CustomCartService implements CartService {
 
             //price
             BigDecimal price = new BigDecimal(-1);
-            for (PerformanceSector perfSector : ticket.getSeat().getSector().getPerformanceSectors()) {
-                if (perfSector.getPerformance() == ticket.getPerformance()) {
+            for (PerformanceSector perfSector : ticket.getPerformance().getPerformanceSectors()) {
+                if (perfSector.getSector() == ticket.getSeat().getSector()) {
                     price = perfSector.getPrice();
                 }
             }

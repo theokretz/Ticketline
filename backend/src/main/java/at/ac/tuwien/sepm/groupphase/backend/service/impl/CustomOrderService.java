@@ -14,6 +14,7 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.OrderRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ReservationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SeatRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.TransactionRepository;
@@ -31,6 +32,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -46,11 +48,12 @@ public class CustomOrderService implements OrderService {
     private final TicketRepository ticketRepository;
     private final SeatRepository seatRepository;
     private final CartService cartService;
+    private final ReservationRepository reservationRepository;
 
     @Autowired
     public CustomOrderService(OrderRepository orderRepository, PerformanceRepository performanceRepository, UserRepository userRepository,
                               NotUserRepository notUserRepository, OrderMapper orderMapper, TransactionRepository transactionRepository,
-                              SeatMapper seatMapper, TicketRepository ticketRepository, SeatRepository seatRepository, CartService cartService) {
+                              SeatMapper seatMapper, TicketRepository ticketRepository, SeatRepository seatRepository, CartService cartService, ReservationRepository reservationRepository) {
         this.orderRepository = orderRepository;
         this.performanceRepository = performanceRepository;
         this.userRepository = userRepository;
@@ -61,6 +64,7 @@ public class CustomOrderService implements OrderService {
         this.ticketRepository = ticketRepository;
         this.seatRepository = seatRepository;
         this.cartService = cartService;
+        this.reservationRepository = reservationRepository;
     }
 
     @Transactional
@@ -93,8 +97,8 @@ public class CustomOrderService implements OrderService {
             throw new FatalException("No PaymentDetails are saved for this User");
         }
         order.setPaymentDetail(user.getPaymentDetails().iterator().next());
-        orderRepository.save(order);
 
+        orderRepository.save(order);
 
         List<CartTicketDto> ticketDtoList = cartService.getCart(userId);
         Set<Ticket> tickets = new HashSet<>();
@@ -103,29 +107,26 @@ public class CustomOrderService implements OrderService {
         for (CartTicketDto cartTicketDto : ticketDtoList) {
             Ticket ticket = ticketRepository.findTicketById(cartTicketDto.getId());
             if (ticket == null) {
+                orderRepository.delete(order);
                 throw new NotFoundException("Could not find Ticket");
+            }
+            if (ticket.getOrder() != null) {
+                orderRepository.delete(order);
+                throw new FatalException("Ticket is already bought");
+            }
+            if (!ticket.getReservation().getCart()) {
+                orderRepository.delete(order);
+                throw new FatalException("Ticket is not in cart");
+            }
+            if (!Objects.equals(ticket.getReservation().getUser().getId(), userId)) {
+                orderRepository.delete(order);
+                throw new FatalException("Ticket is not assigned to user");
             }
             price = price.add(cartTicketDto.getPrice());
             ticket.setOrder(order);
             tickets.add(ticket);
+            reservationRepository.delete(ticket.getReservation());
         }
-
-        //Price
-        /*
-        boolean help = false;
-        for (Ticket ticket : tickets) {
-            Sector sector = ticket.getSeat().getSector();
-            Performance performance = ticket.getPerformance();
-            Set<PerformanceSector> performanceSectors = sector.getPerformanceSectors();
-            for (PerformanceSector perfSector : performanceSectors) {
-                if (Objects.equals(perfSector.getPerformance().getId(), performance.getId()) && !help && perfSector.getSector() == sector) {
-                    price = price.add(perfSector.getPrice());
-                    help = true;
-                }
-            }
-            help = false;
-        }*/
-
 
         order.setTickets(tickets);
 
@@ -157,6 +158,7 @@ public class CustomOrderService implements OrderService {
 
 
         transactionRepository.save(transaction);
+
         return orderMapper.orderToOrderDto(order);
     }
 }
