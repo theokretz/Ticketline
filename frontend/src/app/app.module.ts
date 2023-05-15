@@ -16,6 +16,10 @@ import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PerformanceComponent } from './components/performance/performance.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
+import { CartComponent } from './components/cart/cart.component';
+import { PaymentDetailComponent } from './components/payment-detail/payment-detail.component';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatTableModule} from '@angular/material/table';
 
 @NgModule({
   declarations: [
@@ -27,6 +31,8 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
     MessageComponent,
     PerformanceComponent,
     PageNotFoundComponent,
+    CartComponent,
+    PaymentDetailComponent,
   ],
   imports: [
     BrowserModule,
@@ -40,6 +46,9 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
     //-------
     NgbModule,
     FormsModule,
+    //Needed for MatDialog
+    MatDialogModule,
+    MatTableModule,
   ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent],
