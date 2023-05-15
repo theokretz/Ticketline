@@ -6,6 +6,7 @@ import {AuthGuard} from './guards/auth.guard';
 import {MessageComponent} from './components/message/message.component';
 import { PerformanceComponent } from './components/performance/performance.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
+import {CartComponent} from './components/cart/cart.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -17,7 +18,8 @@ const routes: Routes = [
       { path: ':id', component: PerformanceComponent },
     ]
   },
-  { path: '**', component: PageNotFoundComponent },
+  {path: 'cart', component: CartComponent},
+  { path: '**', component: PageNotFoundComponent }
 ];
 
 @NgModule({

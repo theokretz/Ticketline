@@ -7,10 +7,11 @@ import {AuthService} from '../../services/auth.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
-
+  userId: number;
   constructor(public authService: AuthService) { }
 
   ngOnInit() {
+    this.userId = this.authService.getUserId();
   }
 
 }

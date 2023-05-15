@@ -1,0 +1,52 @@
+<h1>Your Cart</h1>
+
+<div class="ticket-container">
+  <div *ngIf="cartTickets.length === 0">
+    <h5>Your Cart is Empty</h5>
+  </div>
+  <table *ngIf="cartTickets.length !== 0" class="table ticket-table">
+    <thead>
+    <tr class="ticket-header">
+      <th>Event</th>
+      <th>Seat</th>
+      <th>Sector</th>
+      <th>Date</th>
+      <th>Location</th>
+      <th>Price</th>
+      <th class="min-width">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let cartTicket of cartTickets" class="ticket-row">
+      <td>{{cartTicket.eventName}}</td>
+      <td>{{seatToString(cartTicket)}}</td>
+      <td>{{cartTicket.sectorName}}</td>
+      <td>{{dateToLocaleDate(cartTicket)}}</td>
+      <td>{{locationToString(cartTicket)}}</td>
+      <td>{{cartTicket.price}}</td>
+      <td>
+        <div class="btn-group">
+          <a class="btn btn-danger"
+             aria-label="Remove Ticket"
+             (click)="removeTicket(cartTicket.id)"
+             style="font-size: 12px;">
+            <i class="bi-trash"></i>
+            remove
+          </a>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+    <br>
+  </table>
+  <div class="button-container" *ngIf="cartTickets.length !== 0" >
+    <div class="btn-group">
+      <a class="btn btn-outline-danger btn-lg"
+         aria-label="checkout"
+         (click)="checkout()">
+        <i class="bi bi-trash"></i>
+        checkout
+      </a>
+    </div>
+  </div>
+</div>

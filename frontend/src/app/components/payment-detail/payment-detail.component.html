@@ -1,0 +1,31 @@
+<h1 mat-dialog-title>Choose Credit Card</h1>
+<div mat-dialog-content>
+  <table *ngIf="dialogData.paymentDetails" mat-table [dataSource]="dialogData.paymentDetails" class="mat-elevation-z8">
+    <ng-container matColumnDef="number">
+      <th mat-header-cell *matHeaderCellDef> Number </th>
+      <td mat-cell *matCellDef="let element"> {{element.cardNumber}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.cardHolder}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expirationDate">
+      <th mat-header-cell *matHeaderCellDef> Expiration Date </th>
+      <td mat-cell *matCellDef="let element"> {{getFormattedExpirationDate(element.expirationDate)}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="cvv">
+      <th mat-header-cell *matHeaderCellDef> CVV </th>
+      <td mat-cell *matCellDef="let element"> {{element.cvv}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr (click)="buy()" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  <br>
+  <button class="buy-button"
+          (click)="buy()">Buy
+  </button>
+</div>

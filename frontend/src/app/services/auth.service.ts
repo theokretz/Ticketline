@@ -62,6 +62,14 @@ export class AuthService {
     return 'UNDEFINED';
   }
 
+  getUserId() {
+    if(this.getToken() != null) {
+      const decoded: any = jwt_decode(this.getToken());
+      const authInfo: any = decoded.id;
+      return authInfo;
+    }
+  }
+
   private setToken(authResponse: string) {
     localStorage.setItem('authToken', authResponse);
   }
