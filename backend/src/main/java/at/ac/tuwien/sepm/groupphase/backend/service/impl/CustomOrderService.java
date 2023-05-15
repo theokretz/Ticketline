@@ -136,6 +136,7 @@ public class CustomOrderService implements OrderService {
             price = price.add(cartTicketDto.getPrice());
             ticket.setOrder(order);
             tickets.add(ticket);
+            ticket.setReservation(null);
             reservationRepository.delete(ticket.getReservation());
         }
 
