@@ -124,8 +124,13 @@ public class CustomCartService implements CartService {
         List<Reservation> reserved = new ArrayList<>();
         Map<Integer, List<Ticket>> ticketsBySector = new HashMap<>();
         for (Ticket ticket : foundTickets) {
-            // check if ticket is already reserved or bought
-            if (ticket.getOrder() != null || !(ticket.getReservation() == null || ticket.getReservation().getExpirationTs().isBefore(LocalDateTime.now()))) {
+            // if ticket is already in cart
+            if (ticket.getReservation() != null && ticket.getReservation().getCart()) {
+                conflictMsg.add("Ticket " + ticket.getId() + " is already in cart");
+                continue;
+            }
+            // check if ticket is already bought
+            if (ticket.getOrder() != null && (ticket.getReservation() != null && ticket.getReservation().getExpirationTs().isBefore(LocalDateTime.now()))) {
                 // if ticket cannot be reserved, check if it is standing
                 Sector sector = ticket.getSeat().getSector();
                 if (sector.getStanding()) {
@@ -162,11 +167,12 @@ public class CustomCartService implements CartService {
 
     private void addTicketToReserved(ApplicationUser user, List<Reservation> reserved, Ticket ticket) {
         Integer id = ticket.getReservation() == null ? null : ticket.getReservation().getId();
+        LocalDateTime expiration = ticket.getReservation() == null ? LocalDateTime.now().plusMinutes(15) : ticket.getReservation().getExpirationTs();
         Reservation reservation = Reservation.ReservationBuilder.aReservation()
             .withId(id)
             .withTicket(ticket)
             .withCart(true)
-            .withExpirationTs(LocalDateTime.now().plusMinutes(15))
+            .withExpirationTs(expiration)
             .withUser(user)
             .build();
         reserved.add(reservation);
