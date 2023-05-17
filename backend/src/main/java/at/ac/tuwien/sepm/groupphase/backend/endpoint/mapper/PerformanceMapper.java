@@ -2,9 +2,10 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedPerformanceDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedPerformanceSectorDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PerformanceTicketDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedOrderPerformanceDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Hall;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
@@ -21,6 +22,10 @@ public abstract class PerformanceMapper {
     protected SectorMapper sectorMapper;
     @Autowired
     protected SeatMapper seatMapper;
+    @Autowired
+    protected EventMapper eventMapper;
+    @Autowired
+    protected HallMapper hallMapper;
 
     public DetailedPerformanceDto performanceToDetailedPerformanceDto(Performance performance) {
         if (performance == null) {
@@ -51,6 +56,18 @@ public abstract class PerformanceMapper {
             .withLocation(locationDto)
             .withPerformanceSector(detailedPerformanceSectorDto)
             .withPerformanceTickets(performanceTickets)
+            .build();
+    }
+
+    public DetailedOrderPerformanceDto performanceToDetailedOrderPerformanceDto(Performance performance) {
+        if (performance == null) {
+            return null;
+        }
+        return DetailedOrderPerformanceDto.DetailedOrderPerformanceDtoBuilder.aDetailedOrderPerformanceDto()
+            .withId(performance.getId())
+            .withDatetime(performance.getDatetime())
+            .withEvent(eventMapper.eventToDetailedEventDto(performance.getEvent()))
+            .withHall(hallMapper.hallToDetailedHallDto(performance.getHall()))
             .build();
     }
 }

@@ -26,4 +26,14 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
      */
     @Query("SELECT DISTINCT u FROM ApplicationUser u JOIN FETCH u.locations JOIN FETCH u.paymentDetails")
     List<ApplicationUser> findAllWithLocationsAndPaymentDetails();
+
+    /**
+     * Find user by id.
+     *
+     * @param id of user to find
+     * @return user with given id
+     */
+    ApplicationUser getApplicationUserById(Integer id);
+
+
 }

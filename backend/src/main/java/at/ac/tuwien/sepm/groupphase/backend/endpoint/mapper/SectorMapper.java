@@ -1,7 +1,9 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedPerformanceSectorDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedSectorDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -32,4 +34,6 @@ public interface SectorMapper {
             .collect(Collectors.toMap(performanceSector -> performanceSector.getSector().getId(),
                 this::performanceSectorToDetailedPerformanceSectorDto));
     }
+
+    DetailedSectorDto sectorToDetailedSectorDto(Sector sector);
 }

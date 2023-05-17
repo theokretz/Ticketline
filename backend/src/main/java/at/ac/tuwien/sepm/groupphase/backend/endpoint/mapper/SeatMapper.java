@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
-
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedSeatDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PerformanceTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SeatDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
@@ -19,6 +19,8 @@ public abstract class SeatMapper {
 
     @Autowired
     protected TicketRepository ticketRepository;
+    @Autowired
+    protected SectorMapper sectorMapper;
 
     public PerformanceTicketDto[][] performanceToReservedSeat(Performance performance) {
         Set<PerformanceSector> performanceSector = performance.getPerformanceSectors();
@@ -56,4 +58,31 @@ public abstract class SeatMapper {
         }
         return performanceTicketDtos;
     }
+
+    public DetailedSeatDto seatToDetailedSeatDto(Seat seat) {
+        if (seat == null) {
+            return null;
+        }
+        return DetailedSeatDto.DetailedSeatDtoBuilder.aDetailedSeatDto()
+            .withRow(seat.getRow())
+            .withNumber(seat.getNumber())
+            .withSector(sectorMapper.sectorToDetailedSectorDto(seat.getSector()))
+            .build();
+    }
+
+    /**
+     * Seat to seat dto.
+     *
+     * @param seat the seat
+     * @return the seat dto
+     */
+    abstract SeatDto seatToDto(Seat seat);
+
+    /**
+     * Dto to seat.
+     *
+     * @param seatDto the seat dto
+     * @return the seat
+     */
+    abstract Seat dtoToSeat(SeatDto seatDto);
 }
