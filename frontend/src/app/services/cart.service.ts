@@ -1,17 +1,19 @@
-import { Injectable } from '@angular/core';
-import { CartTicket } from '../dtos/ticket';
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { Globals } from '../global/globals';
-import { CheckoutPaymentDetail } from '../dtos/payment-detail';
-import { Booking } from '../dtos/booking';
-import { CheckoutDetails } from '../dtos/checkout-details';
-import { CheckoutLocation } from '../dtos/location';
+import {Injectable} from '@angular/core';
+import {CartTicket} from '../dtos/ticket';
+import {Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {Globals} from '../global/globals';
+import {CheckoutPaymentDetail} from '../dtos/payment-detail';
+import {Booking} from '../dtos/booking';
+import {CheckoutDetails} from '../dtos/checkout-details';
+import {CheckoutLocation} from '../dtos/location';
+import {BookingMerchandise, Merchandise} from '../dtos/merchandise';
 
 export interface DialogData {
   paymentDetails: CheckoutPaymentDetail[];
   locations: CheckoutLocation[];
 }
+
 @Injectable({
   providedIn: 'root',
 })
@@ -19,7 +21,8 @@ export class CartService {
   items: CartTicket[];
   private cartBaseUri: string = this.globals.backendUri;
 
-  constructor(private http: HttpClient, private globals: Globals) {}
+  constructor(private http: HttpClient, private globals: Globals) {
+  }
 
   /**
    * Get the tickets in the cart of the specified user
@@ -55,4 +58,9 @@ export class CartService {
       this.cartBaseUri + '/users/' + userId + '/checkout-details'
     );
   }
+
+  getMerchInfo(bookingMerchandises: BookingMerchandise[]): Observable<Merchandise[]> {
+    return this.http.post<Merchandise[]>(this.cartBaseUri + '/merch', bookingMerchandises);
+  }
+
 }
