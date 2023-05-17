@@ -23,6 +23,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
 import { DeliveryAddressComponent } from './components/cart/delivery-address/delivery-address.component';
 import { BuyComponent } from './components/cart/buy/buy.component';
+import { MerchandiseComponent } from './components/merchandise/merchandise.component';
+import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
   declarations: [
@@ -39,6 +41,8 @@ import { BuyComponent } from './components/cart/buy/buy.component';
     ReservationComponent,
     DeliveryAddressComponent,
     BuyComponent,
+    MerchandiseComponent,
+    MerchandiseComponent,
   ],
   imports: [
     BrowserModule,
@@ -46,7 +50,13 @@ import { BuyComponent } from './components/cart/buy/buy.component';
     ReactiveFormsModule,
     HttpClientModule,
     //Needed for Toastr
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      extendedTimeOut: 1000,
+      closeButton: true,
+      progressBar: true,
+      tapToDismiss: false
+    }),
     BrowserAnimationsModule,
     ReactiveFormsModule,
     //-------
@@ -55,8 +65,12 @@ import { BuyComponent } from './components/cart/buy/buy.component';
     //Needed for MatDialog
     MatDialogModule,
     MatTableModule,
+
   ],
-  providers: [httpInterceptorProviders],
+  providers: [
+    httpInterceptorProviders,
+    CookieService,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

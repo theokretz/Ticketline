@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { CartService } from '../../services/cart.service';
-import { AuthService } from '../../services/auth.service';
-import { BookingTicket, CartTicket } from '../../dtos/ticket';
-import { ToastrService } from 'ngx-toastr';
-import { PaymentDetail } from '../../dtos/payment-detail';
-import { Booking } from 'src/app/dtos/booking';
-import { MatDialog } from '@angular/material/dialog';
-import { PaymentDetailComponent } from './payment-detail/payment-detail.component';
-import { DeliveryAddressComponent } from './delivery-address/delivery-address.component';
-import { BuyComponent } from './buy/buy.component';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {CartService} from '../../services/cart.service';
+import {AuthService} from '../../services/auth.service';
+import {BookingTicket, CartTicket} from '../../dtos/ticket';
+import {ToastrService} from 'ngx-toastr';
+import {PaymentDetail} from '../../dtos/payment-detail';
+import {Booking} from 'src/app/dtos/booking';
+import {MatDialog} from '@angular/material/dialog';
+import {PaymentDetailComponent} from './payment-detail/payment-detail.component';
+import {DeliveryAddressComponent} from './delivery-address/delivery-address.component';
+import {BuyComponent} from './buy/buy.component';
+import {Router} from '@angular/router';
+import {CookieService} from 'ngx-cookie-service';
+import {BookingMerchandise, Merchandise} from '../../dtos/merchandise';
+
 
 @Component({
   selector: 'app-cart',
@@ -18,6 +21,8 @@ import { Router } from '@angular/router';
 })
 export class CartComponent implements OnInit {
   cartTickets: CartTicket[] = [];
+  cartMerch: Merchandise[] = [];
+
   bannerError: string | null = null;
   paymentDetail1: PaymentDetail = new PaymentDetail(
     1,
@@ -33,11 +38,15 @@ export class CartComponent implements OnInit {
     private authService: AuthService,
     private notification: ToastrService,
     private dialog: MatDialog,
-    private router: Router
-  ) {}
+    private router: Router,
+    private cookie: CookieService,
+  ) {
+  }
+
 
   ngOnInit(): void {
     this.reloadCart();
+    this.loadFromCookie();
   }
 
   reloadCart() {
@@ -71,6 +80,7 @@ export class CartComponent implements OnInit {
       });
   }
 
+
   dateToLocaleDate(cartTicket: CartTicket): string {
     return new Date(cartTicket.date).toLocaleDateString();
   }
@@ -101,6 +111,8 @@ export class CartComponent implements OnInit {
           bookingTicket.reservation = cartTicket.reservation;
           return bookingTicket;
         });
+        booking.merchandise = this.cartMerch.map((cartMerch) => new BookingMerchandise(cartMerch.id, cartMerch.quantity));
+
         try {
           const paymentDetailId = await this.openPaymentDialog(
             checkoutDetails.paymentDetails
@@ -118,6 +130,7 @@ export class CartComponent implements OnInit {
               next: () => {
                 this.notification.success('Successfully booked tickets');
                 this.router.navigate(['/']);
+                this.cookie.delete('merchandise');
               },
               error: (err) => {
                 console.error(err);
@@ -151,7 +164,7 @@ export class CartComponent implements OnInit {
     return new Promise((resolve, reject) => {
       const paymentRef = this.dialog.open(PaymentDetailComponent, {
         width: '25%',
-        data: { paymentDetails },
+        data: {paymentDetails},
       });
 
       paymentRef.componentInstance.paymentSelector.subscribe(
@@ -167,7 +180,7 @@ export class CartComponent implements OnInit {
     return new Promise((resolve, reject) => {
       const locationRef = this.dialog.open(DeliveryAddressComponent, {
         width: '25%',
-        data: { locations },
+        data: {locations},
       });
 
       locationRef.componentInstance.locationSelector.subscribe(
@@ -191,4 +204,46 @@ export class CartComponent implements OnInit {
       });
     });
   }
+
+
+  totalPrice(price: number, quantity: number): number {
+    return Number((price * quantity).toFixed(2));
+  }
+
+  // remove merch from cart
+  removeMerch(merchId: number) {
+    const value: string = this.cookie.get('merchandise');
+    if (value !== '') {
+      //delete merch from this.cartMerch
+      this.cartMerch = this.cartMerch.filter(merch => merch.id !== merchId);
+      //delete merch from cookie
+      const bookingMerchandises: BookingMerchandise[] = Object.values(JSON.parse(value))
+        .map(entry => new BookingMerchandise(entry['id'], entry['quantity']));
+      const newBookingMerchandises: BookingMerchandise[] = bookingMerchandises.filter(merch => merch.id !== merchId);
+      this.cookie.set('merchandise', JSON.stringify(newBookingMerchandises));
+    }
+  }
+
+  //load merch from cookie and then fetch remaining Data from backend
+  private loadFromCookie() {
+    const value: string = this.cookie.get('merchandise');
+    if (value !== '') {
+      //create BookingMerchandise[] obj from json
+      const bookingMerchandises: BookingMerchandise[] = Object.values(JSON.parse(value))
+        .map(entry => new BookingMerchandise(entry['id'], entry['quantity']));
+      //get merch info from backend
+      this.service.getMerchInfo(bookingMerchandises).subscribe({
+        next: (data: Merchandise[]) => {
+          data.map(merch => {
+            merch.quantity = bookingMerchandises.find(bookingMerch => bookingMerch.id === merch.id).quantity;
+          });
+          this.cartMerch = data;
+          console.log(this.cartMerch);
+        }, error: (error) => {
+          this.notification.error(error.message, 'Could Not Fetch Merchandise');
+        }
+      });
+    }
+  }
+
 }

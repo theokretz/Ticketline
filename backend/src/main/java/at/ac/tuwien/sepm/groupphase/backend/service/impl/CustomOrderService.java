@@ -116,7 +116,9 @@ public class CustomOrderService implements OrderService {
 
             // check if bookingDto.getPaymentDetailId() is contained in user.getPaymentDetails()
             if (bookingDto.getPaymentDetailId() != null) {
-                PaymentDetail paymentDetail = user.getPaymentDetails().stream().filter(paymentDetail1 -> paymentDetail1.getId().equals(bookingDto.getPaymentDetailId())).findFirst().orElse(null);
+                PaymentDetail paymentDetail =
+                    user.getPaymentDetails().stream().filter(paymentDetail1 -> paymentDetail1.getId().equals(bookingDto.getPaymentDetailId())).findFirst()
+                        .orElse(null);
                 if (paymentDetail == null) {
                     conflictMsg.add("Payment Detail not found for User");
                     throw new ConflictException("Error creating order", conflictMsg);
@@ -132,7 +134,8 @@ public class CustomOrderService implements OrderService {
             }
             // check if bookingDto.getLocationId() is contained in user.getLocations()
             if (bookingDto.getLocationId() != null) {
-                Location location = user.getLocations().stream().filter(location1 -> location1.getId().equals(bookingDto.getLocationId())).findFirst().orElse(null);
+                Location location =
+                    user.getLocations().stream().filter(location1 -> location1.getId().equals(bookingDto.getLocationId())).findFirst().orElse(null);
                 if (location == null) {
                     conflictMsg.add("Location not found for User");
                     throw new ConflictException("Error creating order", conflictMsg);
@@ -146,7 +149,7 @@ public class CustomOrderService implements OrderService {
         // Tickets
         if (hasTickets) {
             // fetch tickets from db
-            List<Ticket> fetchedTickets = ticketRepository.findAllByIdsWithPerformance(
+            List<Ticket> fetchedTickets = ticketRepository.findAllByIdIn(
                 bookingDto.getTickets().stream().map(BookingTicketDto::getTicketId).collect(Collectors.toList()));
 
             // check if all tickets are found
@@ -162,7 +165,8 @@ public class CustomOrderService implements OrderService {
             for (Ticket ticket : fetchedTickets) {
 
                 // find ticket in bookingDto by id
-                BookingTicketDto bookingTicketDto = bookingDto.getTickets().stream().filter(ticketDto -> ticketDto.getTicketId().equals(ticket.getId())).findFirst().get();
+                BookingTicketDto bookingTicketDto =
+                    bookingDto.getTickets().stream().filter(ticketDto -> ticketDto.getTicketId().equals(ticket.getId())).findFirst().get();
 
                 // check if ticket is already bought or reserved
                 if (ticket.getOrder() != null
@@ -218,7 +222,7 @@ public class CustomOrderService implements OrderService {
 
         if (hasMerchandise) {
             List<Merchandise> fetchedMerchandise = merchandiseRepository.findAllById(
-                bookingDto.getMerchandise().stream().map(BookingMerchandiseDto::getMerchandiseId).collect(Collectors.toList()));
+                bookingDto.getMerchandise().stream().map(BookingMerchandiseDto::getId).collect(Collectors.toList()));
 
             if (fetchedMerchandise.size() != bookingDto.getMerchandise().size()) {
                 conflictMsg.add("Not all merchandise found");
@@ -228,7 +232,8 @@ public class CustomOrderService implements OrderService {
             Set<MerchandiseOrdered> merchandiseOrderedToSave = new HashSet<>();
 
             for (BookingMerchandiseDto merchandiseDto : bookingDto.getMerchandise()) {
-                Merchandise merchandise = fetchedMerchandise.stream().filter(merchandise1 -> merchandise1.getId().equals(merchandiseDto.getMerchandiseId())).findFirst().get();
+                Merchandise merchandise =
+                    fetchedMerchandise.stream().filter(merchandise1 -> merchandise1.getId().equals(merchandiseDto.getId())).findFirst().get();
                 MerchandiseOrdered merchandiseOrdered = MerchandiseOrdered.MerchandiseOrderedBuilder.aMerchandiseOrdered()
                     .withMerchandise(merchandise)
                     .withOrder(order)

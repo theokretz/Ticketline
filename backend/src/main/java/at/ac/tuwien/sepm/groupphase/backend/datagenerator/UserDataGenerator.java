@@ -18,14 +18,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 @Profile("generateData")
 @Component
 @DependsOn({"locationDataGenerator"})
 public class UserDataGenerator {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final int NUMBER_OF_USERS_TO_GENERATE = 20;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String TEST_FIRST_NAME = "First Name";
     private static final String TEST_LAST_NAME = "Last Name";
     private static final String TEST_E_MAIL = "test@mail.com";
