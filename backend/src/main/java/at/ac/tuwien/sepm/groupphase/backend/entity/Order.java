@@ -32,11 +32,11 @@ public class Order {
     private Set<MerchandiseOrdered> merchandiseOrdered;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivery_adress_id", nullable = false)
+    @JoinColumn(name = "delivery_adress_id")
     private Location deliveryAddress;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_detail_id", nullable = false)
+    @JoinColumn(name = "payment_detail_id")
     private PaymentDetail paymentDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)

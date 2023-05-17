@@ -1,7 +1,9 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.bookings.BookingDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 
 
 /**
@@ -14,5 +16,5 @@ public interface OrderService {
      * @param userId the user id
      * @return the order dto
      */
-    OrderDto buyTickets(Integer userId) throws ConflictException;
+    OrderDto buyTickets(Integer userId, BookingDto bookingDto) throws ConflictException, ValidationException;
 }

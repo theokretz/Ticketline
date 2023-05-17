@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -46,9 +48,11 @@ public class UserDataGenerator {
             LOGGER.debug("users already generated");
         } else {
             LOGGER.debug("generating {} user entries", NUMBER_OF_USERS_TO_GENERATE);
-            List<Location> location = locationRepository.findAll().subList(0, 5);
-            Set<Location> uniqueLocations = Set.copyOf(location);
+            // find first location without user
+
+
             for (int i = 1; i < NUMBER_OF_USERS_TO_GENERATE; i++) {
+                Location firstWithoutUser = locationRepository.findFirstByUserIdIsNull();
                 ApplicationUser user = ApplicationUser.UserBuilder.aUser()
                     .withAdmin(false)
                     .withFirstName(TEST_FIRST_NAME + " " + i)
@@ -58,11 +62,15 @@ public class UserDataGenerator {
                     .withSalt(TEST_SALT + i)
                     .withPoints(TEST_POINTS + i)
                     .withLocked(false)
-                    .withLocations(uniqueLocations)
+                    .withLocations(Collections.singleton(firstWithoutUser))
                     .build();
 
                 LOGGER.debug("saving user {}", user);
                 notUserRepository.save(user);
+                if (firstWithoutUser != null) {
+                    firstWithoutUser.setUser(user);
+                    locationRepository.save(firstWithoutUser);
+                }
             }
         }
 

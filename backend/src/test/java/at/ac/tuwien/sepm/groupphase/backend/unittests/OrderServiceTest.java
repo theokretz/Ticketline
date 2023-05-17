@@ -278,7 +278,7 @@ public class OrderServiceTest {
             .isNotNull()
             .extracting("id", "tickets", "transactions", "paymentDetail", "deliveryAddress.id", "cancelled")
             .contains(orderEntity.getId(), order.getTickets(), order.getTransactions(), paymentDetail.getId(), location.getId(), false);
-    }*/
+
 
 
     @Test
@@ -286,5 +286,5 @@ public class OrderServiceTest {
         assertThrows(NotFoundException.class, () -> orderService.buyTickets(99999));
     }
 
-
+    }*/
 }

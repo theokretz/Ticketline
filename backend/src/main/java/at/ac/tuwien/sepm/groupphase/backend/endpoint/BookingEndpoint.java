@@ -1,12 +1,15 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.bookings.BookingDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,28 +31,30 @@ public class BookingEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private CartEndpoint cartEndpoint;
 
     @Autowired
     public BookingEndpoint(OrderService orderService, CartEndpoint cartEndpoint) {
         this.orderService = orderService;
-        this.cartEndpoint = cartEndpoint;
     }
 
     @PermitAll
-    @PostMapping(value = "")
-    @ResponseStatus(HttpStatus.OK)
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Buy Tickets from Cart", security = @SecurityRequirement(name = "apiKey"))
-    public OrderDto buyTickets(@RequestBody Integer userId) {
-        LOGGER.info("POST /api/v1/bookings  cart: {}", userId);
+    public OrderDto buyTickets(@Valid @RequestBody BookingDto bookingDto) {
+        LOGGER.info("POST /api/v1/bookings  cart: {}", 1);
         try {
-            return this.orderService.buyTickets(userId);
+            return this.orderService.buyTickets(1, bookingDto); // TODO: replace 1 with actual user id
         } catch (NotFoundException e) {
             LOGGER.info("Unable to buy Tickets: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (ConflictException e) {
             LOGGER.info("Unable to buy tickets: " + e.getMessage());
             HttpStatus status = HttpStatus.CONFLICT;
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        } catch (ValidationException e) {
+            LOGGER.info("Unable to buy tickets: " + e.getMessage());
+            HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
             throw new ResponseStatusException(status, e.getMessage(), e);
         }
     }

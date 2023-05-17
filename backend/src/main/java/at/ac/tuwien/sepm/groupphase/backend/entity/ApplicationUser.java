@@ -57,12 +57,7 @@ public class ApplicationUser {
     @OneToMany(mappedBy = "user")
     private Set<Reservation> reservations;
 
-    @ManyToMany
-    @JoinTable(
-        name = "user_location",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "location_id")
-    )
+    @OneToMany(mappedBy = "user")
     private Set<Location> locations;
 
     public Integer getId() {
@@ -193,7 +188,7 @@ public class ApplicationUser {
     public void setLocations(final Set<Location> locations) {
         this.locations = locations;
     }
-    
+
 
     public static final class UserBuilder {
         private Integer id;
