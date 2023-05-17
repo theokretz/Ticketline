@@ -1,0 +1,16 @@
+<div class="p-3">
+  <h1>Choose Delivery Address</h1>
+  <div
+    class="card p-3"
+    *ngFor="let location of dialogData.locations; let i = index"
+    (click)="locationSelector.emit(location.locationId)"
+  >
+    <h2>Address {{ i + 1 }}</h2>
+    <p>{{ location.street }}</p>
+    <p>{{ location.postalCode }} {{ location.city }}</p>
+    <p>{{ location.country }}</p>
+    <button class="btn btn-primary stretched-link" style="width: 10rem">
+      Select
+    </button>
+  </div>
+</div>

@@ -9,46 +9,55 @@
 
   <table *ngIf="cartTickets.length !== 0" class="table ticket-table">
     <thead>
-    <tr class="ticket-header">
-      <th>Event</th>
-      <th>Seat</th>
-      <th>Sector</th>
-      <th>Date</th>
-      <th>Location</th>
-      <th>Price</th>
-      <th class="min-width">Action</th>
-    </tr>
+      <tr class="ticket-header">
+        <th>Event</th>
+        <th>Seat</th>
+        <th>Sector</th>
+        <th>Date</th>
+        <th>Location</th>
+        <th>Reservation</th>
+        <th>Price</th>
+        <!-- Added checkbox column -->
+        <th class="min-width">Action</th>
+      </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let cartTicket of cartTickets" class="ticket-row">
-      <td>{{cartTicket.eventName}}</td>
-      <td>{{seatToString(cartTicket)}}</td>
-      <td>{{cartTicket.sectorName}}</td>
-      <td>{{dateToLocaleDate(cartTicket)}}</td>
-      <td>{{locationToString(cartTicket)}}</td>
-      <td>{{cartTicket.price}}</td>
-      <td>
-        <div class="btn-group">
-          <a class="btn btn-danger"
-             aria-label="Remove Ticket"
-             (click)="removeTicket(cartTicket.id)"
-             style="font-size: 12px;">
-            <i class="bi-trash"></i>
-            remove
-          </a>
-        </div>
-      </td>
-    </tr>
+      <tr *ngFor="let cartTicket of cartTickets" class="ticket-row">
+        <td>{{ cartTicket.eventName }}</td>
+        <td>{{ seatToString(cartTicket) }}</td>
+        <td>{{ cartTicket.sectorName }}</td>
+        <td>{{ dateToLocaleDate(cartTicket) }}</td>
+        <td>{{ locationToString(cartTicket) }}</td>
+        <td>
+          <input type="checkbox" [(ngModel)]="cartTicket.reservation" />
+        </td>
+        <td>{{ cartTicket.price }}</td>
+        <td>
+          <div class="btn-group">
+            <a
+              class="btn btn-danger"
+              aria-label="Remove Ticket"
+              (click)="removeTicket(cartTicket.id)"
+              style="font-size: 12px"
+            >
+              <i class="bi-trash"></i>
+              Remove
+            </a>
+          </div>
+        </td>
+      </tr>
     </tbody>
-    <br>
+    <br />
   </table>
-  <div class="button-container" *ngIf="cartTickets.length !== 0" >
+  <div class="button-container" *ngIf="cartTickets.length !== 0">
     <div class="btn-group">
-      <a class="btn btn-outline-danger btn-lg"
-         aria-label="checkout"
-         (click)="checkout()">
+      <a
+        class="btn btn-outline-danger btn-lg"
+        aria-label="checkout"
+        (click)="checkout()"
+      >
         <i class="bi bi-trash"></i>
-        checkout
+        Checkout
       </a>
     </div>
   </div>

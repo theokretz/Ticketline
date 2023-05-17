@@ -1,4 +1,4 @@
-import {SimpleSeat} from './seat';
+import { SimpleSeat } from './seat';
 
 export class PerformanceTicket {
   ticketId: number;
@@ -15,4 +15,23 @@ export class SimpleTicket {
 export class ReservedTicket {
   id: number;
   seat: SimpleSeat;
+}
+export class BookingTicket {
+  ticketId: number;
+  reservation: boolean;
+}
+
+export class CartTicket {
+  id: number;
+  seatRow: number;
+  seatNumber: number;
+  sectorName: string;
+  standing: boolean;
+  date: Date;
+  eventName: string;
+  hallName: string;
+  locationCity: string;
+  locationStreet: string;
+  price: number;
+  reservation: boolean;
 }
