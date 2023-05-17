@@ -24,7 +24,7 @@ public class PerformanceDataGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final int NUMBER_OF_PERFORMANCES_TO_GENERATE = 10;
-    private static final LocalDateTime TEST_PERFORMANCE_START = LocalDateTime.of(2023, 1, 1, 10, 0);
+    private static final LocalDateTime TEST_PERFORMANCE_START = LocalDateTime.of(2024, 1, 1, 10, 0);
 
     private final PerformanceRepository performanceRepository;
     private final HallRepository hallRepository;

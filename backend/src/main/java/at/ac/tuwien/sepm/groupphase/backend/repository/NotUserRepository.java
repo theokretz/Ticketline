@@ -14,7 +14,8 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
         "reservations",
         "reservations.ticket",
         "locations",
-        "paymentDetails"
+        "paymentDetails",
+        "paymentDetails.orders",
     })
     ApplicationUser findApplicationUserById(Integer id);
 

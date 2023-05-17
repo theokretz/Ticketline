@@ -3,8 +3,11 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleTicketDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutDetailsDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.TicketMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
+import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
@@ -12,7 +15,9 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.PaymentDetailRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ReservationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.CartService;
@@ -38,15 +43,19 @@ public class CustomCartService implements CartService {
     private final TicketRepository ticketRepository;
     private final NotUserRepository notUserRepository;
     private final ReservationRepository reservationRepository;
+    private final PaymentDetailRepository paymentDetailRepository;
+    private final LocationRepository locationRepository;
 
     private final TicketMapper ticketMapper;
 
     public CustomCartService(TicketRepository ticketRepository, NotUserRepository notUserRepository, ReservationRepository reservationRepository,
-                             TicketMapper ticketMapper) {
+                             TicketMapper ticketMapper, PaymentDetailRepository paymentDetailRepository, LocationRepository locationRepository) {
         this.ticketRepository = ticketRepository;
         this.notUserRepository = notUserRepository;
         this.reservationRepository = reservationRepository;
         this.ticketMapper = ticketMapper;
+        this.paymentDetailRepository = paymentDetailRepository;
+        this.locationRepository = locationRepository;
     }
 
     @Override
@@ -66,13 +75,15 @@ public class CustomCartService implements CartService {
             Ticket ticket = ticketRepository.findTicketById(r.getTicket().getId());
 
             //price
-            BigDecimal price = new BigDecimal(-1);
-            for (PerformanceSector perfSector : ticket.getPerformance().getPerformanceSectors()) {
-                if (perfSector.getSector() == ticket.getSeat().getSector()) {
-                    price = perfSector.getPrice();
-                }
-            }
-            if (Objects.equals(price, BigDecimal.valueOf(-1))) {
+            BigDecimal price;
+            Optional<PerformanceSector> matchingSector = ticket.getPerformance().getPerformanceSectors()
+                .stream()
+                .filter(perfSector -> perfSector.getSector().getId().equals(ticket.getSeat().getSector().getId()))
+                .findFirst();
+
+            if (matchingSector.isPresent()) {
+                price = matchingSector.get().getPrice();
+            } else {
                 throw new FatalException("No Performance Sector assigned");
             }
 
@@ -164,6 +175,61 @@ public class CustomCartService implements CartService {
         reservationRepository.saveAll(reserved);
         return reserved;
     }
+
+    /**
+     * Delete ticket from cart.
+     *
+     * @param userId   the user id
+     * @param ticketId the ticket id
+     */
+    @Override
+    public void deleteTicketFromCart(Integer userId, Integer ticketId) throws ConflictException {
+        LOGGER.debug("Delete Ticket {} from Cart of User {}", ticketId, userId);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        Reservation reservation = reservationRepository.findReservationByTicketId(ticketId);
+        if (reservation == null) {
+            throw new NotFoundException("Could not find Reservation");
+        }
+        List<String> conflictMsg = new ArrayList<>();
+        if (!reservation.getUser().getId().equals(userId)) {
+            conflictMsg.add("Ticket is not in cart of this user");
+        }
+        if (!reservation.getCart()) {
+            conflictMsg.add("Ticket is not in cart");
+        }
+        if (!conflictMsg.isEmpty()) {
+            throw new ConflictException("Could not delete ticket from cart", conflictMsg);
+        }
+        if (reservation.getExpirationTs().equals(reservation.getTicket().getPerformance().getDatetime().minusMinutes(30))) {
+            // reservation is full reservation added to cart
+            reservation.setCart(false);
+            reservationRepository.save(reservation);
+        } else {
+            reservationRepository.delete(reservation);
+        }
+    }
+
+    @Override
+    public List<PaymentDetail> getUserPaymentDetails(Integer userId) {
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        return paymentDetailRepository.findPaymentDetailsByUserId(userId);
+    }
+
+    @Override
+    public List<Location> getUserLocations(Integer userId) {
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        return locationRepository.findAllByUserId(userId);
+    }
+
 
     private void addTicketToReserved(ApplicationUser user, List<Reservation> reserved, Ticket ticket) {
         Integer id = ticket.getReservation() == null ? null : ticket.getReservation().getId();

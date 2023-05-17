@@ -20,27 +20,18 @@ public abstract class SeatMapper {
     @Autowired
     protected TicketRepository ticketRepository;
 
-    public PerformanceTicketDto[][] performanceSectorToReservedSeat(Set<PerformanceSector> performanceSector) {
-        int maxRow = performanceSector.stream().mapToInt(ps -> ps.getSector().getSeats().stream().mapToInt(Seat::getRow).max().orElse(0)).max().orElse(0);
-        int maxNumber = performanceSector.stream().mapToInt(ps -> ps.getSector().getSeats().stream().mapToInt(Seat::getNumber).max().orElse(0)).max().orElse(0);
-        PerformanceTicketDto[][] performanceTicketDtos = new PerformanceTicketDto[maxRow + 1][maxNumber + 1];
-
-        for (PerformanceSector ps : performanceSector) {
-            for (Seat s : ps.getSector().getSeats()) {
-                performanceTicketDtos[s.getRow()][s.getNumber()] = PerformanceTicketDto.PerformanceTicketBuilder.aPerformanceTicket()
-                    .withRow(s.getRow())
-                    .withNumber(s.getNumber())
-                    .withSectorId(ps.getSector().getId())
-                    .build();
-            }
-        }
-        return performanceTicketDtos;
-    }
-
     public PerformanceTicketDto[][] performanceToReservedSeat(Performance performance) {
         Set<PerformanceSector> performanceSector = performance.getPerformanceSectors();
-        int maxRow = performanceSector.stream().mapToInt(ps -> ps.getSector().getSeats().stream().mapToInt(Seat::getRow).max().orElse(0)).max().orElse(0);
-        int maxNumber = performanceSector.stream().mapToInt(ps -> ps.getSector().getSeats().stream().mapToInt(Seat::getNumber).max().orElse(0)).max().orElse(0);
+        int maxRow = performanceSector.stream()
+            .flatMap(ps -> ps.getSector().getSeats().stream())
+            .mapToInt(Seat::getRow)
+            .max()
+            .orElse(0);
+        int maxNumber = performanceSector.stream()
+            .flatMap(ps -> ps.getSector().getSeats().stream())
+            .mapToInt(Seat::getNumber)
+            .max()
+            .orElse(0);
         PerformanceTicketDto[][] performanceTicketDtos = new PerformanceTicketDto[maxRow + 1][maxNumber + 1];
 
         Set<Ticket> tickets = performance.getTickets();
@@ -65,20 +56,4 @@ public abstract class SeatMapper {
         }
         return performanceTicketDtos;
     }
-
-    /**
-     * Seat to seat dto.
-     *
-     * @param seat the seat
-     * @return the seat dto
-     */
-    abstract SeatDto seatToDto(Seat seat);
-
-    /**
-     * Dto to seat.
-     *
-     * @param seatDto the seat dto
-     * @return the seat
-     */
-    abstract Seat dtoToSeat(SeatDto seatDto);
 }

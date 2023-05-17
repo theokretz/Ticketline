@@ -46,6 +46,17 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findAllByIds(@Param("ids") List<Integer> ids);
 
     /**
+     * Find all tickets from a list of ticket ids with performance and performanceSectors.
+     *
+     * @param ids the ticket ids
+     * @return the ticket list
+     */
+    @EntityGraph(attributePaths = {"reservation", "seat", "seat.sector", "performance", "performance.performanceSectors"})
+    @Query("SELECT t FROM Ticket t JOIN FETCH t.performance JOIN FETCH t.performance.performanceSectors WHERE t.id IN :ids")
+    List<Ticket> findAllByIdsWithPerformance(@Param("ids") List<Integer> ids);
+
+
+    /**
      * Find all tickets from a list of ticket ids.
      *
      * @param simpleTickets the event id

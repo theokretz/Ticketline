@@ -33,4 +33,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @EntityGraph(attributePaths = {"ticket", "ticket.seat", "ticket.performance", "ticket.performance.event"})
     List<Reservation> findAllWithNamedReservationByUserIdAndCart(Integer id, Boolean cart);
 
+    /**
+     * Find reservation by ticket id.
+     *
+     * @param ticketId the ticket id
+     * @return the reservation
+     */
+    @EntityGraph(attributePaths = {
+        "user",
+        "ticket",
+        "ticket.performance",
+    })
+    Reservation findReservationByTicketId(Integer ticketId);
 }
