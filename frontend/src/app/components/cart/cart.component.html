@@ -1,9 +1,12 @@
 <h1>Your Cart</h1>
-
+<div *ngIf="cartTickets.length > 0">
+  <p>You have ({{cartTickets.length}}) items in your cart.</p>
+</div>
 <div class="ticket-container">
   <div *ngIf="cartTickets.length === 0">
     <h5>Your Cart is Empty</h5>
   </div>
+
   <table *ngIf="cartTickets.length !== 0" class="table ticket-table">
     <thead>
     <tr class="ticket-header">

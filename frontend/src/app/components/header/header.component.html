@@ -14,14 +14,10 @@
     <ul class="navbar-nav mr-5">
       <a class="nav-link" *ngIf="!authService.isLoggedIn()" routerLink="/login" routerLinkActive="active">Login</a>
       <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/" (click)="authService.logoutUser()">Logout</a>
-      <div class="btn-group">
-        <a class="btn btn-danger"
-           [routerLink]="['cart']"
-           aria-label="Go to cart">
-          <i class="bi-basket"></i>
-          cart
-        </a>
-      </div>
+      <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/cart" >cart</a>
+      <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/reservation" >reservations</a>
+
+      <div><p> </p> </div>
     </ul>
   </div>
 </nav>

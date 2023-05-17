@@ -20,6 +20,7 @@ import { CartComponent } from './components/cart/cart.component';
 import { PaymentDetailComponent } from './components/payment-detail/payment-detail.component';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatTableModule} from '@angular/material/table';
+import { ReservationComponent } from './components/reservation/reservation.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import {MatTableModule} from '@angular/material/table';
     PageNotFoundComponent,
     CartComponent,
     PaymentDetailComponent,
+    ReservationComponent,
   ],
   imports: [
     BrowserModule,
