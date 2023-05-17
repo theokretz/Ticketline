@@ -16,6 +16,10 @@ export class ReservedTicket {
   id: number;
   seat: SimpleSeat;
 }
+export class OrderTicket {
+  id: number;
+  price: number;
+}
 export class BookingTicket {
   ticketId: number;
   reservation: boolean;

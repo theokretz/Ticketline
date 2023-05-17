@@ -18,6 +18,9 @@ import { PerformanceComponent } from './components/performance/performance.compo
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { CartComponent } from './components/cart/cart.component';
 import { ReservationComponent } from './components/reservation/reservation.component';
+import { OrderHistoryComponent } from './components/order-history/order-history.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 import { PaymentDetailComponent } from './components/cart/payment-detail/payment-detail.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
@@ -39,6 +42,7 @@ import { CookieService } from 'ngx-cookie-service';
     CartComponent,
     PaymentDetailComponent,
     ReservationComponent,
+    OrderHistoryComponent,
     DeliveryAddressComponent,
     BuyComponent,
     MerchandiseComponent,
@@ -55,7 +59,7 @@ import { CookieService } from 'ngx-cookie-service';
       extendedTimeOut: 1000,
       closeButton: true,
       progressBar: true,
-      tapToDismiss: false
+      tapToDismiss: false,
     }),
     BrowserAnimationsModule,
     ReactiveFormsModule,
@@ -65,12 +69,10 @@ import { CookieService } from 'ngx-cookie-service';
     //Needed for MatDialog
     MatDialogModule,
     MatTableModule,
-
+    MatCardModule,
+    MatButtonModule,
   ],
-  providers: [
-    httpInterceptorProviders,
-    CookieService,
-  ],
+  providers: [httpInterceptorProviders, CookieService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -1,0 +1,27 @@
+<br>
+<h4>Your Orders</h4>
+<br>
+<div class="ticket-container">
+  <div *ngIf="orders && orders.length === 0">
+    <h5>You Don't Have Any Previous Orders</h5>
+  </div>
+  <div *ngIf="orders && orders.length !== 0">
+    <div *ngFor="let order of orders" class="order-box">
+      <div class="order-details">
+        <table>
+          <tbody>
+          <tr>
+            <td><strong>Order:</strong> {{order.id}}</td>
+            <td> {{dateToString(order)}}</td>
+            <td><strong>№ of tickets:</strong> {{order.tickets.length}}</td>
+            <td><strong>Price:</strong> {{totalPrice(order)}}</td>
+            <td>
+                <button mat-raised-button >View Full Order</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

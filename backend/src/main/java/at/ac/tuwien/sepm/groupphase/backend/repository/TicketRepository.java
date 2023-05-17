@@ -98,4 +98,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      */
     @EntityGraph(attributePaths = {"performance", "seat", "seat.sector"})
     List<Ticket> findByOrderId(Integer id);
+
 }
