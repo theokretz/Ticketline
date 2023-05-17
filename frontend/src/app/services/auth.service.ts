@@ -63,11 +63,10 @@ export class AuthService {
   }
 
   getUserId() {
-    if(this.getToken() != null) {
-      const decoded: any = jwt_decode(this.getToken());
-      const authInfo: any = decoded.id;
-      return authInfo;
+    if (this.getToken() != null) {
+      return 1; // TODO implement
     }
+    return -1;
   }
 
   private setToken(authResponse: string) {

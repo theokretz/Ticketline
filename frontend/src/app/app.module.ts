@@ -17,10 +17,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PerformanceComponent } from './components/performance/performance.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { CartComponent } from './components/cart/cart.component';
-import { PaymentDetailComponent } from './components/payment-detail/payment-detail.component';
-import {MatDialogModule} from '@angular/material/dialog';
-import {MatTableModule} from '@angular/material/table';
 import { ReservationComponent } from './components/reservation/reservation.component';
+import { PaymentDetailComponent } from './components/cart/payment-detail/payment-detail.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatTableModule } from '@angular/material/table';
+import { DeliveryAddressComponent } from './components/cart/delivery-address/delivery-address.component';
+import { BuyComponent } from './components/cart/buy/buy.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +37,8 @@ import { ReservationComponent } from './components/reservation/reservation.compo
     CartComponent,
     PaymentDetailComponent,
     ReservationComponent,
+    DeliveryAddressComponent,
+    BuyComponent,
   ],
   imports: [
     BrowserModule,

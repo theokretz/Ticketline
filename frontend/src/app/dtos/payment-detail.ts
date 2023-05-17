@@ -5,6 +5,10 @@ export class PaymentDetail {
     public cardNumber: number,
     public cvv: number,
     public expirationDate: Date
-  ) {
-  }
+  ) {}
+}
+
+export class CheckoutPaymentDetail {
+  paymentDetailId: number;
+  lastFourDigits: number;
 }

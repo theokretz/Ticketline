@@ -6,6 +6,7 @@ import { PerformanceService } from '../../services/performance.service';
 import { UserService } from '../../services/user.service';
 import { ToastrService } from 'ngx-toastr';
 import { add } from 'lodash';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-performance',
@@ -22,6 +23,7 @@ export class PerformanceComponent implements OnInit {
     private router: Router,
     private performanceService: PerformanceService,
     private userService: UserService,
+    private authService: AuthService,
     private notification: ToastrService
   ) {}
 
@@ -244,10 +246,7 @@ export class PerformanceComponent implements OnInit {
       id: t.ticketId,
     }));
     this.userService
-      .addTicketsToCart(
-        1, // TODO: replace with actual user id
-        ticketIds
-      )
+      .addTicketsToCart(this.authService.getUserId(), ticketIds)
       .subscribe({
         next: () => {
           this.notification.success('Items added to cart');
