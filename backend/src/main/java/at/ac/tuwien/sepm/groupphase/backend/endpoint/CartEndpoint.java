@@ -63,7 +63,7 @@ public class CartEndpoint {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/{id}/cart/tickets")
     @Operation(summary = "put tickets in the cart", security = @SecurityRequirement(name = "apiKey"))
-    public List<SimpleReservationDto> find(@Valid @PathVariable("id") Integer userId, @Valid @RequestBody List<SimpleTicketDto> tickets) {
+    public List<SimpleReservationDto> addTicketToCart(@Valid @PathVariable("id") Integer userId, @Valid @RequestBody List<SimpleTicketDto> tickets) {
         //TODO: authenticate that id = userid
         //@RequestHeader("Authorization") String token,
         LOGGER.info("GET /api/v1/users/{}/cart/tickets", tickets);

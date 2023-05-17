@@ -45,7 +45,7 @@ public class ReservationDataGenerator {
         } else {
             List<Ticket> tickets = ticketRepository.findAllByOrderIsNull();
             LOGGER.debug("generating reservation entries");
-
+            boolean ticketInCart = false;
             for (int i = 1; i < tickets.size(); i++) {
                 if (Math.random() < 0.30) {
                     Optional<ApplicationUser> user = notUserRepository.findById(i % NUMBER_OF_USERS_TO_GENERATE);
@@ -58,7 +58,7 @@ public class ReservationDataGenerator {
                         .withUser(user.get())
                         .withTicket(tickets.get(i))
                         .withExpirationTs(LocalDateTime.now().plusDays(100))
-                        .withCart(true)
+                        .withCart(ticketInCart = !ticketInCart)
                         .build();
                     LOGGER.debug("saving reservation {}", reservation);
                     reservationRepository.save(reservation);
