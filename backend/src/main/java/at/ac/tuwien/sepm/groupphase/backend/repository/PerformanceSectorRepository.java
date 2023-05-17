@@ -4,6 +4,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Set;
 
 
 public interface PerformanceSectorRepository extends JpaRepository<PerformanceSector, Long> {
@@ -15,6 +16,14 @@ public interface PerformanceSectorRepository extends JpaRepository<PerformanceSe
      */
     List<PerformanceSector> findAllByPerformanceId(int performanceId);
 
+
+    /**
+     * Find all performance sectors by performance id.
+     *
+     * @return list of al performance sector entries that match the performance id
+     */
+    Set<PerformanceSector> findAllSetByPerformanceId(int performanceId);
+
     /**
      * find performanceSector by sector and performance id.
      *
@@ -23,4 +32,5 @@ public interface PerformanceSectorRepository extends JpaRepository<PerformanceSe
      * @return the looked up performanceSector
      */
     PerformanceSector findBySectorIdAndPerformanceId(Integer sectorId, Integer performanceId);
+
 }

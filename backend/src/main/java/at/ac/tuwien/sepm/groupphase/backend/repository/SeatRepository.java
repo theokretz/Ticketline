@@ -14,4 +14,11 @@ public interface SeatRepository extends JpaRepository<Seat, Integer> {
      * @return list of seat entries that match sector id
      */
     List<Seat> findAllBySectorId(int sectorId);
+
+    /**
+     * Find all seat entries by sector ids.
+     *
+     * @return list of seat entries that match sector ids
+     */
+    List<Seat> findAllBySectorIdIn(List<Integer> sectorIds);
 }

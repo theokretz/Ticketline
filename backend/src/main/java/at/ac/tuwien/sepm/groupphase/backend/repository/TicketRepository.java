@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -91,12 +92,21 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findBySeatSectorId(Integer id);
 
     /**
-     * Find all tickets matching the id.
+     * Find all tickets matching the order id.
      *
-     * @param id the ticket id
+     * @param id the order id
      * @return the ticket list
      */
     @EntityGraph(attributePaths = {"performance", "seat", "seat.sector"})
     List<Ticket> findByOrderId(Integer id);
 
+
+    /**
+     * Find all tickets matching the performance id.
+     *
+     * @param id the performance id
+     * @return the ticket set
+     */
+    @EntityGraph(attributePaths = {"reservation"})
+    Set<Ticket> findReservationsAndTicketsByPerformanceId(Integer id);
 }

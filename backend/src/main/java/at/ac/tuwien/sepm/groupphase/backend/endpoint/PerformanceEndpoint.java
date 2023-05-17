@@ -2,7 +2,6 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedPerformanceDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.PerformanceMapper;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.service.PerformanceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,24 +27,21 @@ public class PerformanceEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final PerformanceService performanceService;
-    private final PerformanceMapper performanceMapper;
 
     @Autowired
-    public PerformanceEndpoint(PerformanceService performanceService, PerformanceMapper performanceMapper) {
+    public PerformanceEndpoint(PerformanceService performanceService) {
         this.performanceService = performanceService;
-        this.performanceMapper = performanceMapper;
     }
 
 
     @PermitAll
     @GetMapping(value = "/{id}")
     @Operation(summary = "Get detailed information about a specific performance", security = @SecurityRequirement(name = "apiKey"))
-    public DetailedPerformanceDto find(@Valid @PathVariable Integer id) {
+    public DetailedPerformanceDto getPerformancePlan(@Valid @PathVariable Integer id) {
         LOGGER.info("GET /api/v1/performance/{}", id);
 
         try {
-            Performance performance = performanceService.findOne(id);
-            return performanceMapper.performanceToDetailedPerformanceDto(performance);
+            return performanceService.getPerformancePlanById(id);
         } catch (NotFoundException e) {
             LOGGER.warn("Unable to find performance" + e.getMessage());
             HttpStatus status = HttpStatus.NOT_FOUND;
