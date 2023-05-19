@@ -1,6 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.exceptionhandler;
 
+import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.DtoException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -38,14 +42,38 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
+    @ExceptionHandler(value = {FatalException.class})
+    protected ResponseEntity<Object> handleFatal(RuntimeException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+    @ExceptionHandler(value = {DtoException.class})
+    protected ResponseEntity<Object> handleDto(RuntimeException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(value = {ConflictException.class})
+    protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(value = {ValidationException.class})
+    protected ResponseEntity<Object> handleValidation(RuntimeException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY, request);
+    }
+
     /**
      * Override methods from ResponseEntityExceptionHandler to send a customized HTTP response for a know exception
      * from e.g. Spring
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-        HttpHeaders headers,
-        HttpStatusCode status, WebRequest request) {
+                                                                  HttpHeaders headers,
+                                                                  HttpStatusCode status, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         //Get all errors
         List<String> errors = ex.getBindingResult()

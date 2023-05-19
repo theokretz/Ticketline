@@ -1,0 +1,14 @@
+<div class="p-3">
+  <h1>Choose Credit Card</h1>
+  <div
+    class="card p-3"
+    *ngFor="let detail of dialogData.paymentDetails; let i = index"
+    (click)="paymentSelector.emit(detail.paymentDetailId)"
+  >
+    <h2>Payment Detail {{ i + 1 }}</h2>
+    <p>•••• - •••• - •••• - {{ detail.lastFourDigits }}</p>
+    <button class="btn btn-primary stretched-link" style="width: 10rem">
+      Select
+    </button>
+  </div>
+</div>

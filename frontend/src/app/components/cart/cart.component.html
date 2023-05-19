@@ -1,0 +1,103 @@
+<h1>Your Cart</h1>
+<div *ngIf="cartTickets.length > 0">
+  <p>You have ({{cartTickets.length + cartMerch.length}}) items in your cart.</p>
+</div>
+<div class="ticket-container">
+  <div *ngIf="cartTickets.length === 0 || cartMerch.length === 0 ">
+    <h5>Your Cart is Empty</h5>
+  </div>
+
+  <table *ngIf="cartTickets.length !== 0" class="table ticket-table">
+    <thead>
+    <tr class="ticket-header">
+      <th>Event</th>
+      <th>Seat</th>
+      <th>Sector</th>
+      <th>Date</th>
+      <th>Location</th>
+      <th>Reservation</th>
+      <th>Price</th>
+      <!-- Added checkbox column -->
+      <th class="min-width">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let cartTicket of cartTickets" class="ticket-row">
+      <td>{{ cartTicket.eventName }}</td>
+      <td>{{ seatToString(cartTicket) }}</td>
+      <td>{{ cartTicket.sectorName }}</td>
+      <td>{{ dateToLocaleDate(cartTicket) }}</td>
+      <td>{{ locationToString(cartTicket) }}</td>
+      <td>
+        <input [(ngModel)]="cartTicket.reservation" type="checkbox"/>
+      </td>
+      <td>{{ cartTicket.price }}</td>
+      <td>
+        <div class="btn-group">
+          <a
+            (click)="removeTicket(cartTicket.id)"
+            aria-label="Remove Ticket"
+            class="btn btn-danger"
+            style="font-size: 12px"
+          >
+            <i class="bi-trash"></i>
+            Remove
+          </a>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+    <br/>
+  </table>
+
+
+  <div *ngFor="let merch of cartMerch"></div>
+
+  <table *ngIf="cartMerch.length !== 0" class="table ticket-table">
+    <thead>
+    <tr class="ticket-header">
+      <th>Name</th>
+      <th>Quantity</th>
+      <th>Price/Quantity</th>
+      <th>Price</th>
+      <th class="min-width">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let merch of cartMerch" class="ticket-row">
+      <td>{{ merch.title }}</td>
+      <td>{{ merch.quantity}}</td>
+      <td>{{ merch.price }}</td>
+      <td>{{ totalPrice(merch.price, merch.quantity)}}</td>
+
+      <td>
+        <div class="btn-group">
+          <a
+            (click)="removeMerch(merch.id)"
+            aria-label="Remove Merch"
+            class="btn btn-danger"
+            style="font-size: 12px"
+          >
+            <i class="bi-trash"></i>
+            Remove
+          </a>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+    <br/>
+  </table>
+
+  <div *ngIf="cartTickets.length !== 0 || cartMerch.length !== 0" class="button-container">
+    <div class="btn-group">
+      <a
+        (click)="checkout()"
+        aria-label="checkout"
+        class="btn btn-outline-danger btn-lg"
+      >
+        <i class="bi bi-trash"></i>
+        Checkout
+      </a>
+    </div>
+  </div>
+</div>
