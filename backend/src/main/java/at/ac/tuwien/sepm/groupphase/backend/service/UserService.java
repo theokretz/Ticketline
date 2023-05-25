@@ -1,7 +1,11 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserLoginDto;
+
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,4 +41,14 @@ public interface UserService extends UserDetailsService {
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
     String login(UserLoginDto userLoginDto);
+
+    /**
+     * register a user.
+     *
+     * @param userRegisterDto the user DTO to register.
+     * @return "success" if successful
+     * @throws ConflictException   if the email is already ued
+     * @throws ValidationException if the DTO is not valid
+     */
+    String registerUser(UserRegisterDto userRegisterDto) throws ConflictException, ValidationException;
 }

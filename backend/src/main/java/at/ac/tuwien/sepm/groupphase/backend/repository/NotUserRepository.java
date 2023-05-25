@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface NotUserRepository extends JpaRepository<ApplicationUser, Integer> {
@@ -35,5 +36,12 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
      */
     ApplicationUser getApplicationUserById(Integer id);
 
+    /**
+     * get application user by email.
+     *
+     * @param email of user to find
+     * @return ApplicationUser with given email
+     */
+    Optional<ApplicationUser> getApplicationUsersByEmail(String email);
 
 }

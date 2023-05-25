@@ -18,6 +18,7 @@ public class UserRepository {
         admin = new ApplicationUser("admin@email.com", passwordEncoder.encode("password"), true);
     }
 
+
     public ApplicationUser findUserByEmail(String email) {
         if (email.equals(user.getEmail())) {
             return user;

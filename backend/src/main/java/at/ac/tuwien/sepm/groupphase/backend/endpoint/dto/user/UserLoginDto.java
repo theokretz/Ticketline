@@ -1,9 +1,13 @@
-package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
+package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.Objects;
 
+/**
+ * The DTO for logging in as an existing User.
+ */
 public class UserLoginDto {
 
     @NotNull(message = "Email must not be null")

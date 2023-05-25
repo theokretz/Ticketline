@@ -10,13 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 
 @Profile("generateData")
@@ -34,11 +32,14 @@ public class UserDataGenerator {
     private static final String TEST_SALT = "salt";
     private static final Integer TEST_POINTS = 50;
 
+    private final PasswordEncoder passwordEncoder;
+
     private final NotUserRepository notUserRepository;
     private final LocationRepository locationRepository;
 
 
-    public UserDataGenerator(NotUserRepository notUserRepository, LocationRepository locationRepository) {
+    public UserDataGenerator(PasswordEncoder passwordEncoder, NotUserRepository notUserRepository, LocationRepository locationRepository) {
+        this.passwordEncoder = passwordEncoder;
         this.notUserRepository = notUserRepository;
         this.locationRepository = locationRepository;
     }
@@ -59,8 +60,7 @@ public class UserDataGenerator {
                     .withFirstName(TEST_FIRST_NAME + " " + i)
                     .withLastName(TEST_LAST_NAME + " " + i)
                     .withEmail(i + TEST_E_MAIL)
-                    .withPassword(TEST_PASSWORD + i)
-                    .withSalt(TEST_SALT + i)
+                    .withPassword(passwordEncoder.encode(TEST_PASSWORD + i))
                     .withPoints(TEST_POINTS + i)
                     .withLocked(false)
                     .withLocations(Collections.singleton(firstWithoutUser))

@@ -1,19 +1,21 @@
-import { Injectable } from '@angular/core';
-import { AuthRequest } from '../dtos/auth-request';
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {AuthRequest} from '../dtos/authentication/auth-request';
+import {Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {tap} from 'rxjs/operators';
 // @ts-ignore
 import jwt_decode from 'jwt-decode';
-import { Globals } from '../global/globals';
+import {Globals} from '../global/globals';
+import {RegisterRequest} from '../dtos/authentication/user-registration';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private authBaseUri: string = this.globals.backendUri + '/authentication';
+  private authBaseUri: string = this.globals.backendUri;
 
-  constructor(private httpClient: HttpClient, private globals: Globals) {}
+  constructor(private httpClient: HttpClient, private globals: Globals) {
+  }
 
   /**
    * Login in the user. If it was successful, a valid JWT token will be stored
@@ -22,8 +24,17 @@ export class AuthService {
    */
   loginUser(authRequest: AuthRequest): Observable<string> {
     return this.httpClient
-      .post(this.authBaseUri, authRequest, { responseType: 'text' })
+      .post(this.authBaseUri + '/authentication',
+        authRequest,
+        {responseType: 'text'})
       .pipe(tap((authResponse: string) => this.setToken(authResponse)));
+  }
+
+
+  createUser(registerRequest: RegisterRequest) {
+    return this.httpClient.post(
+      this.authBaseUri + '/users', registerRequest, {responseType: 'text'}
+    );
   }
 
   /**
@@ -33,7 +44,7 @@ export class AuthService {
     return (
       !!this.getToken() &&
       this.getTokenExpirationDate(this.getToken()).valueOf() >
-        new Date().valueOf()
+      new Date().valueOf()
     );
   }
 
@@ -62,11 +73,16 @@ export class AuthService {
     return 'UNDEFINED';
   }
 
-  getUserId() {
+  getUserId(): number {
     if (this.getToken() != null) {
-      return 1; // TODO implement
+      const decoded: any = jwt_decode(this.getToken());
+      const authInfo: string = decoded.user;
+      if (authInfo == null || authInfo === '' || authInfo === undefined) {
+        return -1;
+      }
+      return Number(authInfo);
+      return -1;
     }
-    return -1;
   }
 
   private setToken(authResponse: string) {

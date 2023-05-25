@@ -5,9 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -33,8 +30,6 @@ public class ApplicationUser {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 16)
-    private String salt;
 
     @Column(nullable = false)
     private Integer points;
@@ -60,6 +55,15 @@ public class ApplicationUser {
     @OneToMany(mappedBy = "user")
     private Set<Location> locations;
 
+    public ApplicationUser() {
+    }
+
+    public ApplicationUser(String email, String password, Boolean admin) {
+        this.email = email;
+        this.password = password;
+        this.admin = admin;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -70,15 +74,6 @@ public class ApplicationUser {
 
     public Boolean getAdmin() {
         return admin;
-    }
-
-    public ApplicationUser() {
-    }
-
-    public ApplicationUser(String email, String password, Boolean admin) {
-        this.email = email;
-        this.password = password;
-        this.admin = admin;
     }
 
     public void setAdmin(final Boolean admin) {
@@ -115,14 +110,6 @@ public class ApplicationUser {
 
     public void setPassword(final String password) {
         this.password = password;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(final String salt) {
-        this.salt = salt;
     }
 
     public Integer getPoints() {
@@ -190,6 +177,27 @@ public class ApplicationUser {
     }
 
 
+    //TODO remove toString in production
+    @Override
+    public String toString() {
+        return "User{"
+            + "id=" + id
+            + ", admin=" + admin
+            + ", firstName='" + firstName + '\''
+            + ", lastName='" + lastName + '\''
+            + ", email='" + email + '\''
+            + ", password='" + password + '\''
+            + ", points=" + points
+            + ", passwordResetToken='" + passwordResetToken + '\''
+            + ", passwordResetTs=" + passwordResetTs
+            + ", locked=" + locked
+            + ", orders=" + orders
+            + ", paymentDetails=" + paymentDetails
+            + ", reservations=" + reservations
+            + ", locations=" + locations
+            + '}';
+    }
+
     public static final class UserBuilder {
         private Integer id;
         private Boolean admin;
@@ -197,7 +205,6 @@ public class ApplicationUser {
         private String lastName;
         private String email;
         private String password;
-        private String salt;
         private Integer points;
         private String passwordResetToken;
         private LocalDateTime passwordResetTs;
@@ -241,11 +248,6 @@ public class ApplicationUser {
 
         public UserBuilder withPassword(final String password) {
             this.password = password;
-            return this;
-        }
-
-        public UserBuilder withSalt(final String salt) {
-            this.salt = salt;
             return this;
         }
 
@@ -297,7 +299,6 @@ public class ApplicationUser {
             user.setLastName(lastName);
             user.setEmail(email);
             user.setPassword(password);
-            user.setSalt(salt);
             user.setPoints(points);
             user.setPasswordResetToken(passwordResetToken);
             user.setPasswordResetTs(passwordResetTs);
