@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
+package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
@@ -8,6 +8,9 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+/**
+ * UserDTo containing all information about a user.
+ */
 public class UserDto {
     private int id;
     private boolean admin;
@@ -15,7 +18,6 @@ public class UserDto {
     private String lastName;
     private String email;
     private String password;
-    private String salt;
     private Integer points;
     private String passwordResetToken;
     private LocalDateTime passwordResetTs;
@@ -25,12 +27,12 @@ public class UserDto {
     private Set<Reservation> reservations;
     private Set<Location> locations;
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -49,28 +51,28 @@ public class UserDto {
         this.lastName = lastName;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getEmail() {
         return email;
     }
 
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public boolean isAdmin() {
         return admin;
     }
 
-    public void setLocations(Set<Location> locations) {
-        this.locations = locations;
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
     public Set<Location> getLocations() {
         return locations;
+    }
+
+    public void setLocations(Set<Location> locations) {
+        this.locations = locations;
     }
 
     public Set<PaymentDetail> getPaymentDetails() {
@@ -81,20 +83,20 @@ public class UserDto {
         this.paymentDetails = paymentDetails;
     }
 
-    public void setReservations(Set<Reservation> reservations) {
-        this.reservations = reservations;
-    }
-
     public Set<Reservation> getReservations() {
         return reservations;
     }
 
-    public void setLocked(Boolean locked) {
-        this.locked = locked;
+    public void setReservations(Set<Reservation> reservations) {
+        this.reservations = reservations;
     }
 
     public Boolean getLocked() {
         return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
     }
 
     public Set<Order> getOrders() {
@@ -105,36 +107,24 @@ public class UserDto {
         this.orders = orders;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getPassword() {
         return password;
     }
 
-    public void setPoints(Integer points) {
-        this.points = points;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Integer getPoints() {
         return points;
     }
 
-    public void setPasswordResetToken(String passwordResetToken) {
-        this.passwordResetToken = passwordResetToken;
+    public void setPoints(Integer points) {
+        this.points = points;
     }
 
     public LocalDateTime getPasswordResetTs() {
         return passwordResetTs;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
-    public String getSalt() {
-        return salt;
     }
 
     public void setPasswordResetTs(LocalDateTime passwordResetTs) {
@@ -143,6 +133,10 @@ public class UserDto {
 
     public String getPasswordResetToken() {
         return passwordResetToken;
+    }
+
+    public void setPasswordResetToken(String passwordResetToken) {
+        this.passwordResetToken = passwordResetToken;
     }
 
     @Override
@@ -160,8 +154,6 @@ public class UserDto {
             ", email='" + email + '\''
             +
             ", password='" + password + '\''
-            +
-            ", salt='" + salt + '\''
             +
             ", points=" + points
             +

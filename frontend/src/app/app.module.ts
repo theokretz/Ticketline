@@ -28,6 +28,7 @@ import { DeliveryAddressComponent } from './components/cart/delivery-address/del
 import { BuyComponent } from './components/cart/buy/buy.component';
 import { MerchandiseComponent } from './components/merchandise/merchandise.component';
 import { CookieService } from 'ngx-cookie-service';
+import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { CookieService } from 'ngx-cookie-service';
     BuyComponent,
     MerchandiseComponent,
     MerchandiseComponent,
+    RegisterComponent,
   ],
   imports: [
     BrowserModule,

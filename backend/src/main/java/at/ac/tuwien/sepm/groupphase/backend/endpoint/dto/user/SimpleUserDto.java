@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
+package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user;
 
 import java.time.LocalDateTime;
 
@@ -9,11 +9,11 @@ public class SimpleUserDto {
     private String lastName;
     private String email;
     private String password;
-    private String salt;
     private Integer points;
     private String passwordResetToken;
     private LocalDateTime passwordResetTs;
     private Boolean locked;
+    private int failedLogin;
 
     public int getId() {
         return id;
@@ -63,13 +63,6 @@ public class SimpleUserDto {
         this.password = password;
     }
 
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
 
     public Integer getPoints() {
         return points;
@@ -101,6 +94,14 @@ public class SimpleUserDto {
 
     public void setLocked(Boolean locked) {
         this.locked = locked;
+    }
+
+    public int getFailedLogin() {
+        return failedLogin;
+    }
+
+    public void setFailedLogin(int failedLogin) {
+        this.failedLogin = failedLogin;
     }
 }
 

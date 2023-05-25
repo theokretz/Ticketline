@@ -4,6 +4,7 @@ import {MerchandiseService} from '../../services/merchandise.service';
 import {BookingMerchandise, Merchandise} from '../../dtos/merchandise';
 import {ToastrService} from 'ngx-toastr';
 import {CookieService} from 'ngx-cookie-service';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-merchandise',
@@ -24,12 +25,14 @@ export class MerchandiseComponent implements OnInit {
     private notification: ToastrService,
     private merchandiseService: MerchandiseService,
     private cookie: CookieService,
+    private authService: AuthService,
   ) {
   }
 
   ngOnInit(): void {
     this.reloadMerch();
     this.loadFromCookie();
+    console.log(this.authService.getUserId());
   }
 
 

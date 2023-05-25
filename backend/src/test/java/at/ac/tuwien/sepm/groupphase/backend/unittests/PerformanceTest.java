@@ -5,7 +5,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedPerformanceDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PerformanceTicketDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Hall;
@@ -60,40 +60,29 @@ public class PerformanceTest {
 
 
     @Autowired
+    PerformanceService performanceService;
+    @Autowired
     private PerformanceRepository performanceRepository;
-
     @Autowired
     private EventRepository eventRepository;
-
     @Autowired
     private HallRepository hallRepository;
-
     @Autowired
     private at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository NotUserRepository;
     @Autowired
     private LocationRepository locationRepository;
-
     @Autowired
     private PaymentDetailRepository paymentDetailRepository;
-
     @Autowired
     private SectorRepository sectorRepository;
-
     @Autowired
     private PerformanceSectorRepository performanceSectorRepository;
-
     @Autowired
     private SeatRepository seatRepository;
-
     @Autowired
     private TicketRepository ticketRepository;
-
     @Autowired
     private ReservationRepository reservationRepository;
-
-    @Autowired
-    PerformanceService performanceService;
-
     private Performance performance;
     private ApplicationUser user;
     private ApplicationUser user2;
@@ -156,7 +145,6 @@ public class PerformanceTest {
         this.user.setLastName("Besheva");
         this.user.setPassword("Password");
         this.user.setLocked(false);
-        this.user.setSalt("asdjaslkdjaösasd");
         this.user.setPoints(10000);
 
         this.user2 = new ApplicationUser();
@@ -166,7 +154,6 @@ public class PerformanceTest {
         this.user2.setLastName("Besheva");
         this.user2.setPassword("Password");
         this.user2.setLocked(false);
-        this.user2.setSalt("asdjaslkdjaösasd");
         this.user2.setPoints(10000);
 
         paymentDetail = new PaymentDetail();
