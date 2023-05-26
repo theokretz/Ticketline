@@ -44,4 +44,5 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
      */
     Optional<ApplicationUser> getApplicationUsersByEmail(String email);
 
+
 }

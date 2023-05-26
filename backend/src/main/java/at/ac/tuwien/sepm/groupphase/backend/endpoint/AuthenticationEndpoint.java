@@ -10,6 +10,8 @@ import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +41,16 @@ public class AuthenticationEndpoint {
     @PermitAll
     @PostMapping("/authentication")
     public String login(@RequestBody UserLoginDto userLoginDto) {
-        return userService.login(userLoginDto);
+        LOGGER.info(String.format("POST /api/v1/authentication user: %s", userLoginDto.toString()));
+        try {
+            return userService.login(userLoginDto);
+        } catch (BadCredentialsException e) {
+            LOGGER.info("Bad Login Credentials: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage(), e);
+        } catch (LockedException e) {
+            LOGGER.info("Account was locked: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage(), e);
+        }
     }
 
     /**

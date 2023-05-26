@@ -6,6 +6,8 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,7 +42,7 @@ public interface UserService extends UserDetailsService {
      * @return the JWT, if successful
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
      */
-    String login(UserLoginDto userLoginDto);
+    String login(UserLoginDto userLoginDto) throws BadCredentialsException, LockedException;
 
     /**
      * register a user.

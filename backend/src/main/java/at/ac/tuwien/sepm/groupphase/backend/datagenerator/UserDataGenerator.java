@@ -29,7 +29,6 @@ public class UserDataGenerator {
     private static final String TEST_LAST_NAME = "Last Name";
     private static final String TEST_E_MAIL = "test@mail.com";
     private static final String TEST_PASSWORD = "password";
-    private static final String TEST_SALT = "salt";
     private static final Integer TEST_POINTS = 50;
 
     private final PasswordEncoder passwordEncoder;
@@ -38,10 +37,10 @@ public class UserDataGenerator {
     private final LocationRepository locationRepository;
 
 
-    public UserDataGenerator(PasswordEncoder passwordEncoder, NotUserRepository notUserRepository, LocationRepository locationRepository) {
-        this.passwordEncoder = passwordEncoder;
+    public UserDataGenerator(NotUserRepository notUserRepository, LocationRepository locationRepository, PasswordEncoder passwordEncoder) {
         this.notUserRepository = notUserRepository;
         this.locationRepository = locationRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostConstruct
@@ -63,6 +62,7 @@ public class UserDataGenerator {
                     .withPassword(passwordEncoder.encode(TEST_PASSWORD + i))
                     .withPoints(TEST_POINTS + i)
                     .withLocked(false)
+                    .withFailedLogin(0)
                     .withLocations(Collections.singleton(firstWithoutUser))
                     .build();
 

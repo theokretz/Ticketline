@@ -22,6 +22,8 @@ public class UserDto {
     private String passwordResetToken;
     private LocalDateTime passwordResetTs;
     private Boolean locked;
+
+    private int failedLogin;
     private Set<Order> orders;
     private Set<PaymentDetail> paymentDetails;
     private Set<Reservation> reservations;
@@ -97,6 +99,15 @@ public class UserDto {
 
     public void setLocked(Boolean locked) {
         this.locked = locked;
+    }
+
+
+    public int getFailedLogin() {
+        return failedLogin;
+    }
+
+    public void setFailedLogin(int failedLogin) {
+        this.failedLogin = failedLogin;
     }
 
     public Set<Order> getOrders() {

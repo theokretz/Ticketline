@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +40,7 @@ public class CustomUserService implements UserService {
     private final NotUserRepository notUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
+    private final int maxFailedLogin = 5;
 
     @Autowired
     public CustomUserService(UserRepository userRepository, NotUserRepository notUserRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer) {
@@ -67,8 +70,10 @@ public class CustomUserService implements UserService {
             } else {
                 grantedAuthorities = AuthorityUtils.createAuthorityList("ROLE_USER");
             }
-
-            return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
+            return User.builder().username(applicationUser.getEmail())
+                .password(applicationUser.getPassword())
+                .authorities(grantedAuthorities)
+                .accountLocked(applicationUser.getLocked()).build();
         } catch (NotFoundException e) {
             throw new UsernameNotFoundException(e.getMessage(), e);
         }
@@ -104,21 +109,41 @@ public class CustomUserService implements UserService {
      * @return a jwt token if the login was successful
      */
     @Override
-    public String login(UserLoginDto userLoginDto) {
+    public String login(UserLoginDto userLoginDto) throws BadCredentialsException, LockedException {
+        
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (userDetails != null
             && userDetails.isAccountNonExpired()
             && userDetails.isAccountNonLocked()
             && userDetails.isCredentialsNonExpired()
-            && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())
         ) {
             List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
-            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
+            System.out.printf("roles: %s%n", Arrays.toString(roles.toArray()));
+
+            if (!passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())) {
+                if (!roles.contains("ROLE_ADMIN")) {
+                    System.out.println("user is not admin");
+                    this.notUserRepository.getApplicationUsersByEmail(userLoginDto.getEmail()).ifPresent(user -> {
+                        user.setFailedLogin(user.getFailedLogin() + 1);
+                        this.notUserRepository.save(user);
+                        System.out.printf("failed login: %d%n", user.getFailedLogin());
+                        if (user.getFailedLogin() >= maxFailedLogin) {
+                            user.setLocked(true);
+                            this.notUserRepository.save(user);
+                            throw new LockedException(String.format("User {%s} is locked", user.getEmail()));
+                        }
+                    });
+                }
+                throw new BadCredentialsException("Username or password is incorrect");
+            } else {
+
+                return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
+            }
         }
-        throw new BadCredentialsException("Username or password is incorrect or account is locked");
+        throw new LockedException(String.format("User {%s} is locked", userLoginDto.getEmail()));
     }
 
     /**
@@ -146,6 +171,7 @@ public class CustomUserService implements UserService {
             .withPassword(passwordEncoder.encode(userRegisterDto.getPassword()))
             .withPoints(0)
             .withLocked(false)
+            .withFailedLogin(0)
             .build();
 
         //check if user with same email already exists
