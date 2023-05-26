@@ -15,7 +15,11 @@ public class UserRepository {
     @Autowired
     public UserRepository(PasswordEncoder passwordEncoder) {
         user = new ApplicationUser("user@email.com", passwordEncoder.encode("password"), false);
+        user.setLocked(false);
+        user.setFailedLogin(0);
         admin = new ApplicationUser("admin@email.com", passwordEncoder.encode("password"), true);
+        admin.setLocked(false);
+        admin.setFailedLogin(0);
     }
 
 

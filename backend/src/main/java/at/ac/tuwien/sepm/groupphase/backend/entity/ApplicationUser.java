@@ -30,7 +30,6 @@ public class ApplicationUser {
     @Column(nullable = false)
     private String password;
 
-
     @Column(nullable = false)
     private Integer points;
 
@@ -39,6 +38,9 @@ public class ApplicationUser {
 
     @Column
     private LocalDateTime passwordResetTs;
+
+    @Column(nullable = false)
+    private int failedLogin;
 
     @Column(nullable = false)
     private Boolean locked;
@@ -120,6 +122,7 @@ public class ApplicationUser {
         this.points = points;
     }
 
+
     public String getPasswordResetToken() {
         return passwordResetToken;
     }
@@ -143,6 +146,15 @@ public class ApplicationUser {
     public void setLocked(final Boolean locked) {
         this.locked = locked;
     }
+
+    public int getFailedLogin() {
+        return failedLogin;
+    }
+
+    public void setFailedLogin(int failedLogin) {
+        this.failedLogin = failedLogin;
+    }
+
 
     public Set<Order> getOrders() {
         return orders;
@@ -209,6 +221,7 @@ public class ApplicationUser {
         private String passwordResetToken;
         private LocalDateTime passwordResetTs;
         private Boolean locked;
+        private Integer failedLogin;
         private Set<Order> orders;
         private Set<PaymentDetail> paymentDetails;
         private Set<Reservation> reservations;
@@ -271,6 +284,11 @@ public class ApplicationUser {
             return this;
         }
 
+        public UserBuilder withFailedLogin(final Integer failedLogin) {
+            this.failedLogin = failedLogin;
+            return this;
+        }
+
         public UserBuilder withOrders(final Set<Order> orders) {
             this.orders = orders;
             return this;
@@ -291,6 +309,7 @@ public class ApplicationUser {
             return this;
         }
 
+
         public ApplicationUser build() {
             ApplicationUser user = new ApplicationUser();
             user.setId(id);
@@ -303,6 +322,7 @@ public class ApplicationUser {
             user.setPasswordResetToken(passwordResetToken);
             user.setPasswordResetTs(passwordResetTs);
             user.setLocked(locked);
+            user.setFailedLogin(failedLogin);
             user.setOrders(orders);
             user.setPaymentDetails(paymentDetails);
             user.setReservations(reservations);

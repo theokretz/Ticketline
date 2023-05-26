@@ -14,6 +14,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
@@ -70,6 +72,9 @@ public class UserServiceTest {
     private UserRegisterDto checkEqualDtoAndEntity;
     private UserRegisterDto newUser;
     private UserLoginDto newUserLogin;
+    private UserLoginDto falsePasswordUser;
+    private UserLoginDto falsePasswordAdmin;
+    private UserLoginDto falsePasswordLogin;
 
 
     private String generateEmail() {
@@ -250,10 +255,63 @@ public class UserServiceTest {
     }
 
 
+    //------------------------LOCK ACCOUNT------------------------//
+    @Test
+    void failedLoginUserTest() {
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordUser));
+        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordUser.getEmail()).getFailedLogin());
+    }
+
+    @Test
+    void failedLoginAdminTest() {
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
+        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
+
+    }
+
+    @Test
+    void increaseFailedLoginTest() {
+        assertDoesNotThrow(() -> this.service.registerUser(newUser));
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordLogin));
+        assertEquals(1, this.service.findApplicationUserByEmail(newUser.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordLogin));
+        assertEquals(2, this.service.findApplicationUserByEmail(newUser.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordLogin));
+        assertEquals(3, this.service.findApplicationUserByEmail(newUser.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordLogin));
+        assertEquals(4, this.service.findApplicationUserByEmail(newUser.getEmail()).getFailedLogin());
+        assertThrows(LockedException.class, () -> this.service.login(falsePasswordLogin));
+        assertEquals(5, this.service.findApplicationUserByEmail(newUser.getEmail()).getFailedLogin());
+        //more logins shouldn't increase "failedLogin"
+        assertThrows(LockedException.class, () -> this.service.login(falsePasswordLogin));
+        assertEquals(5, this.service.findApplicationUserByEmail(newUser.getEmail()).getFailedLogin());
+        assertEquals(true, this.service.findApplicationUserByEmail(newUser.getEmail()).getLocked());
+        assertThrows(LockedException.class, () -> this.service.login(falsePasswordLogin));
+        assertEquals(5, this.service.findApplicationUserByEmail(newUser.getEmail()).getFailedLogin());
+        assertEquals(true, this.service.findApplicationUserByEmail(newUser.getEmail()).getLocked());
+    }
+
+    @Test
+    void DoNotIncreaseFailedLoginForAdminTest() {
+        //admins should never be locked or have failedLogin > 0
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
+        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
+        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
+        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
+        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
+        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
+    }
+
+
     //------------------------SETUP Method------------------------//
     @BeforeAll
     public void setup() {
         final String CORRECT_PASSWORD = "CorrectPassword123";
+        final String FALSE_PASSWORD = "FalsePassword123";
 
         user = new UserLoginDto();
         user.setEmail("user@email.com");
@@ -368,7 +426,6 @@ public class UserServiceTest {
         validEmail1.setLastName(generateLastName());
         validEmail1.setPassword(CORRECT_PASSWORD);
 
-
         //CHECK IF DTO AND ENTITY ARE EQUAL
 
         checkEqualDtoAndEntity = new UserRegisterDto();
@@ -376,7 +433,6 @@ public class UserServiceTest {
         checkEqualDtoAndEntity.setFirstName(generateFirstName());
         checkEqualDtoAndEntity.setLastName(generateLastName());
         checkEqualDtoAndEntity.setPassword(CORRECT_PASSWORD);
-
 
         //CHECK IF YOU CAN LOGIN WITH NEW CREATED USER
         newUser = new UserRegisterDto();
@@ -389,8 +445,20 @@ public class UserServiceTest {
         newUserLogin.setEmail(newUser.getEmail());
         newUserLogin.setPassword(newUser.getPassword());
 
+        //LOGIN WITH FALSE PASSWORD
+
+        falsePasswordUser = new UserLoginDto();
+        falsePasswordUser.setEmail("user@email.com");
+        falsePasswordUser.setPassword(FALSE_PASSWORD);
+
+        falsePasswordAdmin = new UserLoginDto();
+        falsePasswordAdmin.setEmail("admin@email.com");
+        falsePasswordAdmin.setPassword(FALSE_PASSWORD);
+
+        falsePasswordLogin = new UserLoginDto();
+        falsePasswordLogin.setEmail(newUser.getEmail());
+        falsePasswordLogin.setPassword(FALSE_PASSWORD);
 
     }
-
 
 }
