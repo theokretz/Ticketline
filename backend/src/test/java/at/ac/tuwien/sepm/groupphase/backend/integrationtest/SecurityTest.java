@@ -5,14 +5,21 @@ import at.ac.tuwien.sepm.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.MessageInquiryDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.MessageMapper;
+import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Message;
 import at.ac.tuwien.sepm.groupphase.backend.repository.MessageRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.security.DeclareRoles;
+import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,22 +30,20 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.security.DeclareRoles;
-import jakarta.annotation.security.DenyAll;
-import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -46,6 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 /**
  * Security is a cross-cutting concern, however for the sake of simplicity it is tested against the message endpoint
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
@@ -69,28 +75,24 @@ public class SecurityTest implements TestData {
         DenyAll.class,
         DeclareRoles.class
     );
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private NotUserRepository notUserRepository;
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private MessageRepository messageRepository;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private MessageMapper messageMapper;
-
     @Autowired
     private JwtTokenizer jwtTokenizer;
-
     @Autowired
     private SecurityProperties securityProperties;
-
     @Autowired
     private List<Object> components;
-
     private Message message = Message.MessageBuilder.aMessage()
         .withTitle(TEST_NEWS_TITLE)
         .withSummary(TEST_NEWS_SUMMARY)
@@ -98,15 +100,43 @@ public class SecurityTest implements TestData {
         .withPublishedAt(TEST_NEWS_PUBLISHED_AT)
         .build();
 
+
     @BeforeEach
     public void beforeEach() {
         messageRepository.deleteAll();
+        notUserRepository.deleteAll();
         message = Message.MessageBuilder.aMessage()
             .withTitle(TEST_NEWS_TITLE)
             .withSummary(TEST_NEWS_SUMMARY)
             .withText(TEST_NEWS_TEXT)
             .withPublishedAt(TEST_NEWS_PUBLISHED_AT)
             .build();
+
+        ApplicationUser admin = ApplicationUser.UserBuilder.aUser()
+            .withId(-1)
+            .withAdmin(true)
+            .withFirstName("Admin")
+            .withLastName("Admin")
+            .withEmail("admin@email.com")
+            .withPassword(passwordEncoder.encode("password"))
+            .withPoints(0)
+            .withLocked(false)
+            .withFailedLogin(0)
+            .build();
+        notUserRepository.save(admin);
+
+        ApplicationUser user = ApplicationUser.UserBuilder.aUser()
+            .withId(-2)
+            .withAdmin(true)
+            .withFirstName("user")
+            .withLastName("user")
+            .withEmail("user@email.com")
+            .withPassword(passwordEncoder.encode("password"))
+            .withPoints(0)
+            .withLocked(false)
+            .withFailedLogin(0)
+            .build();
+        notUserRepository.save(user);
     }
 
     /**
@@ -118,16 +148,21 @@ public class SecurityTest implements TestData {
     public void ensureSecurityAnnotationPresentForEveryEndpoint() {
         List<ImmutablePair<Class<?>, Method>> notSecured = components.stream()
             .map(AopUtils::getTargetClass) // beans may be proxies, get the target class instead
-            .filter(clazz -> clazz.getCanonicalName() != null && clazz.getCanonicalName().startsWith(BackendApplication.class.getPackageName())) // limit to our package
+            .filter(clazz -> clazz.getCanonicalName() != null &&
+                clazz.getCanonicalName().startsWith(BackendApplication.class.getPackageName())) // limit to our package
             .filter(clazz -> clazz.getAnnotation(RestController.class) != null) // limit to classes annotated with @RestController
-            .flatMap(clazz -> Arrays.stream(clazz.getDeclaredMethods()).map(method -> new ImmutablePair<Class<?>, Method>(clazz, method))) // get all class -> method pairs
-            .filter(pair -> Arrays.stream(pair.getRight().getAnnotations()).anyMatch(annotation -> mappingAnnotations.contains(annotation.annotationType()))) // keep only the pairs where the method has a "mapping annotation"
-            .filter(pair -> Arrays.stream(pair.getRight().getAnnotations()).noneMatch(annotation -> securityAnnotations.contains(annotation.annotationType()))) // keep only the pairs where the method does not have a "security annotation"
+            .flatMap(clazz -> Arrays.stream(clazz.getDeclaredMethods())
+                .map(method -> new ImmutablePair<Class<?>, Method>(clazz, method))) // get all class -> method pairs
+            .filter(pair -> Arrays.stream(pair.getRight().getAnnotations()).anyMatch(
+                annotation -> mappingAnnotations.contains(annotation.annotationType()))) // keep only the pairs where the method has a "mapping annotation"
+            .filter(pair -> Arrays.stream(pair.getRight().getAnnotations()).noneMatch(annotation -> securityAnnotations.contains(
+                annotation.annotationType()))) // keep only the pairs where the method does not have a "security annotation"
             .toList();
 
         assertThat(notSecured.size())
             .as("Most rest methods should be secured. If one is really intended for public use, explicitly state that with @PermitAll. "
-                + "The following are missing: \n" + notSecured.stream().map(pair -> "Class: " + pair.getLeft() + " Method: " + pair.getRight()).reduce("", (a, b) -> a + "\n" + b))
+                + "The following are missing: \n" +
+                notSecured.stream().map(pair -> "Class: " + pair.getLeft() + " Method: " + pair.getRight()).reduce("", (a, b) -> a + "\n" + b))
             .isZero();
 
     }
@@ -135,7 +170,7 @@ public class SecurityTest implements TestData {
     @Test
     public void givenUserLoggedIn_whenFindAll_then200() throws Exception {
         MvcResult mvcResult = this.mockMvc.perform(get(MESSAGE_BASE_URI)
-            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES)))
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES)))
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -162,9 +197,9 @@ public class SecurityTest implements TestData {
         String body = objectMapper.writeValueAsString(messageInquiryDto);
 
         MvcResult mvcResult = this.mockMvc.perform(post(MESSAGE_BASE_URI)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(body)
-            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES)))
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -179,8 +214,8 @@ public class SecurityTest implements TestData {
         String body = objectMapper.writeValueAsString(messageInquiryDto);
 
         MvcResult mvcResult = this.mockMvc.perform(post(MESSAGE_BASE_URI)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(body))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -195,9 +230,9 @@ public class SecurityTest implements TestData {
         String body = objectMapper.writeValueAsString(messageInquiryDto);
 
         MvcResult mvcResult = this.mockMvc.perform(post(MESSAGE_BASE_URI)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(body)
-            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body)
+                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES)))
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
