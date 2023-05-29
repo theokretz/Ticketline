@@ -73,6 +73,19 @@ public class UserDataGenerator {
                     locationRepository.save(firstWithoutUser);
                 }
             }
+            ApplicationUser admin = ApplicationUser.UserBuilder.aUser()
+                .withId(-1)
+                .withAdmin(true)
+                .withFirstName("Admin")
+                .withLastName("Admin")
+                .withEmail("admin@email.com")
+                .withPassword(passwordEncoder.encode("password"))
+                .withPoints(0)
+                .withLocked(false)
+                .build();
+            notUserRepository.save(admin);
+
+
         }
 
     }

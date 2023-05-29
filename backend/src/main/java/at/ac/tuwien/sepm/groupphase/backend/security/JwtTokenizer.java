@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.security;
 
 import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -28,8 +29,11 @@ public class JwtTokenizer {
 
     public String getAuthToken(String user, List<String> roles) {
         byte[] signingKey = securityProperties.getJwtSecret().getBytes();
-        
-        Optional<ApplicationUser> applicationUser = notUserRepository.getApplicationUsersByEmail(user);
+
+        Optional<ApplicationUser> applicationUser = notUserRepository.findApplicationUsersByEmail(user);
+        if (applicationUser.isEmpty()) {
+            throw new FatalException("Couldn't find user by Email");
+        }
         JwtBuilder token = Jwts.builder()
             .signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
             .setHeaderParam("typ", securityProperties.getJwtType())
@@ -37,10 +41,9 @@ public class JwtTokenizer {
             .setAudience(securityProperties.getJwtAudience())
             .setSubject(user)
             .setExpiration(new Date(System.currentTimeMillis() + securityProperties.getJwtExpirationTime()))
-            .claim("rol", roles);
-        if (applicationUser.isPresent()) {
-            token = token.claim("user", applicationUser.get().getId());
-        }
+            .claim("rol", roles)
+            .claim("user", applicationUser.get().getId());
+
         return securityProperties.getAuthTokenPrefix() + token.compact();
     }
 }

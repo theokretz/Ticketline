@@ -49,10 +49,7 @@ public class UserServiceTest {
     private char nextFirstNameChar = 'a';
     private char nextLastNameChar = 'A';
 
-    private UserLoginDto user;
-    private UserLoginDto admin;
     private UserLoginDto notExistingUser;
-    private UserRegisterDto existingEmail;
     private UserRegisterDto shortPasswordWithNoUppercaseWithNoNumber;
     private UserRegisterDto passwordWithNoUppercaseWithNoNumber;
     private UserRegisterDto passwordWithNoUppercase;
@@ -72,10 +69,13 @@ public class UserServiceTest {
     private UserRegisterDto checkEqualDtoAndEntity;
     private UserRegisterDto newUser;
     private UserLoginDto newUserLogin;
-    private UserLoginDto falsePasswordUser;
-    private UserLoginDto falsePasswordAdmin;
     private UserLoginDto falsePasswordLogin;
+    private UserRegisterDto existingEmail;
 
+    @AfterEach
+    void tearDown() {
+        repository.deleteAll();
+    }
 
     private String generateEmail() {
         return String.format("newEmail%d@email.com", emailCounter++);
@@ -95,31 +95,11 @@ public class UserServiceTest {
         return String.format("Lastname%c", nextLastNameChar);
     }
 
-    @AfterEach
-    void tearDown() {
-        repository.deleteAll();
-    }
 
-    @Test
-    void loginAsUserTest() {
-        String token = this.service.login(user);
-        assertNotNull(token);
-    }
-
-    @Test
-    void loginAsAdminTest() {
-        String token = this.service.login(admin);
-        assertNotNull(token);
-    }
 
     @Test
     void loginAsNotExistingUserTest() {
         assertThrows(UsernameNotFoundException.class, () -> this.service.login(notExistingUser));
-    }
-
-    @Test
-    void registerWithExistingEmailTest() {
-        assertThrows(ConflictException.class, () -> this.service.registerUser(existingEmail));
     }
 
     @Test
@@ -254,18 +234,61 @@ public class UserServiceTest {
         assertDoesNotThrow(() -> this.service.login(newUserLogin));
     }
 
+    @Test
+    void registerWithExistingEmailTest() {
+        assertDoesNotThrow(() -> this.service.registerUser(newUser));
+        assertDoesNotThrow(() -> this.service.login(newUserLogin));
+        assertThrows(ConflictException.class,() -> this.service.registerUser(existingEmail));
+    }
+
+
 
     //------------------------LOCK ACCOUNT------------------------//
     @Test
     void failedLoginUserTest() {
-        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordUser));
-        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordUser.getEmail()).getFailedLogin());
+        ApplicationUser user = ApplicationUser.UserBuilder.aUser()
+            .withId(99)
+            .withAdmin(false)
+            .withFirstName("user")
+            .withLastName("user")
+            .withEmail("user@email.com")
+            .withPassword(passwordEncoder.encode("password"))
+            .withPoints(0)
+            .withLocked(false)
+            .withFailedLogin(0)
+            .build();
+        this.repository.save(user);
+        assertThrows(BadCredentialsException.class, () -> this.service.login(
+            UserLoginDto.UserLoginDtoBuilder.anUserLoginDto()
+                .withEmail(user.getEmail())
+                .withPassword("falsePassword123")
+                .build()
+        ));
+        assertEquals(1, this.service.findApplicationUserByEmail(user.getEmail()).getFailedLogin());
     }
 
     @Test
     void failedLoginAdminTest() {
-        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
-        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
+        ApplicationUser admin = ApplicationUser.UserBuilder.aUser()
+            .withId(-99)
+            .withAdmin(true)
+            .withFirstName("admin")
+            .withLastName("admin")
+            .withEmail("user@email.com")
+            .withPassword(passwordEncoder.encode("password"))
+            .withPoints(0)
+            .withLocked(false)
+            .withFailedLogin(0)
+            .build();
+        this.repository.save(admin);
+        assertThrows(BadCredentialsException.class, () -> this.service.login(
+            UserLoginDto.UserLoginDtoBuilder.anUserLoginDto()
+                .withEmail(admin.getEmail())
+                .withPassword("falsePassword123")
+                .build()
+
+        ));
+        assertEquals(0, this.service.findApplicationUserByEmail(admin.getEmail()).getFailedLogin());
 
     }
 
@@ -293,17 +316,36 @@ public class UserServiceTest {
 
     @Test
     void DoNotIncreaseFailedLoginForAdminTest() {
+        ApplicationUser admin = ApplicationUser.UserBuilder.aUser()
+            .withId(-99)
+            .withAdmin(true)
+            .withFirstName("admin")
+            .withLastName("admin")
+            .withEmail("user@email.com")
+            .withPassword(passwordEncoder.encode("password"))
+            .withPoints(0)
+            .withLocked(false)
+            .withFailedLogin(0)
+            .build();
+        this.repository.save(admin);
+
+        UserLoginDto adminLogin = UserLoginDto.UserLoginDtoBuilder.anUserLoginDto()
+            .withEmail(admin.getEmail())
+            .withPassword("falsePassword123")
+            .build();
+
+
         //admins should never be locked or have failedLogin > 0
-        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
-        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
-        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
-        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
-        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
-        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
-        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
-        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
-        assertThrows(BadCredentialsException.class, () -> this.service.login(falsePasswordAdmin));
-        assertEquals(0, this.service.findApplicationUserByEmail(falsePasswordAdmin.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(adminLogin));
+        assertEquals(0, this.service.findApplicationUserByEmail(adminLogin.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(adminLogin));
+        assertEquals(0, this.service.findApplicationUserByEmail(adminLogin.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(adminLogin));
+        assertEquals(0, this.service.findApplicationUserByEmail(adminLogin.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(adminLogin));
+        assertEquals(0, this.service.findApplicationUserByEmail(adminLogin.getEmail()).getFailedLogin());
+        assertThrows(BadCredentialsException.class, () -> this.service.login(adminLogin));
+        assertEquals(0, this.service.findApplicationUserByEmail(adminLogin.getEmail()).getFailedLogin());
     }
 
 
@@ -313,23 +355,9 @@ public class UserServiceTest {
         final String CORRECT_PASSWORD = "CorrectPassword123";
         final String FALSE_PASSWORD = "FalsePassword123";
 
-        user = new UserLoginDto();
-        user.setEmail("user@email.com");
-        user.setPassword("password");
-
-        admin = new UserLoginDto();
-        admin.setEmail("admin@email.com");
-        admin.setPassword("password");
-
         notExistingUser = new UserLoginDto();
         notExistingUser.setEmail("test@email.com");
         notExistingUser.setPassword(CORRECT_PASSWORD);
-
-        existingEmail = new UserRegisterDto();
-        existingEmail.setEmail("user@email.com");
-        existingEmail.setFirstName("Peter");
-        existingEmail.setLastName("Hu");
-        existingEmail.setPassword(CORRECT_PASSWORD);
 
         // CHECK PASSWORD
         shortPasswordWithNoUppercaseWithNoNumber = new UserRegisterDto();
@@ -445,15 +473,13 @@ public class UserServiceTest {
         newUserLogin.setEmail(newUser.getEmail());
         newUserLogin.setPassword(newUser.getPassword());
 
-        //LOGIN WITH FALSE PASSWORD
+        //LOGIN EXISTING USER WITH FALSE PASSWORD
 
-        falsePasswordUser = new UserLoginDto();
-        falsePasswordUser.setEmail("user@email.com");
-        falsePasswordUser.setPassword(FALSE_PASSWORD);
-
-        falsePasswordAdmin = new UserLoginDto();
-        falsePasswordAdmin.setEmail("admin@email.com");
-        falsePasswordAdmin.setPassword(FALSE_PASSWORD);
+        existingEmail = new UserRegisterDto();
+        existingEmail.setEmail(newUser.getEmail());
+        existingEmail.setFirstName(generateFirstName());
+        existingEmail.setLastName(generateLastName());
+        existingEmail.setPassword(CORRECT_PASSWORD);
 
         falsePasswordLogin = new UserLoginDto();
         falsePasswordLogin.setEmail(newUser.getEmail());

@@ -9,7 +9,6 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import org.slf4j.Logger;
@@ -35,7 +34,6 @@ import java.util.Optional;
 public class CustomUserService implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final UserRepository userRepository;
 
     private final NotUserRepository notUserRepository;
     private final PasswordEncoder passwordEncoder;
@@ -43,8 +41,7 @@ public class CustomUserService implements UserService {
     private final int maxFailedLogin = 5;
 
     @Autowired
-    public CustomUserService(UserRepository userRepository, NotUserRepository notUserRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer) {
-        this.userRepository = userRepository;
+    public CustomUserService(NotUserRepository notUserRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer) {
         this.notUserRepository = notUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -89,13 +86,7 @@ public class CustomUserService implements UserService {
     public ApplicationUser findApplicationUserByEmail(String email) {
         LOGGER.debug("Find application user by email");
         Optional<ApplicationUser> applicationUser;
-        //TODO only for testing. REMOVE IN PRODUCTION
-        if (email.equals("user@email.com") || email.equals("admin@email.com")) {
-            ApplicationUser user = userRepository.findUserByEmail(email);
-            applicationUser = Optional.of(user);
-        } else {
-            applicationUser = notUserRepository.getApplicationUsersByEmail(email);
-        }
+        applicationUser = notUserRepository.findApplicationUsersByEmail(email);
         if (applicationUser.isPresent()) {
             return applicationUser.get();
         }
@@ -110,7 +101,7 @@ public class CustomUserService implements UserService {
      */
     @Override
     public String login(UserLoginDto userLoginDto) throws BadCredentialsException, LockedException {
-        
+
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (userDetails != null
             && userDetails.isAccountNonExpired()
@@ -121,20 +112,21 @@ public class CustomUserService implements UserService {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
-            System.out.printf("roles: %s%n", Arrays.toString(roles.toArray()));
+            LOGGER.info("roles: %s%n", Arrays.toString(roles.toArray()));
 
             if (!passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())) {
                 if (!roles.contains("ROLE_ADMIN")) {
-                    System.out.println("user is not admin");
-                    this.notUserRepository.getApplicationUsersByEmail(userLoginDto.getEmail()).ifPresent(user -> {
+                    LOGGER.info("user is not admin");
+                    this.notUserRepository.findApplicationUsersByEmail(userLoginDto.getEmail()).ifPresent(user -> {
                         user.setFailedLogin(user.getFailedLogin() + 1);
                         this.notUserRepository.save(user);
-                        System.out.printf("failed login: %d%n", user.getFailedLogin());
+                        LOGGER.info("failed login: %d%n", user.getFailedLogin());
                         if (user.getFailedLogin() >= maxFailedLogin) {
                             user.setLocked(true);
                             this.notUserRepository.save(user);
                             throw new LockedException(String.format("User {%s} is locked", user.getEmail()));
                         }
+
                     });
                 }
                 throw new BadCredentialsException("Username or password is incorrect");
@@ -175,7 +167,7 @@ public class CustomUserService implements UserService {
             .build();
 
         //check if user with same email already exists
-        if (!(userRepository.findUserByEmail(userRegisterDto.getEmail()) == null)) {
+        if (notUserRepository.findApplicationUsersByEmail(userRegisterDto.getEmail()).isPresent()) {
             error.add(String.format("User with email: {%s} already exists", userRegisterDto.getEmail()));
             throw new ConflictException("Email Conflict", error);
         }
@@ -183,7 +175,7 @@ public class CustomUserService implements UserService {
         //if save() throws an error then something dramatic happened
         saved = notUserRepository.save(applicationUser);
         //TODO remove sout and toString() in ApplicationUser  in production
-        System.out.println(saved);
+        LOGGER.info("{}", saved);
         //check if entity is the same as DTO (except password)
         if (saved.getEmail().equals(userRegisterDto.getEmail())
             && saved.getFirstName().equals(userRegisterDto.getFirstName())

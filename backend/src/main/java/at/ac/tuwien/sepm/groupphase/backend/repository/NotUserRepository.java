@@ -42,7 +42,7 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
      * @param email of user to find
      * @return ApplicationUser with given email
      */
-    Optional<ApplicationUser> getApplicationUsersByEmail(String email);
+    Optional<ApplicationUser> findApplicationUsersByEmail(String email);
 
 
 }
