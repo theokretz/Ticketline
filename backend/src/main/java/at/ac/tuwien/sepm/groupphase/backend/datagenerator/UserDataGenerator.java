@@ -82,6 +82,7 @@ public class UserDataGenerator {
                 .withPassword(passwordEncoder.encode("password"))
                 .withPoints(0)
                 .withLocked(false)
+                .withFailedLogin(0)
                 .build();
             notUserRepository.save(admin);
 
