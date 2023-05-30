@@ -16,11 +16,11 @@ public class BookingTicketDto {
         return reservation;
     }
 
-    private void setTicketId(Integer ticketId) {
+    public void setTicketId(Integer ticketId) {
         this.ticketId = ticketId;
     }
 
-    private void setReservation(Boolean reservation) {
+    public void setReservation(Boolean reservation) {
         this.reservation = reservation;
     }
 }

@@ -45,6 +45,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.lang.StrictMath.floor;
+
 @Service
 public class CustomOrderService implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -56,11 +58,12 @@ public class CustomOrderService implements OrderService {
     private final ReservationRepository reservationRepository;
     private final MerchandiseRepository merchandiseRepository;
     private final MerchandiseOrderedRepository merchandiseOrderedRepository;
+    private final CustomOrderValidator validator;
 
     @Autowired
     public CustomOrderService(OrderRepository orderRepository, NotUserRepository notUserRepository, OrderMapper orderMapper,
                               TransactionRepository transactionRepository, TicketRepository ticketRepository, ReservationRepository reservationRepository,
-                              MerchandiseRepository merchandiseRepository, MerchandiseOrderedRepository merchandiseOrderedRepository) {
+                              MerchandiseRepository merchandiseRepository, MerchandiseOrderedRepository merchandiseOrderedRepository, CustomOrderValidator validator) {
         this.orderRepository = orderRepository;
         this.notUserRepository = notUserRepository;
         this.orderMapper = orderMapper;
@@ -69,6 +72,7 @@ public class CustomOrderService implements OrderService {
         this.reservationRepository = reservationRepository;
         this.merchandiseRepository = merchandiseRepository;
         this.merchandiseOrderedRepository = merchandiseOrderedRepository;
+        this.validator = validator;
     }
 
 
@@ -122,6 +126,7 @@ public class CustomOrderService implements OrderService {
         if (user == null) {
             throw new NotFoundException("Could not find User");
         }
+        validator.validPoints(user.getPoints(), bookingDto);
 
         //create order
         Order order = null;
@@ -236,7 +241,7 @@ public class CustomOrderService implements OrderService {
         }
 
         //Merchandise
-
+        int deductedPoints = 0;
         if (hasMerchandise) {
             List<Merchandise> fetchedMerchandise = merchandiseRepository.findAllById(
                 bookingDto.getMerchandise().stream().map(BookingMerchandiseDto::getId).collect(Collectors.toList()));
@@ -255,10 +260,14 @@ public class CustomOrderService implements OrderService {
                     .withMerchandise(merchandise)
                     .withOrder(order)
                     .withQuantity(merchandiseDto.getQuantity())
-                    .withPoints(false)
+                    .withPoints(merchandiseDto.getBuyWithPoints())
                     .build();
                 merchandiseOrderedToSave.add(merchandiseOrdered);
-                price = price.add(merchandise.getPrice().multiply(new BigDecimal(merchandiseDto.getQuantity())));
+                if (!merchandiseDto.getBuyWithPoints()) {
+                    price = price.add(merchandise.getPrice().multiply(new BigDecimal(merchandiseDto.getQuantity())));
+                } else {
+                    deductedPoints = merchandise.getPointsPrice() * merchandiseDto.getQuantity();
+                }
             }
 
             merchandiseOrderedRepository.saveAll(merchandiseOrderedToSave);
@@ -270,10 +279,11 @@ public class CustomOrderService implements OrderService {
             Transaction transaction = new Transaction();
             transaction.setOrder(order);
             transaction.setDeductedAmount(price);
-            //TODO: deducted points?
-            transaction.setDeductedPoints(0);
+            int points = (int) floor(price.doubleValue());
+            int overallPoints = points - deductedPoints;
+            transaction.setDeductedPoints(overallPoints);
             order.setTransactions(Collections.singleton(transaction));
-
+            user.setPoints(user.getPoints() + overallPoints);
             transactionRepository.save(transaction);
         }
 

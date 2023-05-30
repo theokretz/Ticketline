@@ -37,6 +37,7 @@ public class Merchandise {
     @OneToMany(mappedBy = "merchandise")
     private Set<MerchandiseOrdered> merchandiseMerchandiseOrdereds;
 
+
     public Integer getId() {
         return id;
     }

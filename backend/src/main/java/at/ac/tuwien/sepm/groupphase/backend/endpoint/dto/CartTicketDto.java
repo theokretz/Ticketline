@@ -106,6 +106,7 @@ public class CartTicketDto {
         this.price = price;
     }
 
+
     public static final class CartTicketDtoBuilder {
         private Integer id;
         private int seatRow;
@@ -180,6 +181,7 @@ public class CartTicketDto {
             this.price = price;
             return this;
         }
+
 
         public CartTicketDto build() {
             CartTicketDto cartTicketDto = new CartTicketDto();

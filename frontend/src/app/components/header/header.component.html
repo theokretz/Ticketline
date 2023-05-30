@@ -52,6 +52,11 @@
           >Cart</a
         >
       </li>
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="authService.isLoggedIn()"
+        >Points: {{userPoints  | async}}</a
+        >
+      </li>
     </ul>
     <ul class="navbar-nav px-3" style="margin-left: auto">
       <li class="nav-item">
@@ -73,6 +78,7 @@
           >Logout</a
         >
       </li>
+
     </ul>
   </div>
 </nav>

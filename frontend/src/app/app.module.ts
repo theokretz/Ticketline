@@ -28,6 +28,7 @@ import { DeliveryAddressComponent } from './components/cart/delivery-address/del
 import { BuyComponent } from './components/cart/buy/buy.component';
 import { MerchandiseComponent } from './components/merchandise/merchandise.component';
 import { CookieService } from 'ngx-cookie-service';
+import { MerchandiseEventComponent } from './components/merchandise/merchandise-event/merchandise-event.component';
 import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
@@ -48,6 +49,7 @@ import { RegisterComponent } from './components/register/register.component';
     BuyComponent,
     MerchandiseComponent,
     MerchandiseComponent,
+    MerchandiseEventComponent,
     RegisterComponent,
   ],
   imports: [

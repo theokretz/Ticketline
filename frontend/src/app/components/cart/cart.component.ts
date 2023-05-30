@@ -12,6 +12,8 @@ import {BuyComponent} from './buy/buy.component';
 import {Router} from '@angular/router';
 import {CookieService} from 'ngx-cookie-service';
 import {BookingMerchandise, Merchandise} from '../../dtos/merchandise';
+import {Cart} from '../../dtos/cart';
+import {MerchandiseEventComponent} from '../merchandise/merchandise-event/merchandise-event.component';
 
 
 @Component({
@@ -22,6 +24,7 @@ import {BookingMerchandise, Merchandise} from '../../dtos/merchandise';
 export class CartComponent implements OnInit {
   cartTickets: CartTicket[] = [];
   cartMerch: Merchandise[] = [];
+  cart: Cart = new Cart();
 
   bannerError: string | null = null;
   paymentDetail1: PaymentDetail = new PaymentDetail(
@@ -52,7 +55,8 @@ export class CartComponent implements OnInit {
   reloadCart() {
     this.service.getCartTickets(this.authService.getUserId()).subscribe({
       next: (data) => {
-        this.cartTickets = data;
+        this.cart = data;
+        this.cartTickets = data.tickets;
         this.cartTickets.forEach((cartTicket) => {
           cartTicket.reservation = false;
         });
@@ -111,7 +115,9 @@ export class CartComponent implements OnInit {
           bookingTicket.reservation = cartTicket.reservation;
           return bookingTicket;
         });
-        booking.merchandise = this.cartMerch.map((cartMerch) => new BookingMerchandise(cartMerch.id, cartMerch.quantity));
+
+        booking.merchandise = this.cartMerch.map((cartMerch) =>
+          new BookingMerchandise(cartMerch.id, cartMerch.quantity, cartMerch.buyWithPoints));
 
         try {
           const paymentDetailId = await this.openPaymentDialog(
@@ -131,6 +137,8 @@ export class CartComponent implements OnInit {
                 this.notification.success('Successfully booked tickets');
                 this.router.navigate(['/']);
                 this.cookie.delete('merchandise');
+                this.reloadCart();
+                this.service.getCartPoints(this.authService.getUserId());
               },
               error: (err) => {
                 console.error(err);
@@ -158,6 +166,14 @@ export class CartComponent implements OnInit {
         );
       },
     });
+  }
+
+  checkoutPointsValidation(usedPoints: number): void {
+    if (usedPoints > this.cart.userPoints) {
+      this.openMerchDialog();
+    }else {
+      this.checkout();
+    }
   }
 
   openPaymentDialog(paymentDetails): Promise<number> {
@@ -192,6 +208,7 @@ export class CartComponent implements OnInit {
     });
   }
 
+
   openBuyDialog(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const buyRef = this.dialog.open(BuyComponent, {
@@ -205,9 +222,53 @@ export class CartComponent implements OnInit {
     });
   }
 
+  openMerchDialog() {
+      this.dialog.open(MerchandiseEventComponent, {
+        width: '25%',
+      });
+  }
+
+  pointsUsed(): number {
+    let points = 0;
+    this.cartMerch.forEach((cartMerch) => {
+      if (cartMerch.buyWithPoints) {
+        points += cartMerch.pointsPrice * cartMerch.quantity;
+      }
+    });
+    return points;
+  }
 
   totalPrice(price: number, quantity: number): number {
     return Number((price * quantity).toFixed(2));
+  }
+
+  totalPoints(points: number, quantity: number): number {
+    return Number(Math.ceil(( points * quantity)));
+  }
+
+  overallPrice(): number {
+    let price = 0;
+    this.cartTickets.forEach((cartTicket) => {
+      price += cartTicket.price;
+    });
+    this.cartMerch.forEach((cartMerch) => {
+      if (!cartMerch.buyWithPoints) {
+        price += cartMerch.price * cartMerch.quantity;
+      }
+    });
+    return Number(price.toFixed(2));
+  }
+
+  receivedPoints(): number {
+    return Math.floor(this.overallPrice());
+  }
+
+  //check if user has enough points to buy merch
+  handleCheckboxClickMerch(points: number, checkbox: HTMLInputElement): void {
+    if (points > this.cart.userPoints) {
+      this.notification.error('You do not have enough points.', 'Not enough points');
+      checkbox.checked = false;
+    }
   }
 
   // remove merch from cart
@@ -223,6 +284,7 @@ export class CartComponent implements OnInit {
       this.cookie.set('merchandise', JSON.stringify(newBookingMerchandises));
     }
   }
+
 
   //load merch from cookie and then fetch remaining Data from backend
   private loadFromCookie() {
@@ -245,5 +307,6 @@ export class CartComponent implements OnInit {
       });
     }
   }
+
 
 }

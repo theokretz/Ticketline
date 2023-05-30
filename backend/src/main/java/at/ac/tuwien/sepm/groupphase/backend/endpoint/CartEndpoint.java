@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleReservationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutDetailsDto;
@@ -55,7 +55,7 @@ public class CartEndpoint {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/{id}/cart")
     @Operation(summary = "get cart of a user", security = @SecurityRequirement(name = "apiKey"))
-    public List<CartTicketDto> getCart(@Valid @PathVariable("id") Integer userId) {
+    public CartDto getCart(@Valid @PathVariable("id") Integer userId) {
         LOGGER.info("GET /api/v1/users/{}/cart", userId);
         try {
             return cartService.getCart(userId);

@@ -1,8 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleTicketDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutDetailsDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
@@ -21,7 +20,7 @@ public interface CartService {
      * @param userId the user id
      * @return the cart
      */
-    List<CartTicketDto> getCart(Integer userId);
+    CartDto getCart(Integer userId);
 
     /**
      * Put a list of tickets in a users cart.

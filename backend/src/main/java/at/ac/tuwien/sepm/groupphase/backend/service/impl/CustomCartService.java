@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.TicketMapper;
@@ -58,7 +59,7 @@ public class CustomCartService implements CartService {
     }
 
     @Override
-    public List<CartTicketDto> getCart(Integer userId) {
+    public CartDto getCart(Integer userId) {
         LOGGER.debug("Get Cart of User {}", userId);
         ApplicationUser user = notUserRepository.findApplicationUserById(userId);
         if (user == null) {
@@ -104,7 +105,14 @@ public class CustomCartService implements CartService {
         }
         // to keep the cart consistent between reloads
         tickets.sort(Comparator.comparing(CartTicketDto::getId));
-        return tickets;
+
+        CartDto cartDto = CartDto.CartDtoBuilder.aCartDto()
+            .withUserId(userId)
+            .withUserPoints(user.getPoints())
+            .withTickets(tickets)
+            .build();
+
+        return cartDto;
     }
 
 
