@@ -1,10 +1,11 @@
 <h1>Your Cart</h1>
+
 <div *ngIf="cartTickets.length > 0">
   <p>You have ({{cartTickets.length + cartMerch.length}}) items in your cart.</p>
 </div>
 <div class="ticket-container">
-  <div *ngIf="cartTickets.length === 0 || cartMerch.length === 0 ">
-    <h5>Your Cart is Empty</h5>
+  <div *ngIf="cartTickets.length === 0 && cartMerch.length === 0 ">
+    <h5 class="cart-empty">Your Cart is Empty</h5>
   </div>
 
   <table *ngIf="cartTickets.length !== 0" class="table ticket-table">
@@ -31,7 +32,7 @@
       <td>
         <input [(ngModel)]="cartTicket.reservation" type="checkbox"/>
       </td>
-      <td>{{ cartTicket.price }}</td>
+      <td>{{ cartTicket.price }}  €</td>
       <td>
         <div class="btn-group">
           <a
@@ -60,6 +61,8 @@
       <th>Quantity</th>
       <th>Price/Quantity</th>
       <th>Price</th>
+      <th>Points</th>
+      <th>Buy with Points</th>
       <th class="min-width">Action</th>
     </tr>
     </thead>
@@ -67,9 +70,11 @@
     <tr *ngFor="let merch of cartMerch" class="ticket-row">
       <td>{{ merch.title }}</td>
       <td>{{ merch.quantity}}</td>
-      <td>{{ merch.price }}</td>
-      <td>{{ totalPrice(merch.price, merch.quantity)}}</td>
-
+      <td>{{ merch.price }}  €</td>
+      <td>{{ totalPrice(merch.price, merch.quantity)}} €</td>
+      <td>{{ totalPoints(merch.pointsPrice, merch.quantity)}}</td>
+      <td>
+          <input [(ngModel)]="merch.buyWithPoints" type="checkbox" id="checkboxMerch" (click)="handleCheckboxClickMerch(totalPoints(merch.pointsPrice, merch.quantity), $any($event.target))" />
       <td>
         <div class="btn-group">
           <a
@@ -88,10 +93,19 @@
     <br/>
   </table>
 
+  <div class = "price-container">
+     <p id="points" class="points">Available Points: {{cart.userPoints}} </p>
+     <p id="usedPoints" class="points">Used Points: {{pointsUsed()}}</p>
+     <p id="price" class="points">Total Price: {{overallPrice()}} €</p>
+  </div>
+  <p id="receivedPoints" class="points-received">You receive <span class="bold-text">{{receivedPoints()}} Points </span> for this Order!</p>
+
+
+
   <div *ngIf="cartTickets.length !== 0 || cartMerch.length !== 0" class="button-container">
     <div class="btn-group">
       <a
-        (click)="checkout()"
+        (click)="checkoutPointsValidation(pointsUsed())"
         aria-label="checkout"
         class="btn btn-outline-danger btn-lg"
       >

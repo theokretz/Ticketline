@@ -261,8 +261,20 @@ public class CartServiceTest {
     }
 
     @Test
-    public void getCartShouldReturnTickets() {
-        List<CartTicketDto> list = cartService.getCart(user.getId());
+    void getCartShouldReturnTickets() {
+
+        CartDto cartDto = cartService.getCart(user.getId());
+        List<CartTicketDto> list = cartDto.getTickets();
+        assertThat(list)
+            .isNotEmpty()
+            .hasSize(2);
+    }
+
+    @Test
+    void getCartShouldReturnRightAmountOfPoints() {
+        CartDto cartDto = cartService.getCart(user.getId());
+        List<CartTicketDto> list = cartDto.getTickets();
         assertThat(list).isNotEmpty();
+        assertThat(cartDto.getUserPoints()).isEqualTo(user.getPoints());
     }
 }

@@ -43,11 +43,51 @@
   margin: auto;
 }
 .btn-outline-danger {
-  padding: 20px 30px;
+  padding: 15px 40px;
   font-size: 24px;
 }
 
 .button-container {
   text-align: right;
   padding-right: 50px;
+}
+
+.points {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ce5a57;
+  padding-top: 10px;
+  padding-right: 30px;
+}
+
+.points-received {
+  text-align: left;
+  font-size: 16px;
+  color: #ce5a57;
+  padding-left: 20px;
+}
+
+.price-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-top: 1px solid #ce5a57;
+
+}
+
+.cart-empty{
+  text-align: left;
+  padding-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ce5a57;
+}
+
+.bold-text{
+  font-weight: bold;
+}
+
+#checkboxMerch{
+  accent-color: #ce5a57;
 }

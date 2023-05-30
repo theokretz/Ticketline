@@ -38,4 +38,5 @@ export class CartTicket {
   locationStreet: string;
   price: number;
   reservation: boolean;
+  userPoints: number;
 }

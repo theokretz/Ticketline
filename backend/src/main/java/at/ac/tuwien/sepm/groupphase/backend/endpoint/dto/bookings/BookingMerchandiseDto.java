@@ -7,12 +7,14 @@ public class BookingMerchandiseDto {
     private Integer id;
     @NotNull
     private Integer quantity;
+    @NotNull
+    private Boolean buyWithPoints;
 
     public Integer getId() {
         return id;
     }
 
-    private void setId(Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -20,10 +22,17 @@ public class BookingMerchandiseDto {
         return quantity;
     }
 
-    private void setQuantity(Integer quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 
+    public Boolean getBuyWithPoints() {
+        return buyWithPoints;
+    }
+
+    public void setBuyWithPoints(Boolean buyWithPoints) {
+        this.buyWithPoints = buyWithPoints;
+    }
 
     @Override
     public String toString() {

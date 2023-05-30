@@ -14,6 +14,7 @@ public class MerchandiseDto {
 
     private String description;
 
+
     // private Set<MerchandiseOrdered> merchandiseMerchandiseOrdereds;
 
 
@@ -64,6 +65,7 @@ public class MerchandiseDto {
     public void setDescription(String description) {
         this.description = description;
     }
+
 
     /*
     public Set<MerchandiseOrdered> getMerchandiseMerchandiseOrdereds() {

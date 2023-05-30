@@ -3,6 +3,7 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {AuthService} from '../../services/auth.service';
 import {AuthRequest} from '../../dtos/authentication/auth-request';
+import {CartService} from '../../services/cart.service';
 
 
 @Component({
@@ -19,7 +20,8 @@ export class LoginComponent implements OnInit {
   error = false;
   errorMessage = '';
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router,
+              private cartService: CartService,) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]]
@@ -49,6 +51,7 @@ export class LoginComponent implements OnInit {
     this.authService.loginUser(authRequest).subscribe({
       next: () => {
         console.log('Successfully logged in user: ' + authRequest.email);
+        this.cartService.getCartPoints(this.authService.getUserId());
         this.router.navigate(['/message']);
       },
       error: error => {
