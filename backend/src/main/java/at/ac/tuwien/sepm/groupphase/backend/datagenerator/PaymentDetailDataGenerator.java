@@ -39,7 +39,7 @@ public class PaymentDetailDataGenerator {
             LOGGER.debug("generating payment detail entries");
             notUserRepository.findAll().forEach(user -> {
                 PaymentDetail paymentDetail = PaymentDetail.PaymentDetailBuilder.aPaymentDetail()
-                    .withCardNumber(123456789)
+                    .withCardNumber("123456789")
                     .withCardHolder(user.getFirstName() + " " + user.getLastName())
                     .withCvv(123)
                     .withExpirationDate(LocalDate.now().plusDays(100))

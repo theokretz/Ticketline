@@ -40,8 +40,4 @@ public interface CartService {
      */
     void deleteTicketFromCart(Integer userId, Integer ticketId) throws ConflictException;
 
-
-    List<PaymentDetail> getUserPaymentDetails(Integer userId);
-
-    List<Location> getUserLocations(Integer userId);
 }

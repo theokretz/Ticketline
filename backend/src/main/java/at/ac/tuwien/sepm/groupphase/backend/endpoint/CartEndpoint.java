@@ -13,6 +13,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.service.CartService;
+import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.PermitAll;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.invoke.MethodHandles;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -41,12 +43,14 @@ public class CartEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final CartService cartService;
+    private final UserService userService;
     private final ReservationMapper reservationMapper;
     private final CheckoutMapper checkoutMapper;
 
     @Autowired
-    public CartEndpoint(CartService cartService, ReservationMapper reservationMapper, CheckoutMapper checkoutMapper) {
+    public CartEndpoint(CartService cartService, UserService userService, ReservationMapper reservationMapper, CheckoutMapper checkoutMapper) {
         this.cartService = cartService;
+        this.userService = userService;
         this.reservationMapper = reservationMapper;
         this.checkoutMapper = checkoutMapper;
     }
@@ -108,16 +112,15 @@ public class CartEndpoint {
         }
     }
 
-
     @PermitAll
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/{id}/checkout-details")
     @Operation(summary = "get checkout details (locations and payment details)", security = @SecurityRequirement(name = "apiKey"))
-    public CheckoutDetailsDto getUserCheckoutDetails(@Valid @PathVariable("id") Integer userId) {
+    public CheckoutDetailsDto getUserCheckoutDetails(@Valid @PathVariable("id") Integer userId, Principal principal) {
         LOGGER.info("GET /api/v1/users/{}/checkout-details", userId);
         try {
-            List<PaymentDetail> paymentDetails = cartService.getUserPaymentDetails(userId);
-            List<Location> locations = cartService.getUserLocations(userId);
+            List<PaymentDetail> paymentDetails = userService.getUserPaymentDetails(userId);
+            List<Location> locations = userService.getUserLocations(userId);
             return checkoutMapper.generateCheckoutDetailsDto(paymentDetails, locations);
         } catch (NotFoundException e) {
             LOGGER.info("Unable to get checkout details: " + e.getMessage());

@@ -81,6 +81,7 @@ public class UserDataGenerator {
                 .withEmail("admin@email.com")
                 .withPassword(passwordEncoder.encode("password"))
                 .withPoints(0)
+                .withFailedLogin(0)
                 .withLocked(false)
                 .withFailedLogin(0)
                 .build();

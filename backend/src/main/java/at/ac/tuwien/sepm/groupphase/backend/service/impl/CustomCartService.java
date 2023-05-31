@@ -221,24 +221,6 @@ public class CustomCartService implements CartService {
         }
     }
 
-    @Override
-    public List<PaymentDetail> getUserPaymentDetails(Integer userId) {
-        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("Could not find User");
-        }
-        return paymentDetailRepository.findPaymentDetailsByUserId(userId);
-    }
-
-    @Override
-    public List<Location> getUserLocations(Integer userId) {
-        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("Could not find User");
-        }
-        return locationRepository.findAllByUserId(userId);
-    }
-
 
     private void addTicketToReserved(ApplicationUser user, List<Reservation> reserved, Ticket ticket) {
         Integer id = ticket.getReservation() == null ? null : ticket.getReservation().getId();

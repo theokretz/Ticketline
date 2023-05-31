@@ -22,7 +22,7 @@ public class PaymentDetail {
 
 
     @Column(nullable = false)
-    private Integer cardNumber;
+    private String cardNumber;
 
     @Column(nullable = false)
     private String cardHolder;
@@ -48,11 +48,11 @@ public class PaymentDetail {
         this.id = id;
     }
 
-    public Integer getCardNumber() {
+    public String getCardNumber() {
         return cardNumber;
     }
 
-    public void setCardNumber(final Integer cardNumber) {
+    public void setCardNumber(final String cardNumber) {
         this.cardNumber = cardNumber;
     }
 
@@ -111,7 +111,7 @@ public class PaymentDetail {
 
     public static final class PaymentDetailBuilder {
         private Integer id;
-        private Integer cardNumber;
+        private String cardNumber;
         private String cardHolder;
         private Integer cvv;
         private LocalDate expirationDate;
@@ -130,7 +130,7 @@ public class PaymentDetail {
             return this;
         }
 
-        public PaymentDetailBuilder withCardNumber(Integer cardNumber) {
+        public PaymentDetailBuilder withCardNumber(String cardNumber) {
             this.cardNumber = cardNumber;
             return this;
         }
