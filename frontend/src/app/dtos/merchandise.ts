@@ -23,6 +23,12 @@ export class Merchandise {
   description?: string;
   quantity?: number;
   buyWithPoints?: boolean;
+}
 
 
+export class OrderMerchandise {
+  id: number;
+  itemName: string;
+  quantity: number;
+  price: number;
 }

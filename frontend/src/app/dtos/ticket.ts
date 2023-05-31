@@ -19,6 +19,9 @@ export class ReservedTicket {
 export class OrderTicket {
   id: number;
   price: number;
+  artists: string;
+  eventName: string;
+  datetime: Date;
 }
 export class BookingTicket {
   ticketId: number;
