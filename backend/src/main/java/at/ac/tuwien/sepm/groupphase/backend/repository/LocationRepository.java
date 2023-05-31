@@ -10,5 +10,7 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
     List<Location> findAllByUserId(Integer userId);
 
     Location findFirstByUserIdIsNull();
+
+    Location findLocationById(Integer locationId);
 }
 

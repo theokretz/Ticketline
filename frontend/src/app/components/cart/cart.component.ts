@@ -1,20 +1,25 @@
-import {Component, OnInit} from '@angular/core';
-import {CartService} from '../../services/cart.service';
-import {AuthService} from '../../services/auth.service';
-import {BookingTicket, CartTicket} from '../../dtos/ticket';
-import {ToastrService} from 'ngx-toastr';
-import {PaymentDetail} from '../../dtos/payment-detail';
-import {Booking} from 'src/app/dtos/booking';
-import {MatDialog} from '@angular/material/dialog';
-import {PaymentDetailComponent} from './payment-detail/payment-detail.component';
-import {DeliveryAddressComponent} from './delivery-address/delivery-address.component';
-import {BuyComponent} from './buy/buy.component';
-import {Router} from '@angular/router';
-import {CookieService} from 'ngx-cookie-service';
-import {BookingMerchandise, Merchandise} from '../../dtos/merchandise';
-import {Cart} from '../../dtos/cart';
-import {MerchandiseEventComponent} from '../merchandise/merchandise-event/merchandise-event.component';
-
+import { Component, OnInit } from '@angular/core';
+import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
+import { BookingTicket, CartTicket } from '../../dtos/ticket';
+import { ToastrService } from 'ngx-toastr';
+import {
+  PaymentDetail,
+  CheckoutPaymentDetail,
+} from '../../dtos/payment-detail';
+import { Booking } from 'src/app/dtos/booking';
+import { MatDialog } from '@angular/material/dialog';
+import { PaymentDetailComponent } from './payment-detail/payment-detail.component';
+import { DeliveryAddressComponent } from './delivery-address/delivery-address.component';
+import { BuyComponent } from './buy/buy.component';
+import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
+import { BookingMerchandise, Merchandise } from '../../dtos/merchandise';
+import { CreatePaymentDetailComponent } from './create-payment-detail/create-payment-detail.component';
+import { CheckoutLocation } from '../../dtos/location';
+import { CreateDeliveryLocationComponent } from './create-delivery-location/create-delivery-location.component';
+import { Cart } from '../../dtos/cart';
+import { MerchandiseEventComponent } from '../merchandise/merchandise-event/merchandise-event.component';
 
 @Component({
   selector: 'app-cart',
@@ -27,14 +32,6 @@ export class CartComponent implements OnInit {
   cart: Cart = new Cart();
 
   bannerError: string | null = null;
-  paymentDetail1: PaymentDetail = new PaymentDetail(
-    1,
-    'First Last',
-    123456789,
-    111,
-    new Date('2030-01-01')
-  );
-  paymentDetails: PaymentDetail[] = [this.paymentDetail1, this.paymentDetail1];
 
   constructor(
     private service: CartService,
@@ -42,10 +39,8 @@ export class CartComponent implements OnInit {
     private notification: ToastrService,
     private dialog: MatDialog,
     private router: Router,
-    private cookie: CookieService,
-  ) {
-  }
-
+    private cookie: CookieService
+  ) {}
 
   ngOnInit(): void {
     this.reloadCart();
@@ -63,7 +58,6 @@ export class CartComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching cart', error);
-        this.bannerError = 'Could not fetch cart: ' + error.message;
         const errorMessage =
           error.status === 0 ? 'Is the user logged in?' : error.message.message;
         this.notification.error(errorMessage, 'Could Not Fetch Cart');
@@ -83,7 +77,6 @@ export class CartComponent implements OnInit {
         },
       });
   }
-
 
   dateToLocaleDate(cartTicket: CartTicket): string {
     return new Date(cartTicket.date).toLocaleDateString();
@@ -116,18 +109,38 @@ export class CartComponent implements OnInit {
           return bookingTicket;
         });
 
-        booking.merchandise = this.cartMerch.map((cartMerch) =>
-          new BookingMerchandise(cartMerch.id, cartMerch.quantity, cartMerch.buyWithPoints));
+        booking.merchandise = this.cartMerch.map(
+          (cartMerch) =>
+            new BookingMerchandise(
+              cartMerch.id,
+              cartMerch.quantity,
+              cartMerch.buyWithPoints
+            )
+        );
 
         try {
-          const paymentDetailId = await this.openPaymentDialog(
-            checkoutDetails.paymentDetails
-          );
+          let paymentDetailId = -1;
+          do {
+            paymentDetailId = await this.openPaymentDialog(
+              checkoutDetails.paymentDetails
+            );
+            if (paymentDetailId === -1) {
+              const createdPayment = await this.openCreatePaymentDialog();
+              checkoutDetails.paymentDetails.push(createdPayment);
+            }
+          } while (paymentDetailId === -1);
           booking.paymentDetailId = paymentDetailId;
 
-          const locationId = await this.openLocationDialog(
-            checkoutDetails.locations
-          );
+          let locationId = -1;
+          do {
+            locationId = await this.openLocationDialog(
+              checkoutDetails.locations
+            );
+            if (locationId === -1) {
+              const createdLocation = await this.openCreateLocationDialog();
+              checkoutDetails.locations.push(createdLocation);
+            }
+          } while (locationId === -1);
           booking.locationId = locationId;
 
           const buy = await this.openBuyDialog();
@@ -168,10 +181,37 @@ export class CartComponent implements OnInit {
     });
   }
 
+  openCreateLocationDialog(): Promise<CheckoutLocation> {
+    return new Promise((resolve, reject) => {
+      const locationRef = this.dialog.open(CreateDeliveryLocationComponent, {
+        width: '25%',
+      });
+      locationRef.componentInstance.locationEmitter.subscribe(
+        (location: CheckoutLocation) => {
+          locationRef.close();
+          resolve(location);
+        }
+      );
+    });
+  }
+
+  openCreatePaymentDialog(): Promise<CheckoutPaymentDetail> {
+    return new Promise((resolve, reject) => {
+      const paymentRef = this.dialog.open(CreatePaymentDetailComponent, {
+        width: '25%',
+      });
+      paymentRef.componentInstance.paymentDetailEmitter.subscribe(
+        (paymentDetail: CheckoutPaymentDetail) => {
+          paymentRef.close();
+          resolve(paymentDetail);
+        }
+      );
+    });
+  }
   checkoutPointsValidation(usedPoints: number): void {
     if (usedPoints > this.cart.userPoints) {
       this.openMerchDialog();
-    }else {
+    } else {
       this.checkout();
     }
   }
@@ -180,7 +220,7 @@ export class CartComponent implements OnInit {
     return new Promise((resolve, reject) => {
       const paymentRef = this.dialog.open(PaymentDetailComponent, {
         width: '25%',
-        data: {paymentDetails},
+        data: { paymentDetails },
       });
 
       paymentRef.componentInstance.paymentSelector.subscribe(
@@ -196,7 +236,7 @@ export class CartComponent implements OnInit {
     return new Promise((resolve, reject) => {
       const locationRef = this.dialog.open(DeliveryAddressComponent, {
         width: '25%',
-        data: {locations},
+        data: { locations },
       });
 
       locationRef.componentInstance.locationSelector.subscribe(
@@ -207,7 +247,6 @@ export class CartComponent implements OnInit {
       );
     });
   }
-
 
   openBuyDialog(): Promise<boolean> {
     return new Promise((resolve, reject) => {
@@ -223,9 +262,9 @@ export class CartComponent implements OnInit {
   }
 
   openMerchDialog() {
-      this.dialog.open(MerchandiseEventComponent, {
-        width: '25%',
-      });
+    this.dialog.open(MerchandiseEventComponent, {
+      width: '25%',
+    });
   }
 
   pointsUsed(): number {
@@ -243,7 +282,7 @@ export class CartComponent implements OnInit {
   }
 
   totalPoints(points: number, quantity: number): number {
-    return Number(Math.ceil(( points * quantity)));
+    return Number(Math.ceil(points * quantity));
   }
 
   overallPrice(): number {
@@ -266,7 +305,10 @@ export class CartComponent implements OnInit {
   //check if user has enough points to buy merch
   handleCheckboxClickMerch(points: number, checkbox: HTMLInputElement): void {
     if (points > this.cart.userPoints) {
-      this.notification.error('You do not have enough points.', 'Not enough points');
+      this.notification.error(
+        'You do not have enough points.',
+        'Not enough points'
+      );
       checkbox.checked = false;
     }
   }
@@ -276,37 +318,40 @@ export class CartComponent implements OnInit {
     const value: string = this.cookie.get('merchandise');
     if (value !== '') {
       //delete merch from this.cartMerch
-      this.cartMerch = this.cartMerch.filter(merch => merch.id !== merchId);
+      this.cartMerch = this.cartMerch.filter((merch) => merch.id !== merchId);
       //delete merch from cookie
-      const bookingMerchandises: BookingMerchandise[] = Object.values(JSON.parse(value))
-        .map(entry => new BookingMerchandise(entry['id'], entry['quantity']));
-      const newBookingMerchandises: BookingMerchandise[] = bookingMerchandises.filter(merch => merch.id !== merchId);
+      const bookingMerchandises: BookingMerchandise[] = Object.values(
+        JSON.parse(value)
+      ).map((entry) => new BookingMerchandise(entry['id'], entry['quantity']));
+      const newBookingMerchandises: BookingMerchandise[] =
+        bookingMerchandises.filter((merch) => merch.id !== merchId);
       this.cookie.set('merchandise', JSON.stringify(newBookingMerchandises));
     }
   }
-
 
   //load merch from cookie and then fetch remaining Data from backend
   private loadFromCookie() {
     const value: string = this.cookie.get('merchandise');
     if (value !== '') {
       //create BookingMerchandise[] obj from json
-      const bookingMerchandises: BookingMerchandise[] = Object.values(JSON.parse(value))
-        .map(entry => new BookingMerchandise(entry['id'], entry['quantity']));
+      const bookingMerchandises: BookingMerchandise[] = Object.values(
+        JSON.parse(value)
+      ).map((entry) => new BookingMerchandise(entry['id'], entry['quantity']));
       //get merch info from backend
       this.service.getMerchInfo(bookingMerchandises).subscribe({
         next: (data: Merchandise[]) => {
-          data.map(merch => {
-            merch.quantity = bookingMerchandises.find(bookingMerch => bookingMerch.id === merch.id).quantity;
+          data.map((merch) => {
+            merch.quantity = bookingMerchandises.find(
+              (bookingMerch) => bookingMerch.id === merch.id
+            ).quantity;
           });
           this.cartMerch = data;
           console.log(this.cartMerch);
-        }, error: (error) => {
+        },
+        error: (error) => {
           this.notification.error(error.message, 'Could Not Fetch Merchandise');
-        }
+        },
       });
     }
   }
-
-
 }

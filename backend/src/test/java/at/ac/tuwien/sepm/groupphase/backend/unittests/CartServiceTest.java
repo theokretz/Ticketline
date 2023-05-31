@@ -159,7 +159,7 @@ public class CartServiceTest {
         paymentDetail = new PaymentDetail();
         paymentDetail.setCvv(222);
         paymentDetail.setCardHolder("hallo2");
-        paymentDetail.setCardNumber(23123131);
+        paymentDetail.setCardNumber("23123131");
         paymentDetail.setExpirationDate(LocalDate.now());
         paymentDetail.setUser(user);
 

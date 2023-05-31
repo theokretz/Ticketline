@@ -165,7 +165,7 @@ public class PerformanceTest {
         paymentDetail = new PaymentDetail();
         paymentDetail.setCvv(222);
         paymentDetail.setCardHolder("hallo2");
-        paymentDetail.setCardNumber(23123131);
+        paymentDetail.setCardNumber("23123131");
         paymentDetail.setExpirationDate(LocalDate.of(2024, 10, 10));
         paymentDetail.setUser(user);
 

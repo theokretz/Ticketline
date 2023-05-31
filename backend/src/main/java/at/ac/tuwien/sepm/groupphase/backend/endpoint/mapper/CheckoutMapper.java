@@ -6,20 +6,22 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutPaymen
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import org.mapstruct.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public abstract class CheckoutMapper {
+
+    @Autowired
+    private PaymentDetailMapper paymentDetailMapper;
+
     public CheckoutDetailsDto generateCheckoutDetailsDto(List<PaymentDetail> paymentDetails, List<Location> locations) {
         CheckoutDetailsDto checkoutDetailsDto = new CheckoutDetailsDto();
         List<CheckoutPaymentDetail> checkoutPaymentDetails = new ArrayList<>();
         for (PaymentDetail paymentDetail : paymentDetails) {
-            CheckoutPaymentDetail checkoutPaymentDetail = new CheckoutPaymentDetail();
-            checkoutPaymentDetail.setPaymentDetailId(paymentDetail.getId());
-            checkoutPaymentDetail.setLastFourDigits(paymentDetail.getCardNumber() % 10000);
-            checkoutPaymentDetails.add(checkoutPaymentDetail);
+            checkoutPaymentDetails.add(paymentDetailMapper.paymentDetailToCheckoutPaymentDetail(paymentDetail));
         }
         List<CheckoutLocation> checkoutLocations = new ArrayList<>();
         for (Location location : locations) {

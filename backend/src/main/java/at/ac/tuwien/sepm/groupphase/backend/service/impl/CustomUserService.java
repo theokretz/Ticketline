@@ -1,21 +1,29 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
+import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.PaymentDetailRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
+import org.h2.security.auth.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
@@ -25,10 +33,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CustomUserService implements UserService {
@@ -40,11 +51,17 @@ public class CustomUserService implements UserService {
     private final JwtTokenizer jwtTokenizer;
     private final int maxFailedLogin = 5;
 
+    private final LocationRepository locationRepository;
+    private final PaymentDetailRepository paymentDetailRepository;
+
     @Autowired
-    public CustomUserService(NotUserRepository notUserRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer) {
+    public CustomUserService(NotUserRepository notUserRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer,
+                             LocationRepository locationRepository, PaymentDetailRepository paymentDetailRepository) {
         this.notUserRepository = notUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
+        this.paymentDetailRepository = paymentDetailRepository;
+        this.locationRepository = locationRepository;
     }
 
     /**
@@ -193,5 +210,114 @@ public class CustomUserService implements UserService {
                     saved.getLastName(),
                     userRegisterDto));
         }
+    }
+
+    @Override
+    public boolean isUserAuthenticated(Integer userId, Authentication auth) {
+        LOGGER.trace("isUserAuthenticated({},{})", userId, auth);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        return user.getId().equals(auth.getPrincipal());
+    }
+
+    @Override
+    public List<Location> getUserLocations(Integer userId) {
+        LOGGER.trace("getUserLocations({})", userId);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        return locationRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    public Location updateUserLocation(Integer id, LocationDto locationDto) throws ValidationException {
+        LOGGER.trace("updateUserLocation({},{})", id, locationDto);
+        List<String> error = new ArrayList<>();
+        if (locationDto == null || (error = locationDto.validate()).size() > 0) {
+            throw new ValidationException("LocationDto is not valid", error);
+        }
+
+        ApplicationUser user = notUserRepository.findApplicationUserById(id);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+
+        Location location = Location.LocationBuilder.aLocation()
+            .withUser(user)
+            .withPostalCode(locationDto.getPostalCode())
+            .withCity(locationDto.getCity())
+            .withCountry(locationDto.getCountry())
+            .withStreet(locationDto.getStreet())
+            .build();
+        return this.locationRepository.save(location);
+    }
+
+    @Override
+    public void deleteUserLocation(Integer userId, Integer locationId) {
+        LOGGER.trace("deleteUserLocation({},{})", userId, locationId);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        Location location = locationRepository.findLocationById(locationId);
+        if (location == null) {
+            throw new NotFoundException("Could not find Location");
+        }
+        locationRepository.delete(location);
+    }
+
+
+    @Override
+    public List<PaymentDetail> getUserPaymentDetails(Integer userId) {
+        LOGGER.trace("getUserPaymentDetails({})", userId);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        return paymentDetailRepository.findPaymentDetailsByUserId(userId);
+    }
+
+    @Override
+    public PaymentDetail updateUserPaymentDetails(Integer id, SimplePaymentDetailDto paymentDetails) throws ValidationException {
+        LOGGER.trace("updateUserPaymentDetails({},{})", id, paymentDetails);
+        ApplicationUser user = notUserRepository.findApplicationUserById(id);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        List<String> error = new ArrayList<>();
+        if (paymentDetails == null || (error = paymentDetails.validate()).size() > 0) {
+            throw new ValidationException("PaymentDetailsDto is not valid", error);
+        }
+        PaymentDetail paymentDetail = PaymentDetail.PaymentDetailBuilder.aPaymentDetail()
+            .withUser(user)
+            .withCardNumber(paymentDetails.getCardNumber())
+            .withCardHolder(paymentDetails.getCardHolder())
+            .withExpirationDate(paymentDetails.getExpirationDate())
+            .withCvv(paymentDetails.getCvv())
+            .build();
+
+        PaymentDetail saved = this.paymentDetailRepository.save(paymentDetail);
+        Set<PaymentDetail> userPaymentDetails = user.getPaymentDetails();
+        userPaymentDetails.add(saved);
+        user.setPaymentDetails(userPaymentDetails);
+        return saved;
+    }
+
+    @Override
+    public void deleteUserPaymentDetails(Integer userId, Integer paymentDetailsId) {
+        LOGGER.trace("deleteUserPaymentDetails({},{})", userId, paymentDetailsId);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+
+        Optional<PaymentDetail> paymentDetail = paymentDetailRepository.findPaymentDetailById(paymentDetailsId);
+        if (paymentDetail.isEmpty()) {
+            throw new NotFoundException("Could not find PaymentDetail");
+        }
+        paymentDetailRepository.delete(paymentDetail.get());
     }
 }
