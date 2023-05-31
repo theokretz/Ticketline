@@ -1,9 +1,10 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleOrderDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderHistoryDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.bookings.BookingDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public interface OrderService {
 
-    List<SimpleOrderDto> getOrderHistory(Integer id);
+    List<OrderHistoryDto> getOrderHistory(Integer id) throws NotFoundException, ValidationException;
 
     /**
      * Buy tickets returns order dto.

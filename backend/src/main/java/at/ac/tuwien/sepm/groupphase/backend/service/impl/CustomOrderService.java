@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleOrderDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.OrderHistoryDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.bookings.BookingDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.bookings.BookingMerchandiseDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.bookings.BookingTicketDto;
@@ -61,9 +61,12 @@ public class CustomOrderService implements OrderService {
     private final CustomOrderValidator validator;
 
     @Autowired
-    public CustomOrderService(OrderRepository orderRepository, NotUserRepository notUserRepository, OrderMapper orderMapper,
-                              TransactionRepository transactionRepository, TicketRepository ticketRepository, ReservationRepository reservationRepository,
-                              MerchandiseRepository merchandiseRepository, MerchandiseOrderedRepository merchandiseOrderedRepository, CustomOrderValidator validator) {
+    public CustomOrderService(OrderRepository orderRepository, NotUserRepository notUserRepository,
+                              OrderMapper orderMapper, TransactionRepository transactionRepository,
+                              TicketRepository ticketRepository, ReservationRepository reservationRepository,
+                              MerchandiseRepository merchandiseRepository,
+                              MerchandiseOrderedRepository merchandiseOrderedRepository,
+                              CustomOrderValidator validator) {
         this.orderRepository = orderRepository;
         this.notUserRepository = notUserRepository;
         this.orderMapper = orderMapper;
@@ -77,16 +80,26 @@ public class CustomOrderService implements OrderService {
 
 
     @Override
-    public List<SimpleOrderDto> getOrderHistory(Integer id) {
+    public List<OrderHistoryDto> getOrderHistory(Integer id) throws NotFoundException, ValidationException {
         LOGGER.info("Find all orders for user with id {}", id);
+        List<String> validationErrors = new ArrayList<>();
+        if (id == null) {
+            throw new NotFoundException(String.format("No id has been provided"));
+        }
+        if (id <= 0) {
+            validationErrors.add("Id can't be a negative number");
+        }
+        if (!validationErrors.isEmpty()) {
+            throw new ValidationException(String.format("Validation failed:"), validationErrors);
+        }
         ApplicationUser user = notUserRepository.getApplicationUserById(id);
         if (user == null) {
             throw new NotFoundException(String.format("Could not find user with id %s", id));
         }
         List<Order> allOrders = orderRepository.getAllOrdersByUserId(id);
-        List<SimpleOrderDto> allOrdersDto = new ArrayList<>();
+        List<OrderHistoryDto> allOrdersDto = new ArrayList<>();
         for (Order order : allOrders) {
-            allOrdersDto.add(orderMapper.orderToSimpleOrderDto(order));
+            allOrdersDto.add(orderMapper.orderToOrderHistoryDto(order));
         }
         return allOrdersDto;
     }

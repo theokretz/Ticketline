@@ -18,9 +18,9 @@ export class OrderHistoryComponent implements OnInit {
   ngOnInit(): void {
     this.reloadOrders();
   }
-
   reloadOrders(): void {
-    this.service.getOrders(1).subscribe({
+    // TODO: get user id
+    this.service.getOrders(20).subscribe({
       next: data => {
         this.orders = data;
       },
@@ -30,16 +30,16 @@ export class OrderHistoryComponent implements OnInit {
     });
   }
 
-  dateToString(order: Order): string {
-    const date = new Date(order.orderTs);
-    return 'Ordered on ' + date.toDateString();
+  dateToString(input: Date): string {
+    const date = new Date(input);
+    return '' + date.toLocaleDateString(
+      'en-GB',
+      {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'
+      });
   }
 
   totalPrice(order: Order): number {
-    let totalPrice = 0;
-    for (const ticket of order.tickets) {
-      totalPrice += ticket.price;
-    }
-    return totalPrice;
+    return order.totalPrice;
   }
+
 }
