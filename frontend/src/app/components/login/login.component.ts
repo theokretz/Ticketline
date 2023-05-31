@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit {
       next: () => {
         console.log('Successfully logged in user: ' + authRequest.email);
         this.cartService.getCartPoints(this.authService.getUserId());
-        this.router.navigate(['/message']);
+        this.router.navigate(['/news']);
       },
       error: error => {
         console.log('Could not log in due to:');

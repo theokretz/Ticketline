@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -29,6 +30,7 @@ public class ApplicationUser {
     private String email;
     @Column(nullable = false)
     private String password;
+
 
     @Column(nullable = false)
     private Integer points;
@@ -57,6 +59,9 @@ public class ApplicationUser {
     @OneToMany(mappedBy = "user")
     private Set<Location> locations;
 
+    @ManyToMany(mappedBy = "users")
+    private Set<News> news;
+
     public ApplicationUser() {
     }
 
@@ -65,6 +70,7 @@ public class ApplicationUser {
         this.password = password;
         this.admin = admin;
     }
+
 
     public Integer getId() {
         return id;
@@ -189,6 +195,14 @@ public class ApplicationUser {
     }
 
 
+    public Set<News> getNews() {
+        return news;
+    }
+
+    public void setNews(Set<News> news) {
+        this.news = news;
+    }
+
     //TODO remove toString in production
     @Override
     public String toString() {
@@ -226,6 +240,7 @@ public class ApplicationUser {
         private Set<PaymentDetail> paymentDetails;
         private Set<Reservation> reservations;
         private Set<Location> locations;
+        private Set<News> news;
 
         private UserBuilder() {
         }
@@ -309,6 +324,10 @@ public class ApplicationUser {
             return this;
         }
 
+        public UserBuilder withNews(final Set<News> news) {
+            this.news = news;
+            return this;
+        }
 
         public ApplicationUser build() {
             ApplicationUser user = new ApplicationUser();
@@ -327,6 +346,7 @@ public class ApplicationUser {
             user.setPaymentDetails(paymentDetails);
             user.setReservations(reservations);
             user.setLocations(locations);
+            user.setNews(news);
             return user;
         }
     }

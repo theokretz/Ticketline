@@ -3,9 +3,9 @@
   <hr class="my-4">
   <a *ngIf="!authService.isLoggedIn()" class="btn btn-primary btn-lg" routerLink="/login" role="button">Login</a>
   <div *ngIf="authService.isLoggedIn()">
-    <p>Check out the latest message from the SEPM group phase.</p>
+    <p>Check out the latest news from the SEPM group phase.</p>
     <p class="lead">
-      <a class="btn btn-primary btn-lg" routerLink="/message" role="button">Message</a>
+      <a class="btn btn-primary btn-lg" routerLink="/news" role="button">News</a>
     </p>
   </div>
 </div>
