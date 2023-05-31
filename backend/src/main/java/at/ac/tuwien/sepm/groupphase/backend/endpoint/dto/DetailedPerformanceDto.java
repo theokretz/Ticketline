@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public class DetailedPerformanceDto {
-
+    private Integer id;
     private LocalDateTime dateTime;
     private String hallName;
     private String eventName;
@@ -12,6 +12,13 @@ public class DetailedPerformanceDto {
     private Map<Integer, DetailedPerformanceSectorDto> performanceSector;
     private PerformanceTicketDto[][] tickets;
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public LocalDateTime getDateTime() {
         return dateTime;
@@ -63,7 +70,7 @@ public class DetailedPerformanceDto {
 
 
     public static final class DetailedPerformanceDtoBuilder {
-
+        private Integer id;
         private LocalDateTime timestamp;
         private String eventName;
         private String hallName;
@@ -78,6 +85,11 @@ public class DetailedPerformanceDto {
 
         public static DetailedPerformanceDtoBuilder aDetailedPerformanceDto() {
             return new DetailedPerformanceDtoBuilder();
+        }
+
+        public DetailedPerformanceDtoBuilder withId(Integer id) {
+            this.id = id;
+            return this;
         }
 
         public DetailedPerformanceDtoBuilder withTimestamp(LocalDateTime timestamp) {
@@ -112,6 +124,7 @@ public class DetailedPerformanceDto {
 
         public DetailedPerformanceDto build() {
             DetailedPerformanceDto detailedPerformanceDto = new DetailedPerformanceDto();
+            detailedPerformanceDto.setId(id);
             detailedPerformanceDto.setDateTime(timestamp);
             detailedPerformanceDto.setEventName(eventName);
             detailedPerformanceDto.setHallName(hallName);

@@ -11,6 +11,10 @@ import {ReservationComponent} from './components/reservation/reservation.compone
 import {CartComponent} from './components/cart/cart.component';
 import {MerchandiseComponent} from './components/merchandise/merchandise.component';
 import {RegisterComponent} from './components/register/register.component';
+import {
+  SearchEventByArtistComponent
+} from './components/search/search-event-by-artist/search-event-by-artist.component';
+import {EventDetailsComponent} from './components/event-details/event-details.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -22,6 +26,12 @@ const routes: Routes = [
   {path: 'merchandise', component: MerchandiseComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'cart', component: CartComponent},
+  {
+    path: 'search', children: [
+      {path: 'artists', component: SearchEventByArtistComponent},
+    ]
+  },
+  {path: ':id/event', component: EventDetailsComponent},
   {path: '**', component: PageNotFoundComponent},
 ];
 

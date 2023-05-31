@@ -30,6 +30,13 @@ import { MerchandiseComponent } from './components/merchandise/merchandise.compo
 import { CookieService } from 'ngx-cookie-service';
 import { MerchandiseEventComponent } from './components/merchandise/merchandise-event/merchandise-event.component';
 import { RegisterComponent } from './components/register/register.component';
+import { SearchEventByArtistComponent } from './components/search/search-event-by-artist/search-event-by-artist.component';
+import {MatInputModule} from '@angular/material/input';
+import {MatIconModule} from '@angular/material/icon';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { EventDetailsComponent } from './components/event-details/event-details.component';
 
 @NgModule({
   declarations: [
@@ -51,31 +58,38 @@ import { RegisterComponent } from './components/register/register.component';
     MerchandiseComponent,
     MerchandiseEventComponent,
     RegisterComponent,
+    SearchEventByArtistComponent,
+    EventDetailsComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    //Needed for Toastr
-    ToastrModule.forRoot({
-      timeOut: 3000,
-      extendedTimeOut: 1000,
-      closeButton: true,
-      progressBar: true,
-      tapToDismiss: false,
-    }),
-    BrowserAnimationsModule,
-    ReactiveFormsModule,
-    //-------
-    NgbModule,
-    FormsModule,
-    //Needed for MatDialog
-    MatDialogModule,
-    MatTableModule,
-    MatCardModule,
-    MatButtonModule,
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        //Needed for Toastr
+        ToastrModule.forRoot({
+            timeOut: 3000,
+            extendedTimeOut: 1000,
+            closeButton: true,
+            progressBar: true,
+            tapToDismiss: false,
+        }),
+        BrowserAnimationsModule,
+        ReactiveFormsModule,
+        //-------
+        NgbModule,
+        FormsModule,
+        //Needed for MatDialog
+        MatDialogModule,
+        MatTableModule,
+        MatCardModule,
+        MatButtonModule,
+        MatInputModule,
+        MatIconModule,
+        MatToolbarModule,
+        MatAutocompleteModule,
+        MatButtonToggleModule,
+    ],
   providers: [httpInterceptorProviders, CookieService],
   bootstrap: [AppComponent],
 })
