@@ -6,6 +6,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 
 import java.util.List;
 
@@ -38,6 +39,6 @@ public interface CartService {
      * @param userId   the user id
      * @param ticketId the ticket id
      */
-    void deleteTicketFromCart(Integer userId, Integer ticketId) throws ConflictException;
+    void deleteTicketFromCart(Integer userId, Integer ticketId) throws ConflictException, UnauthorizedException;
 
 }

@@ -15,6 +15,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PaymentDetailRepository;
@@ -192,7 +193,7 @@ public class CustomCartService implements CartService {
      * @param ticketId the ticket id
      */
     @Override
-    public void deleteTicketFromCart(Integer userId, Integer ticketId) throws ConflictException {
+    public void deleteTicketFromCart(Integer userId, Integer ticketId) throws ConflictException, UnauthorizedException {
         LOGGER.debug("Delete Ticket {} from Cart of User {}", ticketId, userId);
         ApplicationUser user = notUserRepository.findApplicationUserById(userId);
         if (user == null) {
@@ -204,7 +205,7 @@ public class CustomCartService implements CartService {
         }
         List<String> conflictMsg = new ArrayList<>();
         if (!reservation.getUser().getId().equals(userId)) {
-            conflictMsg.add("Ticket is not in cart of this user");
+            throw new UnauthorizedException("Could not delete ticekt from cart", List.of("User is not authorized"));
         }
         if (!reservation.getCart()) {
             conflictMsg.add("Ticket is not in cart");
@@ -221,8 +222,8 @@ public class CustomCartService implements CartService {
         }
     }
 
-
     private void addTicketToReserved(ApplicationUser user, List<Reservation> reserved, Ticket ticket) {
+        LOGGER.debug("Adding Ticket {} to reserved", ticket.getId());
         Integer id = ticket.getReservation() == null ? null : ticket.getReservation().getId();
         LocalDateTime expiration = ticket.getReservation() == null ? LocalDateTime.now().plusMinutes(15) : ticket.getReservation().getExpirationTs();
         Reservation reservation = Reservation.ReservationBuilder.aReservation()
@@ -234,5 +235,4 @@ public class CustomCartService implements CartService {
             .build();
         reserved.add(reservation);
     }
-
 }
