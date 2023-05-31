@@ -111,4 +111,14 @@ public class CustomPerformanceService implements PerformanceService {
         }
         return perf;
     }
+
+    @Override
+    public List<Performance> getPerformancesOfEventById(Integer id) {
+        LOGGER.debug("Find performances of the event with id{}", id);
+        List<Performance> performances = performanceRepository.findAllByEvent_Id(id);
+        if (performances.isEmpty()) {
+            throw new NotFoundException(String.format("Could not find performances of event with the given id{}", id));
+        }
+        return performances;
+    }
 }

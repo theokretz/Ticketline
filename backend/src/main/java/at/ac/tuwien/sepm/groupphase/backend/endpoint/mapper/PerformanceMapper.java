@@ -59,6 +59,32 @@ public abstract class PerformanceMapper {
             .build();
     }
 
+    public DetailedPerformanceDto performanceDtotoDetailedPerformanceDtoForSearch(Performance performance) {
+        if (performance == null) {
+            return null;
+        }
+        Hall hall = performance.getHall();
+        if (hall == null) {
+            return null;
+        }
+        Location location = hall.getLocation();
+        if (location == null) {
+            return null;
+        }
+        if (performance.getEvent() == null) {
+            return null;
+        }
+
+        LocationDto locationDto = locationMapper.locationToLocationDto(location);
+        return DetailedPerformanceDto.DetailedPerformanceDtoBuilder.aDetailedPerformanceDto()
+            .withId(performance.getId())
+            .withTimestamp(performance.getDatetime())
+            .withEventName(performance.getEvent().getName())
+            .withHallName(hall.getName())
+            .withLocation(locationDto)
+            .build();
+    }
+
     public DetailedOrderPerformanceDto performanceToDetailedOrderPerformanceDto(Performance performance) {
         if (performance == null) {
             return null;

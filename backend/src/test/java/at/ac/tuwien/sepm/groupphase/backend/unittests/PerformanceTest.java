@@ -92,6 +92,7 @@ public class PerformanceTest {
     private Set<PaymentDetail> paymentDetailSet;
     private UserDto userDto;
     private Event event;
+    private Event event2;
     private Hall hall;
     private Sector standingSector;
     private Sector seatedSector;
@@ -116,6 +117,11 @@ public class PerformanceTest {
         event.setName("The Eras Tour 2");
         event.setLength(Duration.ZERO);
         eventRepository.save(event);
+
+        event2 = new Event();
+        event2.setName("The Eras Tour 3");
+        event2.setLength(Duration.ZERO);
+        eventRepository.save(event2);
 
         location = new Location();
         location.setCity("Vienna");
@@ -319,6 +325,25 @@ public class PerformanceTest {
         assertEquals(performanceTicketDto[2][2].getSectorId(), seatedSeat.getSector().getId());
         assertEquals(detailedPerformanceDto.getPerformanceSector().get(performanceTicketDto[2][2].getSectorId()).getName(),
             seatedPerformanceSector.getSector().getName());
+    }
+
+    @Test
+    void getPerformancesByEventIdOfNonExistingEventShouldThrowNotFoundException() {
+        Assertions.assertThrows(NotFoundException.class, () -> performanceService.getPerformancesOfEventById(-1));
+    }
+
+    @Test
+    void getPerformancesByEventIdShouldReturnAllPerformancesOfEvent() {
+        Assertions.assertDoesNotThrow(() -> performanceService.getPerformancesOfEventById(1));
+        List<Performance> performances = performanceService.getPerformancesOfEventById(performance.getEvent().getId());
+
+        assertEquals(1, performances.size());
+
+    }
+
+    @Test
+    void getPerformancesOfEventWithNoPerformancesShouldThrowNotFoundException() {
+        Assertions.assertThrows(NotFoundException.class, () -> performanceService.getPerformancesOfEventById(2));
     }
 
 }

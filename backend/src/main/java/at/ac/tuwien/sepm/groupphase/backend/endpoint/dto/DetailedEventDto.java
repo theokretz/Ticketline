@@ -3,11 +3,20 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 import java.time.Duration;
 
 public class DetailedEventDto {
+    private Integer id;
     private String name;
     private String type;
     private Duration length;
     private String description;
     private String artists;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -50,6 +59,7 @@ public class DetailedEventDto {
     }
 
     public static final class DetailedEventDtoBuilder {
+        private Integer id;
         private String name;
         private String type;
         private Duration length;
@@ -61,6 +71,11 @@ public class DetailedEventDto {
 
         public static DetailedEventDtoBuilder aDetailedEventDto() {
             return new DetailedEventDtoBuilder();
+        }
+
+        public DetailedEventDtoBuilder withId(Integer id) {
+            this.id = id;
+            return this;
         }
 
         public DetailedEventDtoBuilder withName(String name) {
@@ -90,6 +105,7 @@ public class DetailedEventDto {
 
         public DetailedEventDto build() {
             DetailedEventDto detailedEventDto = new DetailedEventDto();
+            detailedEventDto.setId(id);
             detailedEventDto.setName(name);
             detailedEventDto.setType(type);
             detailedEventDto.setLength(length);

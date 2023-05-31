@@ -16,5 +16,15 @@ public interface ArtistRepository extends JpaRepository<Artist, Integer> {
      */
     @Query("SELECT a FROM Artist a LEFT JOIN FETCH a.events")
     List<Artist> findAllFetchEvents();
+
+    /**
+     * Find all artists with name LIKE the given.
+     *
+     * @return list of all found artist
+     */
+    List<Artist> findByNameContainingIgnoreCase(String name);
+
+
+
 }
 

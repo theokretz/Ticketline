@@ -13,7 +13,23 @@ export class PerformanceService {
 
   constructor(private httpClient: HttpClient, private globals: Globals) {}
 
+  /**
+   * Get the performance with the specified id
+   *
+   * @param id the id of the performance that should be fetched
+   * @return an observable of the performance
+   */
   public getPerformanceById(id: number): Observable<Performance> {
     return this.httpClient.get<Performance>(this.performanceBaseUri + '/' + id);
+  }
+
+  /**
+   * Get the tickets in the cart of the specified user
+   *
+   * @param id the id of the event, whose performances should be fetched
+   * @return an observable list of the performances of the event
+   */
+  public getPerformancesOfEventWithId(id: number): Observable<Performance[]> {
+    return this.httpClient.get<Performance[]>(this.performanceBaseUri + '/event/' + id);
   }
 }
