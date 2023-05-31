@@ -3,7 +3,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {HomeComponent} from './components/home/home.component';
 import {LoginComponent} from './components/login/login.component';
 import {AuthGuard} from './guards/auth.guard';
-import {MessageComponent} from './components/message/message.component';
+import { NewsComponent } from './components/news/news.component';
 import {PerformanceComponent} from './components/performance/performance.component';
 import {PageNotFoundComponent} from './components/page-not-found/page-not-found.component';
 import {OrderHistoryComponent} from './components/order-history/order-history.component';
@@ -11,6 +11,7 @@ import {ReservationComponent} from './components/reservation/reservation.compone
 import {CartComponent} from './components/cart/cart.component';
 import {MerchandiseComponent} from './components/merchandise/merchandise.component';
 import {RegisterComponent} from './components/register/register.component';
+import {NewsDetailedComponent} from './components/news/news-detailed/news-detailed.component';
 import {
   SearchEventByArtistComponent
 } from './components/search/search-event-by-artist/search-event-by-artist.component';
@@ -19,7 +20,8 @@ import {EventDetailsComponent} from './components/event-details/event-details.co
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'login', component: LoginComponent},
-  {path: 'message', canActivate: [AuthGuard], component: MessageComponent},
+  {path: 'news', canActivate: [AuthGuard], component: NewsComponent},
+  {path: 'news/:id', component: NewsDetailedComponent},
   {path: 'performances/:id', component: PerformanceComponent},
   {path: 'reservations', component: ReservationComponent},
   {path: 'order-history', component: OrderHistoryComponent},

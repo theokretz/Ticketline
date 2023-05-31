@@ -9,7 +9,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
-import { MessageComponent } from './components/message/message.component';
+import { NewsComponent } from './components/news/news.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { httpInterceptorProviders } from './interceptors';
 import { ToastrModule } from 'ngx-toastr';
@@ -39,6 +39,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { EventDetailsComponent } from './components/event-details/event-details.component';
+import { NewsDetailedComponent } from './components/news/news-detailed/news-detailed.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,7 @@ import { EventDetailsComponent } from './components/event-details/event-details.
     FooterComponent,
     HomeComponent,
     LoginComponent,
-    MessageComponent,
+    NewsComponent,
     PerformanceComponent,
     PageNotFoundComponent,
     CartComponent,
@@ -60,6 +61,7 @@ import { EventDetailsComponent } from './components/event-details/event-details.
     MerchandiseComponent,
     MerchandiseEventComponent,
     RegisterComponent,
+    NewsDetailedComponent,
     CreatePaymentDetailComponent,
     CreateDeliveryLocationComponent,
     SearchEventByArtistComponent,

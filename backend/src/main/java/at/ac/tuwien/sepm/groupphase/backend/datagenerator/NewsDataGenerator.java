@@ -21,10 +21,17 @@ import java.util.List;
 public class NewsDataGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final String TEST_NEWS_TITLE = " News about";
-
+    private static final String TEST_NEWS_TITLE = " News about ";
+    private static final String TEST_NEWS_SUMMARY =
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, "
+            + "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
     private static final int NUMBER_OF_NEWS_TO_GENERATE_FOR_EACH_EVENT = 3;
-    private static final String TEST_NEWS_TEXT = " Great News!\nThis is the text of the news about ";
+    private static final String TEST_NEWS_TEXT =
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim "
+            + "veniam, "
+            + "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate "
+            + "velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia "
+            + "deserunt mollit anim id est laborum.";
 
     private final NewsRepository newsRepository;
     private final EventRepository eventRepository;
@@ -41,13 +48,16 @@ public class NewsDataGenerator {
         } else {
             LOGGER.debug("news {} news entries", NUMBER_OF_NEWS_TO_GENERATE_FOR_EACH_EVENT);
             List<News> newsList = new ArrayList<>();
+            String[] imgPaths = {"cat.png", "cat_black.png", "turtle.png", "duck.jpg"};
             eventRepository.findAll().forEach(event -> {
                 for (int i = 1; i <= NUMBER_OF_NEWS_TO_GENERATE_FOR_EACH_EVENT; i++) {
                     News news = News.NewsBuilder.aNews()
-                        .withContent(TEST_NEWS_TEXT + event.getName() + " " + i)
+                        .withSummary(TEST_NEWS_SUMMARY + event.getName() + "_" + i)
+                        .withContent(TEST_NEWS_TEXT + event.getName() + "_" + i)
                         .withPublicationDate(LocalDate.of(2023, 4, i))
-                        .withTitle(TEST_NEWS_TITLE + event.getName() + " " + i)
+                        .withTitle(event.getName() + " is starting! " + i)
                         .withEvent(event)
+                        .withImagePath(imgPaths[(int) (Math.random() * 4)])
                         .build();
                     newsList.add(news);
                 }
