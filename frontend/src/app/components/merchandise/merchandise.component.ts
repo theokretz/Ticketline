@@ -14,6 +14,7 @@ import {AuthService} from '../../services/auth.service';
 export class MerchandiseComponent implements OnInit {
 
   merchandiseList: Merchandise[] = [];
+  isChecked = false;
 
   tempQuantity = {};
 
@@ -30,14 +31,14 @@ export class MerchandiseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.reloadMerch();
+    this.reloadMerch(false);
     this.loadFromCookie();
     console.log(this.authService.getUserId());
   }
 
 
-  reloadMerch(): void {
-    this.merchandiseService.getMerchandise()
+  reloadMerch(withPoints: boolean): void {
+    this.merchandiseService.getMerchandise(withPoints)
       .subscribe({
         next: data => {
           this.merchandiseList = data;
@@ -75,7 +76,13 @@ export class MerchandiseComponent implements OnInit {
     const value: BookingMerchandise = this.getCartMerch(id);
     return (value === undefined) ? '0' : value.quantity.toString();
   }
-
+  getMerchCheck(): void {
+    if (this.isChecked) {
+      this.reloadMerch(true);
+    } else {
+      this.reloadMerch(false);
+    }
+  }
 
   //add merchandise to cart
   private addMerch(id: number, quantity: number): void {

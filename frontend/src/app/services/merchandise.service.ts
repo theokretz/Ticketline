@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Globals} from '../global/globals';
 import {Observable} from 'rxjs';
 import {Merchandise} from '../dtos/merchandise';
@@ -17,9 +17,14 @@ export class MerchandiseService {
   ) {
   }
 
-  public getMerchandise(): Observable<Merchandise[]> {
-    console.log(this.merchandiseBaseUri);
-    return this.httpClient.get<Merchandise[]>(this.merchandiseBaseUri);
+  public getMerchandise(withPoints: boolean): Observable<Merchandise[]> {
+    console.log(this.merchandiseBaseUri + ', ' + withPoints);
+    if (withPoints) {
+      const params = new HttpParams().set('withPoints', 'true');
+      return this.httpClient.get<Merchandise[]>(this.merchandiseBaseUri, {params});
+    } else {
+      return this.httpClient.get<Merchandise[]>(this.merchandiseBaseUri);
+    }
   }
 
 }

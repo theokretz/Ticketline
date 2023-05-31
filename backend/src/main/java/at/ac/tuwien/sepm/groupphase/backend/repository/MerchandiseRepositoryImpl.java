@@ -31,6 +31,12 @@ public class MerchandiseRepositoryImpl extends SimpleJpaRepository<Merchandise, 
         return findAll(filter);
     }
 
+    @Override
+    public List<Merchandise> findAllMerchandiseWithPoints() {
+        Specification<Merchandise> filter = (root, query, cb) -> cb.greaterThan(root.get("pointsPrice"), 0);
+        return findAll(filter);
+    }
+
     /*
     LANGE VERSION:
 
