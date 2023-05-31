@@ -8,7 +8,7 @@ import java.util.List;
 public interface MerchandiseService {
 
 
-    List<MerchandiseDto> getMerchandise();
+    List<MerchandiseDto> getMerchandise(boolean withPoints);
 
     //List<MerchandiseDto> filterMerchandise(MerchandiseFilterDto filterParams);
 

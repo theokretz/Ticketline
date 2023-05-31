@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,12 +34,13 @@ public class MerchandiseEndpoint {
     @Secured("ROLE_USER")
     @GetMapping(BASE_PATH)
     @Operation(summary = "Return all merch items")
-    public List<MerchandiseDto> getMerchandise() {
+    public List<MerchandiseDto> getMerchandise(@RequestParam(required = false) boolean withPoints) {
         /*TODO perhaps pass search argument to method to limit the number of items shown -> start: 10 end: 20 for example
          *  -> could be done later
          */
         LOGGER.info("GET" + BASE_PATH);
-        return this.merchandiseService.getMerchandise();
+        LOGGER.info("withPoints: {}", withPoints);
+        return this.merchandiseService.getMerchandise(withPoints);
     }
 
     @Secured("ROLE_USER")

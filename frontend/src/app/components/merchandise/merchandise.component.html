@@ -1,3 +1,14 @@
+<br>
+<h1>Merchandise</h1>
+<div class="merch-header">
+  <div class="checkbox-wrapper-3">
+    <input type="checkbox" id="cbx-3" (change)="getMerchCheck()" [(ngModel)]="isChecked"/>
+    <label for="cbx-3" class="toggle"><span></span></label>
+  </div>
+  <div>
+    <h6>Show redeemable with <b><i class="bi bi-stop-circle-fill"></i> Points</b></h6>
+  </div>
+</div>
 <div class="d-grid gap-4">
 
   <div class="p-2">
@@ -9,10 +20,9 @@
                  class="card-img-top"
                  src="https://cdn.shopify.com/s/files/1/2117/2713/products/LIP355A_METEORACOVERSPRAYNAVYTEE_grande_cropped.png?v=1679350057">
             <div class="card-body">
-              <h5 class="card-title">{{merch.name}}</h5>
+              <h5 class="card-title">{{merch.title}}</h5>
               <p class="card-text">{{merch.description}}</p>
-              <p style="display: inline-block" class="card-text">{{merch.price}}€</p>
-              <p style="float: right" class="card-text-points">{{merch.pointsPrice}} Points</p>
+              <p class="card-text">{{isChecked ? merch.pointsPrice + "   " : merch.price + "€"}}<i *ngIf="isChecked" class="bi bi-stop-circle-fill"> Points</i></p>
               <div class="container-fluid">
                 <div class="row">
                   <!-- If the item is in the card, show the quantity as placeholder -->
