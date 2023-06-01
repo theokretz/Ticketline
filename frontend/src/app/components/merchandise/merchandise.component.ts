@@ -1,18 +1,17 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {MerchandiseService} from '../../services/merchandise.service';
-import {BookingMerchandise, Merchandise} from '../../dtos/merchandise';
-import {ToastrService} from 'ngx-toastr';
-import {CookieService} from 'ngx-cookie-service';
-import {AuthService} from '../../services/auth.service';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MerchandiseService } from '../../services/merchandise.service';
+import { BookingMerchandise, Merchandise } from '../../dtos/merchandise';
+import { ToastrService } from 'ngx-toastr';
+import { CookieService } from 'ngx-cookie-service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-merchandise',
   templateUrl: './merchandise.component.html',
-  styleUrls: ['./merchandise.component.scss']
+  styleUrls: ['./merchandise.component.scss'],
 })
 export class MerchandiseComponent implements OnInit {
-
   merchandiseList: Merchandise[] = [];
   isChecked = false;
 
@@ -26,33 +25,28 @@ export class MerchandiseComponent implements OnInit {
     private notification: ToastrService,
     private merchandiseService: MerchandiseService,
     private cookie: CookieService,
-    private authService: AuthService,
-  ) {
-  }
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.reloadMerch(false);
     this.loadFromCookie();
-    console.log(this.authService.getUserId());
   }
 
-
   reloadMerch(withPoints: boolean): void {
-    this.merchandiseService.getMerchandise(withPoints)
-      .subscribe({
-        next: data => {
-          this.merchandiseList = data;
-        },
-        error: error => {
-          console.log(error);
-          this.notification.error('Something went wrong');
-        }
-      });
+    this.merchandiseService.getMerchandise(withPoints).subscribe({
+      next: (data) => {
+        this.merchandiseList = data;
+      },
+      error: (error) => {
+        console.log(error);
+        this.notification.error('Something went wrong');
+      },
+    });
   }
 
   addMerchToCart(id: number, quantity: number): void {
     if (id >= 0 && quantity >= 0) {
-
       if (this.getCartMerch(id) === undefined) {
         this.addMerch(id, quantity);
         this.notification.info('Added to Cart');
@@ -69,12 +63,11 @@ export class MerchandiseComponent implements OnInit {
     } else {
       this.notification.error('enter correct Quantity');
     }
-
   }
 
   getPlaceholder(id: number): string {
     const value: BookingMerchandise = this.getCartMerch(id);
-    return (value === undefined) ? '0' : value.quantity.toString();
+    return value === undefined ? '0' : value.quantity.toString();
   }
   getMerchCheck(): void {
     if (this.isChecked) {
@@ -91,7 +84,7 @@ export class MerchandiseComponent implements OnInit {
       //update quantity
       this.getCartMerch(id).quantity = quantity;
     } else {
-      this.cart.push({id, quantity});
+      this.cart.push({ id, quantity });
     }
   }
 

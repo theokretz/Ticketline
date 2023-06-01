@@ -43,3 +43,16 @@ export class CartTicket {
   reservation: boolean;
   userPoints: number;
 }
+
+export class OrderPageTicket {
+  id: number;
+  price: number;
+  number: number;
+  row: number;
+  sectorName: string;
+  standing: boolean;
+  eventName: string;
+  hallName: string;
+  performanceStart: Date;
+  artistNames: string[];
+}

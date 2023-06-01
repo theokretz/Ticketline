@@ -19,6 +19,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Transaction;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.MerchandiseOrderedRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.MerchandiseRepository;
@@ -104,7 +105,7 @@ public class CustomOrderService implements OrderService {
         return allOrdersDto;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = { ConflictException.class, ValidationException.class })
     @Override
     public OrderDto buyTickets(Integer userId, BookingDto bookingDto) throws ConflictException, ValidationException {
         LOGGER.debug("Buy Tickets from Cart, userId: {}", userId);
@@ -181,6 +182,7 @@ public class CustomOrderService implements OrderService {
         }
 
         BigDecimal price = new BigDecimal(0);
+        int totalPoints = 0;
         // Tickets
         if (hasTickets) {
             // fetch tickets from db
@@ -223,18 +225,10 @@ public class CustomOrderService implements OrderService {
                         .build();
                     reservationsToSave.add(reservation);
                 } else {
-                    // but ticket
-                    Optional<PerformanceSector> matchingSector = ticket.getPerformance().getPerformanceSectors()
-                        .stream()
-                        .filter(perfSector -> perfSector.getSector() == ticket.getSeat().getSector())
-                        .findFirst();
-
-                    if (matchingSector.isPresent()) {
-                        price = price.add(matchingSector.get().getPrice());
-                    } else {
-                        throw new FatalException("No Performance Sector assigned");
-                    }
-
+                    // buy ticket
+                    BigDecimal ticketPrice = getTicketPrice(ticket);
+                    price = price.add(ticketPrice);
+                    totalPoints += (int) floor(ticketPrice.doubleValue());
                     ticket.setOrder(order);
                     ticketsToSave.add(ticket);
                     if (ticket.getReservation() != null) {
@@ -254,7 +248,6 @@ public class CustomOrderService implements OrderService {
         }
 
         //Merchandise
-        int deductedPoints = 0;
         if (hasMerchandise) {
             List<Merchandise> fetchedMerchandise = merchandiseRepository.findAllById(
                 bookingDto.getMerchandise().stream().map(BookingMerchandiseDto::getId).collect(Collectors.toList()));
@@ -277,9 +270,11 @@ public class CustomOrderService implements OrderService {
                     .build();
                 merchandiseOrderedToSave.add(merchandiseOrdered);
                 if (!merchandiseDto.getBuyWithPoints()) {
-                    price = price.add(merchandise.getPrice().multiply(new BigDecimal(merchandiseDto.getQuantity())));
+                    BigDecimal merchPrice = merchandise.getPrice().multiply(new BigDecimal(merchandiseDto.getQuantity()));
+                    price = price.add(merchPrice);
+                    totalPoints += (int) floor(merchPrice.doubleValue());
                 } else {
-                    deductedPoints = merchandise.getPointsPrice() * merchandiseDto.getQuantity();
+                    totalPoints -= merchandise.getPointsPrice() * merchandiseDto.getQuantity();
                 }
             }
 
@@ -292,14 +287,205 @@ public class CustomOrderService implements OrderService {
             Transaction transaction = new Transaction();
             transaction.setOrder(order);
             transaction.setDeductedAmount(price);
-            int points = (int) floor(price.doubleValue());
-            int overallPoints = points - deductedPoints;
-            transaction.setDeductedPoints(overallPoints);
+            transaction.setDeductedPoints(totalPoints);
+            transaction.setTransactionTs(LocalDateTime.now());
             order.setTransactions(Collections.singleton(transaction));
-            user.setPoints(user.getPoints() + overallPoints);
+            user.setPoints(user.getPoints() + totalPoints);
             transactionRepository.save(transaction);
         }
 
         return orderMapper.orderToOrderDto(order);
+    }
+
+    @Transactional(rollbackFor = { UnauthorizedException.class, ConflictException.class, ValidationException.class })
+    @Override
+    public void cancelItems(Integer userId, Integer orderId, Integer[] tickets, Integer[] merchandise) throws UnauthorizedException, ConflictException, ValidationException {
+        LOGGER.debug("cancelItems({}, {}, {}, {})", userId, orderId, tickets, merchandise);
+
+        if (tickets.length == 0 && merchandise.length == 0) {
+            throw new ValidationException("Error cancelling order", List.of("No items to cancel"));
+        }
+
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+
+        Order order = getAndCheckOrder(userId, orderId);
+
+        List<String> conflictMsg = new ArrayList<>();
+        for (Integer ticket : tickets) {
+            // check if ticket.getId() is in order.getTickets()
+            Optional<Ticket> ticketToCancel = order.getTickets().stream().filter(t -> t.getId().equals(ticket)).findFirst();
+            if (ticketToCancel.isEmpty()) {
+                conflictMsg.add("Ticket " + ticket + " is not in order");
+                continue;
+            }
+            // check if ticket performance is in the past
+            if (ticketToCancel.get().getPerformance().getDatetime().isBefore(LocalDateTime.now())) {
+                conflictMsg.add("Ticket " + ticket + " is in the past");
+            }
+        }
+        for (Integer merch : merchandise) {
+            // check if merchandise.getId() is in order.getMerchandiseOrdered()
+            Optional<MerchandiseOrdered> merchandiseToCancel = order.getMerchandiseOrdered().stream().filter(m -> m.getId().equals(merch)).findFirst();
+            if (merchandiseToCancel.isEmpty()) {
+                conflictMsg.add("Merchandise " + merch + " is not in order");
+                continue;
+            }
+            // check if order ts is more than 3 days ago
+            if (order.getOrderTs().isBefore(LocalDateTime.now().minusDays(3))) {
+                conflictMsg.add("Merchandise " + merch + " has already been shipped");
+            }
+        }
+        if (!conflictMsg.isEmpty()) {
+            throw new ConflictException("Error cancelling order", conflictMsg);
+        }
+
+        BigDecimal price = new BigDecimal(0);
+        Integer totalPoints = 0;
+        Transaction transaction = new Transaction();
+        transaction.setOrder(order);
+
+        for (Integer ticket : tickets) {
+            // find ticket in order.getTickets()
+            Ticket ticketToCancel = order.getTickets().stream().filter(t -> t.getId().equals(ticket)).findFirst().get();
+            BigDecimal ticketPrice = getTicketPrice(ticketToCancel);
+            price = price.subtract(ticketPrice);
+            totalPoints -= (int) floor(ticketPrice.doubleValue());
+            ticketToCancel.setOrder(null);
+        }
+
+        for (Integer merch : merchandise) {
+            // find merchandise in order.getMerchandiseOrdered()
+            MerchandiseOrdered merchandiseOrderedToCancel = order.getMerchandiseOrdered().stream().filter(m -> m.getId().equals(merch)).findFirst().get();
+            if (!merchandiseOrderedToCancel.getPoints()) {
+                BigDecimal merchPrice = merchandiseOrderedToCancel.getMerchandise().getPrice().multiply(new BigDecimal(merchandiseOrderedToCancel.getQuantity()));
+                price = price.subtract(merchPrice);
+                int points = (int) floor(merchPrice.doubleValue());
+                totalPoints -= points;
+            } else {
+                totalPoints += merchandiseOrderedToCancel.getMerchandise().getPointsPrice() * merchandiseOrderedToCancel.getQuantity();
+            }
+            merchandiseOrderedRepository.delete(merchandiseOrderedToCancel);
+        }
+
+        transaction.setDeductedAmount(price);
+        transaction.setDeductedPoints(totalPoints);
+        transaction.setTransactionTs(LocalDateTime.now());
+        transactionRepository.save(transaction);
+        Integer newPoints = user.getPoints() + totalPoints;
+        if (newPoints < 0) {
+            throw new ConflictException("Error cancelling order", List.of("User has already spent points"));
+        }
+        user.setPoints(newPoints);
+        if (order.getTickets().isEmpty() && order.getMerchandiseOrdered().isEmpty()) {
+            order.setCancelled(true);
+        }
+    }
+
+    @Transactional(rollbackFor = { UnauthorizedException.class, ConflictException.class, ValidationException.class })
+    @Override
+    public void cancelOrder(Integer userId, Integer orderId) throws UnauthorizedException, ConflictException {
+        LOGGER.debug("cancelOrder({}, {})", userId, orderId);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+
+        Order order = getAndCheckOrder(userId, orderId);
+
+        if (!order.getTickets().isEmpty() && order.getTickets().stream().anyMatch(t -> t.getPerformance().getDatetime().isBefore(LocalDateTime.now()))) {
+            throw new ConflictException("Error cancelling order", List.of("Ticket has already been used"));
+        }
+
+        if (!order.getMerchandiseOrdered().isEmpty() && order.getOrderTs().isBefore(LocalDateTime.now().minusDays(3))) {
+            throw new ConflictException("Error cancelling order", List.of("Order has already been shipped"));
+        }
+
+        BigDecimal price = new BigDecimal(0);
+        Integer totalPoints = 0;
+        Transaction transaction = new Transaction();
+        transaction.setOrder(order);
+
+        for (Ticket ticket : order.getTickets()) {
+            BigDecimal ticketPrice = getTicketPrice(ticket);
+            price = price.subtract(ticketPrice);
+            totalPoints -= (int) floor(ticketPrice.doubleValue());
+            ticket.setOrder(null);
+        }
+
+        for (MerchandiseOrdered merchandiseOrdered : order.getMerchandiseOrdered()) {
+            if (!merchandiseOrdered.getPoints()) {
+                BigDecimal merchPrice = merchandiseOrdered.getMerchandise().getPrice().multiply(new BigDecimal(merchandiseOrdered.getQuantity()));
+                price = price.subtract(merchPrice);
+                totalPoints -= (int) floor(merchPrice.doubleValue());
+            } else {
+                totalPoints += merchandiseOrdered.getMerchandise().getPointsPrice() * merchandiseOrdered.getQuantity();
+            }
+            merchandiseOrderedRepository.delete(merchandiseOrdered);
+        }
+
+        transaction.setDeductedAmount(price);
+        transaction.setDeductedPoints(totalPoints);
+        transaction.setTransactionTs(LocalDateTime.now());
+        Integer newPoints = user.getPoints() + totalPoints;
+        if (newPoints < 0) {
+            throw new ConflictException("Error cancelling order", List.of("User has already spent points"));
+        }
+        transactionRepository.save(transaction);
+        user.setPoints(newPoints);
+        order.setCancelled(true);
+    }
+
+
+    private Order getAndCheckOrder(Integer userId, Integer orderId) throws UnauthorizedException, ConflictException {
+        Order order = orderRepository.getOrderHereById(orderId);
+        if (order == null) {
+            throw new NotFoundException("Could not find Order");
+        }
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("Error cancelling order", List.of("User is not authorized to cancel this order"));
+        }
+
+        if (order.getCancelled()) {
+            throw new ConflictException("Error cancelling order", List.of("Order is already cancelled"));
+        }
+        return order;
+    }
+
+    private BigDecimal getTicketPrice(Ticket ticket) {
+        Optional<PerformanceSector> matchingSector = ticket.getPerformance().getPerformanceSectors()
+            .stream()
+            .filter(perfSector -> perfSector.getSector() == ticket.getSeat().getSector())
+            .findFirst();
+
+        if (matchingSector.isPresent()) {
+            return matchingSector.get().getPrice();
+        } else {
+            throw new FatalException("No Performance Sector assigned");
+        }
+    }
+
+
+    @Override
+    public Order getOrder(Integer userId, Integer orderId) throws UnauthorizedException {
+        LOGGER.debug("cancelOrder({}, {})", userId, orderId);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+
+        Order order = orderRepository.getOrderNowById(orderId);
+        if (order == null) {
+            throw new NotFoundException("Could not find Order");
+        }
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("Error cancelling order", List.of("User is not authorized to cancel this order"));
+        }
+
+        return order;
     }
 }

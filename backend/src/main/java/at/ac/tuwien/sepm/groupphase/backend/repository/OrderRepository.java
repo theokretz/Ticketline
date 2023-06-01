@@ -29,8 +29,41 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     @EntityGraph(attributePaths = {
         "tickets",
-        "transactions"
+        "transactions",
+        "user"
     })
     Order getOrderById(Integer id);
+
+    @EntityGraph(attributePaths = {
+        "tickets",
+        "tickets.performance",
+        "tickets.performance.performanceSectors",
+        "tickets.seat",
+        "tickets.seat.sector",
+        "transactions",
+        "merchandiseOrdered",
+        "merchandiseOrdered.merchandise",
+        "user"
+    })
+    Order getOrderHereById(Integer id);
+
+    @EntityGraph(attributePaths = {
+        "deliveryAddress",
+        "paymentDetail",
+        "tickets",
+        "tickets.performance",
+        "tickets.performance.performanceSectors",
+        "tickets.performance.event",
+        "tickets.performance.event.artists",
+        "tickets.performance.hall",
+        "tickets.seat",
+        "tickets.seat.sector",
+        "transactions",
+        "merchandiseOrdered",
+        "merchandiseOrdered.merchandise",
+        "user",
+        "transactions",
+    })
+    Order getOrderNowById(Integer id);
 }
 

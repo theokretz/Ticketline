@@ -10,3 +10,7 @@ export class CheckoutPaymentDetail {
   paymentDetailId: number;
   lastFourDigits: number;
 }
+
+export class OrderPagePaymentDetail {
+  lastFourDigits: number;
+}

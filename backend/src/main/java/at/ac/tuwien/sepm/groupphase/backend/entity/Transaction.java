@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -28,6 +29,9 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
+
+    @Column(nullable = false)
+    private LocalDateTime transactionTs;
 
     public Integer getId() {
         return id;
@@ -61,6 +65,14 @@ public class Transaction {
         this.order = order;
     }
 
+    public LocalDateTime getTransactionTs() {
+        return transactionTs;
+    }
+
+    public void setTransactionTs(LocalDateTime transactionTs) {
+        this.transactionTs = transactionTs;
+    }
+
     @Override
     public String toString() {
         return "Transaction{"
@@ -68,6 +80,7 @@ public class Transaction {
             + ", deductedAmount=" + deductedAmount
             + ", deductedPoints=" + deductedPoints
             + ", order=" + order
+            + ", transactionTs=" + transactionTs
             + '}';
     }
 
@@ -76,6 +89,7 @@ public class Transaction {
         private BigDecimal deductedAmount;
         private Integer deductedPoints;
         private Order order;
+        private LocalDateTime transactionTs;
 
         private TransactionBuilder() {
         }
@@ -104,12 +118,18 @@ public class Transaction {
             return this;
         }
 
+        public TransactionBuilder withTransactionTs(LocalDateTime transactionTs) {
+            this.transactionTs = transactionTs;
+            return this;
+        }
+
         public Transaction build() {
             Transaction transaction = new Transaction();
             transaction.setId(id);
             transaction.setDeductedAmount(deductedAmount);
             transaction.setDeductedPoints(deductedPoints);
             transaction.setOrder(order);
+            transaction.setTransactionTs(transactionTs);
             return transaction;
         }
     }

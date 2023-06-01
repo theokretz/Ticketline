@@ -5,14 +5,13 @@ export class BookingMerchandise {
   constructor(id: number, quantity: number, buyWithPoints?: boolean) {
     this.id = id;
     this.quantity = quantity;
-    if(buyWithPoints){
+    if (buyWithPoints) {
       this.buyWithPoints = buyWithPoints;
-    }else{
+    } else {
       this.buyWithPoints = false;
     }
   }
 }
-
 
 export class Merchandise {
   id: number;
@@ -25,10 +24,18 @@ export class Merchandise {
   buyWithPoints?: boolean;
 }
 
-
 export class OrderMerchandise {
   id: number;
   itemName: string;
   quantity: number;
   price: number;
+}
+
+export class OrderPageMerchandise {
+  id: number;
+  quantity: number;
+  price: number;
+  pointsPrice: number;
+  points: boolean;
+  title: string;
 }

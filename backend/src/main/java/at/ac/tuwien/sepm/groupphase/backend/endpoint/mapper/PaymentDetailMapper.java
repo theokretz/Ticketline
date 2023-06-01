@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutPaymentDetail;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.orderpage.OrderPagePaymentDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,4 +22,11 @@ public abstract class PaymentDetailMapper {
     }
 
     public abstract List<SimplePaymentDetailDto> paymentDetailListToSimplePaymentDetailDtoList(List<PaymentDetail> locations);
+
+    public OrderPagePaymentDetailDto paymentDetailToOrderPagePaymentDetailDto(PaymentDetail paymentDetail) {
+        OrderPagePaymentDetailDto orderPagePaymentDetailDto = new OrderPagePaymentDetailDto();
+        String cardNumber = paymentDetail.getCardNumber();
+        orderPagePaymentDetailDto.setLastFourDigits(Integer.parseInt(cardNumber.substring(cardNumber.length() - 4)));
+        return orderPagePaymentDetailDto;
+    }
 }

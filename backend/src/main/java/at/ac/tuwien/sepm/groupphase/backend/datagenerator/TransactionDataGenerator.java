@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +82,7 @@ public class TransactionDataGenerator {
                     .withOrder(order)
                     .withDeductedAmount(price)
                     .withDeductedPoints(points)
+                    .withTransactionTs(LocalDateTime.now())
                     .build();
 
                 transactionList.add(transaction);

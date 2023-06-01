@@ -39,6 +39,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { EventDetailsComponent } from './components/event-details/event-details.component';
+import { OrderDetailedComponent } from './components/order-detailed/order-detailed.component';
 import { NewsDetailedComponent } from './components/news/news-detailed/news-detailed.component';
 import { ForgotPasswordComponent } from './components/login/forgot-password/forgot-password.component';
 import { ResetComponent } from './components/reset/reset.component';
@@ -68,6 +69,7 @@ import { ResetComponent } from './components/reset/reset.component';
     CreateDeliveryLocationComponent,
     SearchEventByArtistComponent,
     EventDetailsComponent,
+    OrderDetailedComponent,
     ForgotPasswordComponent,
     ResetComponent,
   ],
