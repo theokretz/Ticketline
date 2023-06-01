@@ -11,11 +11,15 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const authUri = this.globals.backendUri + '/authentication';
-    const registerUri = this.globals.backendUri + '/users';
+    const dontIntercept = [
+      this.globals.backendUri + '/authentication'
+      , this.globals.backendUri + '/users'
+      , this.globals.backendUri + '/resets'
+      , this.globals.backendUri + '/resets/*'
+    ];
 
     // Do not intercept authentication requests
-    if (req.url === authUri || req.url === registerUri) {
+    if (dontIntercept.some(url => req.url.match(url))) {
       return next.handle(req);
     }
 

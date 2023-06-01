@@ -45,4 +45,12 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
     Optional<ApplicationUser> findApplicationUsersByEmail(String email);
 
 
+    /**
+     * get application user by password reset token.
+     *
+     * @param token of user to find
+     * @return ApplicationUser with given token
+     */
+    Optional<ApplicationUser> getApplicationUserByPasswordResetToken(String token);
+    
 }

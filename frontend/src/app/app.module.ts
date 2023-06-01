@@ -40,6 +40,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { EventDetailsComponent } from './components/event-details/event-details.component';
 import { NewsDetailedComponent } from './components/news/news-detailed/news-detailed.component';
+import { ForgotPasswordComponent } from './components/login/forgot-password/forgot-password.component';
+import { ResetComponent } from './components/reset/reset.component';
 
 @NgModule({
   declarations: [
@@ -66,6 +68,8 @@ import { NewsDetailedComponent } from './components/news/news-detailed/news-deta
     CreateDeliveryLocationComponent,
     SearchEventByArtistComponent,
     EventDetailsComponent,
+    ForgotPasswordComponent,
+    ResetComponent,
   ],
   imports: [
     BrowserModule,
