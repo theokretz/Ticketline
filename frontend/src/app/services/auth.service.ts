@@ -7,11 +7,14 @@ import { tap } from 'rxjs/operators';
 import jwt_decode from 'jwt-decode';
 import { Globals } from '../global/globals';
 import { RegisterRequest } from '../dtos/authentication/user-registration';
+import { PasswordResetRequest } from '../dtos/passwordReset/passwordResetRequest';
+import { PasswordUpdate } from '../dtos/passwordReset/passwordUpdate';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+
   private authBaseUri: string = this.globals.backendUri;
 
   constructor(private httpClient: HttpClient, private globals: Globals) {}
@@ -82,6 +85,18 @@ export class AuthService {
     }
     return -1;
   }
+
+  sendResetPasswordEmail(email: PasswordResetRequest) {
+    return this.httpClient.post(
+      this.authBaseUri + '/resets', email
+    );
+  }
+
+  updatePassword(token: string, password: PasswordUpdate) {
+    return this.httpClient.put(
+      this.authBaseUri + '/resets/' + token, password);
+  }
+
 
   private setToken(authResponse: string) {
     localStorage.setItem('authToken', authResponse);
