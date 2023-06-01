@@ -146,12 +146,14 @@ export class CartComponent implements OnInit {
           const buy = await this.openBuyDialog();
           if (buy) {
             this.service.buy(booking).subscribe({
-              next: () => {
+              next: (orderResp) => {
                 this.notification.success('Successfully booked tickets');
-                this.router.navigate(['/']);
                 this.cookie.delete('merchandise');
-                this.reloadCart();
-                this.service.getCartPoints(this.authService.getUserId());
+                if (orderResp !== null) {
+                  this.router.navigate(['/orders/' + orderResp.id]);
+                } else {
+                  this.router.navigate(['/reservations']);
+                }
               },
               error: (err) => {
                 console.error(err);
@@ -299,7 +301,16 @@ export class CartComponent implements OnInit {
   }
 
   receivedPoints(): number {
-    return Math.floor(this.overallPrice());
+    let points = 0;
+    this.cartTickets.forEach((cartTicket) => {
+      points += Math.floor(cartTicket.price);
+    });
+    this.cartMerch.forEach((cartMerch) => {
+      if (!cartMerch.buyWithPoints) {
+        points += Math.floor(cartMerch.price * cartMerch.quantity);
+      }
+    });
+    return points;
   }
 
   //check if user has enough points to buy merch
@@ -346,7 +357,6 @@ export class CartComponent implements OnInit {
             ).quantity;
           });
           this.cartMerch = data;
-          console.log(this.cartMerch);
         },
         error: (error) => {
           this.notification.error(error.message, 'Could Not Fetch Merchandise');
