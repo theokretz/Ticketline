@@ -4,7 +4,6 @@ import { AuthService } from '../../services/auth.service';
 import { BookingTicket, CartTicket } from '../../dtos/ticket';
 import { ToastrService } from 'ngx-toastr';
 import {
-  PaymentDetail,
   CheckoutPaymentDetail,
 } from '../../dtos/payment-detail';
 import { Booking } from 'src/app/dtos/booking';
@@ -149,6 +148,7 @@ export class CartComponent implements OnInit {
               next: (orderResp) => {
                 this.notification.success('Successfully booked tickets');
                 this.cookie.delete('merchandise');
+                this.service.getCartPoints(this.authService.getUserId());
                 if (orderResp !== null) {
                   this.router.navigate(['/orders/' + orderResp.id]);
                 } else {
@@ -290,7 +290,9 @@ export class CartComponent implements OnInit {
   overallPrice(): number {
     let price = 0;
     this.cartTickets.forEach((cartTicket) => {
-      price += cartTicket.price;
+      if (!cartTicket.reservation) {
+        price += cartTicket.price;
+      }
     });
     this.cartMerch.forEach((cartMerch) => {
       if (!cartMerch.buyWithPoints) {
@@ -303,7 +305,9 @@ export class CartComponent implements OnInit {
   receivedPoints(): number {
     let points = 0;
     this.cartTickets.forEach((cartTicket) => {
-      points += Math.floor(cartTicket.price);
+      if (!cartTicket.reservation) {
+        points += Math.floor(cartTicket.price);
+      }
     });
     this.cartMerch.forEach((cartMerch) => {
       if (!cartMerch.buyWithPoints) {

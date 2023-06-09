@@ -379,7 +379,7 @@ public class CustomOrderService implements OrderService {
             throw new ConflictException("Error cancelling order", List.of("User has already spent points"));
         }
         user.setPoints(newPoints);
-        if (order.getTickets().isEmpty() && order.getMerchandiseOrdered().isEmpty()) {
+        if (tickets.length == order.getTickets().size() && merchandise.length == order.getMerchandiseOrdered().size()) {
             order.setCancelled(true);
         }
     }
