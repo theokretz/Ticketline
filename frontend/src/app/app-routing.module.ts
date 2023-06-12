@@ -17,6 +17,12 @@ import { EventDetailsComponent } from './components/event-details/event-details.
 import { ForgotPasswordComponent } from './components/login/forgot-password/forgot-password.component';
 import { ResetComponent } from './components/reset/reset.component';
 import { OrderDetailedComponent } from './components/order-detailed/order-detailed.component';
+import {
+  SearchPerformancesByLocationComponent
+} from './components/search/search-performances-by-location/search-performances-by-location.component';
+import {
+  PerformanceOnLocationComponent
+} from './components/performance/performance-on-location/performance-on-location.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -26,14 +32,17 @@ const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset/:token', component: ResetComponent },
   { path: 'performances/:id', component: PerformanceComponent },
+  { path: 'performances/location/:id', component: PerformanceOnLocationComponent},
   { path: 'reservations', component: ReservationComponent },
   { path: 'order-history', component: OrderHistoryComponent },
   { path: 'merchandise', component: MerchandiseComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'cart', component: CartComponent },
   {
-    path: 'search',
-    children: [{ path: 'artists', component: SearchEventByArtistComponent }],
+    path: 'search', children: [
+      { path: 'artists', component: SearchEventByArtistComponent },
+      { path: 'locations', component: SearchPerformancesByLocationComponent },
+    ],
   },
   { path: ':id/event', component: EventDetailsComponent },
   { path: 'orders/:id', component: OrderDetailedComponent },

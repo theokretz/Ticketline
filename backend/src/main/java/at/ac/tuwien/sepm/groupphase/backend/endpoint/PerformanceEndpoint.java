@@ -33,7 +33,7 @@ public class PerformanceEndpoint {
 
     private final PerformanceService performanceService;
     private final EventService eventService;
-    private PerformanceMapper performanceMapper;
+    private final PerformanceMapper performanceMapper;
 
     @Autowired
     public PerformanceEndpoint(PerformanceService performanceService, EventService eventService, PerformanceMapper performanceMapper) {
@@ -72,7 +72,27 @@ public class PerformanceEndpoint {
             return performanceDtos;
         } catch (NotFoundException e) {
             LOGGER.warn("Unable to find performances of event" + e.getMessage());
-            HttpStatus status = HttpStatus.NOT_FOUND;
+            HttpStatus status = HttpStatus.OK;
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        }
+    }
+
+    @Secured("ROLE_USER")
+    @GetMapping("/location/{id}")
+    @Operation(summary = "Get all performances whose location is with the given id", security = @SecurityRequirement(name = "apiKey"))
+    public List<DetailedPerformanceDto> getPerformancesOfLocation(@Valid @PathVariable("id") Integer id) {
+        LOGGER.info("GET api/v1/performances/location/{}", id);
+        try {
+            List<Performance> performances = this.performanceService.getPerformancesOfLocationById(id);
+            List<DetailedPerformanceDto> performanceDtos = new ArrayList<>();
+            for (Performance performance : performances) {
+                performanceDtos.add(this.performanceMapper.performanceDtotoDetailedPerformanceDtoForSearch(performance));
+            }
+            return performanceDtos;
+
+        } catch (NotFoundException e) {
+            LOGGER.warn("Unable to find performances of location" + e.getMessage());
+            HttpStatus status = HttpStatus.OK;
             throw new ResponseStatusException(status, e.getMessage(), e);
         }
     }

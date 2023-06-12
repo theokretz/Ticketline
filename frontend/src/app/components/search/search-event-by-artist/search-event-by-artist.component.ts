@@ -36,7 +36,7 @@ export class SearchEventByArtistComponent implements OnInit {
 
   onChanges(): void {
     this.searchForm.get('searchBar').valueChanges.pipe(
-      debounceTime(500)).subscribe( {
+      debounceTime(500)).subscribe({
       next: data => {
         this.searchName = data;
         this.searchArtists();
@@ -54,6 +54,9 @@ export class SearchEventByArtistComponent implements OnInit {
       debounceTime(600)).subscribe({
       next: data => {
         this.artists = data;
+        if (this.artists.length === 0 && this.notification.currentlyActive === 0) {
+          this.notification.error('No artists match your search');
+        }
       },
       error: error => {
         console.error('Error fetching artists', error);
@@ -76,6 +79,7 @@ export class SearchEventByArtistComponent implements OnInit {
       }
     });
   }
+
   redirectToEvent(eventId: number) {
     this.router.navigate([eventId + '/event']);
   }

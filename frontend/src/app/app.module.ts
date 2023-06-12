@@ -43,6 +43,9 @@ import { OrderDetailedComponent } from './components/order-detailed/order-detail
 import { NewsDetailedComponent } from './components/news/news-detailed/news-detailed.component';
 import { ForgotPasswordComponent } from './components/login/forgot-password/forgot-password.component';
 import { ResetComponent } from './components/reset/reset.component';
+import { SearchPerformancesByLocationComponent } from
+    './components/search/search-performances-by-location/search-performances-by-location.component';
+import { PerformanceOnLocationComponent } from './components/performance/performance-on-location/performance-on-location.component';
 
 @NgModule({
   declarations: [
@@ -72,6 +75,8 @@ import { ResetComponent } from './components/reset/reset.component';
     OrderDetailedComponent,
     ForgotPasswordComponent,
     ResetComponent,
+    SearchPerformancesByLocationComponent,
+    PerformanceOnLocationComponent,
   ],
   imports: [
     BrowserModule,

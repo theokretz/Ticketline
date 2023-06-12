@@ -121,4 +121,15 @@ public class CustomPerformanceService implements PerformanceService {
         }
         return performances;
     }
+
+    @Override
+    public List<Performance> getPerformancesOfLocationById(Integer id) {
+        LOGGER.debug("Find performances of location with id{}", id);
+        List<Performance> performances = performanceRepository.findAllByHallLocation_Id(id);
+        if (performances.isEmpty()) {
+            throw new NotFoundException(String.format("Could not find performances of event with the given id{}", id));
+        }
+        return performances;
+    }
+
 }
