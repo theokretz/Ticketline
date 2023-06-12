@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
@@ -87,6 +88,7 @@ public class PerformanceTest {
     private ApplicationUser user;
     private ApplicationUser user2;
     private Location location;
+    private Location location1;
     private Set<Location> locationSet;
     private PaymentDetail paymentDetail;
     private Set<PaymentDetail> paymentDetailSet;
@@ -132,6 +134,14 @@ public class PerformanceTest {
         locationSet = new HashSet<>();
         locationSet.add(location);
         locationRepository.save(location);
+
+        location1 = new Location();
+        location1.setCity("Vienna");
+        location1.setCountry("Austria");
+        location1.setPostalCode(1030);
+        location1.setStreet("Straße 3");
+
+        locationRepository.save(location1);
 
         hall = new Hall();
         hall.setName("Halle 2");
@@ -344,6 +354,24 @@ public class PerformanceTest {
     @Test
     void getPerformancesOfEventWithNoPerformancesShouldThrowNotFoundException() {
         Assertions.assertThrows(NotFoundException.class, () -> performanceService.getPerformancesOfEventById(2));
+    }
+
+    @Test
+    void getPerformancesOnLocationShouldReturnAllPerformances() {
+        Assertions.assertDoesNotThrow(() -> performanceService.getPerformancesOfLocationById(1));
+        List<Performance> performances = performanceService.getPerformancesOfLocationById(performance.getHall().getLocation().getId());
+
+        assertEquals(1, performances.size());
+    }
+
+    @Test
+    void getPerformancesOnNonExistingLocationShouldThrowNotFoundException() {
+        Assertions.assertThrows(NotFoundException.class, () -> performanceService.getPerformancesOfLocationById(-1));
+    }
+
+    @Test
+    void getPerformancesOnLocationWithNoPerformancesShouldThrowNotFoundException() {
+        Assertions.assertThrows(NotFoundException.class, () -> performanceService.getPerformancesOfLocationById(2));
     }
 
 }

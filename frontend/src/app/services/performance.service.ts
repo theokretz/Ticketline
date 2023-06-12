@@ -32,4 +32,14 @@ export class PerformanceService {
   public getPerformancesOfEventWithId(id: number): Observable<Performance[]> {
     return this.httpClient.get<Performance[]>(this.performanceBaseUri + '/event/' + id);
   }
+
+  /**
+   * Get the tickets in the cart of the specified user
+   *
+   * @param id the id of the location, whose performances should be fetched
+   * @return an observable list of the found performances on this location
+   */
+  getPerformancesOnLocationById(id: number): Observable<Performance[]> {
+    return this.httpClient.get<Performance[]>(this.performanceBaseUri + '/location/' + id);
+  }
 }

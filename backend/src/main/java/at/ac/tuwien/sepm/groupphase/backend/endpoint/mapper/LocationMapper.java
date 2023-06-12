@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.LocationSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import org.mapstruct.Mapper;
 
@@ -23,4 +24,6 @@ public abstract class LocationMapper {
         checkoutLocation.setStreet(location.getStreet());
         return checkoutLocation;
     }
+
+    public abstract LocationSearchDto locationToLocationSearchDto(Location location);
 }

@@ -17,11 +17,18 @@ public interface PerformanceService {
     DetailedPerformanceDto getPerformancePlanById(Integer id);
 
     /**
-
      * Get the performances of the event specified by the given id.
      *
      * @param id the id of the event whose performances should be fetched
      * @return a list of performances of the event matching the given id
      */
     List<Performance> getPerformancesOfEventById(Integer id);
+
+    /**
+     * Get the performances with location specified by the given id.
+     *
+     * @param id the id of the location whose performances should be fetched
+     * @return a list of performances with a location matching the given id
+     */
+    List<Performance> getPerformancesOfLocationById(Integer id);
 }

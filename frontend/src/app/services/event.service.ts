@@ -4,6 +4,7 @@ import {Artist} from '../dtos/artist';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Globals} from '../global/globals';
 import {Event} from '../dtos/event';
+import {LocationSearch} from '../dtos/location';
 
 
 @Injectable({
@@ -34,6 +35,7 @@ export class EventService {
   /**
    * Get the events of the specified artist
    *
+   * @param artistId the id of the artist, whose events should be fetched
    * @param artistName the name of the artist, whose events should be fetched
    * @return an observable list of the found events
    */
@@ -42,5 +44,15 @@ export class EventService {
       .set('id', artistId)
       .set('name', artistName);
     return this.http.get<Event[]>(this.baseUri + '/events-by-artist', { params });
+  }
+
+  /**
+   * Get the locations with the specified parameters
+   *
+   * @param params the parameters of the locations that should be fetched
+   * @return an observable list of the found locations
+   */
+  searchLocations(params: HttpParams): Observable<LocationSearch[]> {
+    return this.http.get<LocationSearch[]>(this.baseUri + '/locations', {params});
   }
 }
