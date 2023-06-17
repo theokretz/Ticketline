@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
@@ -15,8 +16,8 @@ import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -49,35 +50,42 @@ public class OrderDataGenerator {
         } else {
             LOGGER.debug("generating order entries");
             List<Ticket> tickets = ticketRepository.findAllByOrderIsNullAndReservationIsNull();
-            notUserRepository.findAllWithLocationsAndPaymentDetails().forEach(user -> {
+            Collections.shuffle(tickets); // Shuffle the list of tickets
 
+            List<ApplicationUser> users = notUserRepository.findAllWithLocationsAndPaymentDetails();
+            int numTicketsPerOrder = 4; // Number of tickets to be assigned to each order
+            int totalOrders = (tickets.size() / numTicketsPerOrder) / 50;
+            int ticketsAssigned = 0;
 
-                Set<Ticket> boughtTicket = new HashSet<>();
+            for (int i = 0; i < totalOrders; i++) {
+                ApplicationUser user = users.get(i % users.size()); // Select user in a round-robin fashion
+                Set<Ticket> boughtTickets = new HashSet<>();
 
-                Iterator<Ticket> ticketIter = tickets.iterator();
-                while (boughtTicket.size() < 4 && ticketIter.hasNext()) {
-                    boughtTicket.add(ticketIter.next());
+                for (int j = 0; j < numTicketsPerOrder && ticketsAssigned < tickets.size(); j++) {
+                    Ticket ticket = tickets.get(ticketsAssigned++);
+                    boughtTickets.add(ticket);
                 }
 
-                if (boughtTicket.isEmpty()) {
-                    return;
+                if (boughtTickets.isEmpty()) {
+                    continue;
                 }
+
                 Order order = Order.OrderBuilder.aOrder()
                     .setOrderTs(LocalDateTime.now())
                     .setCancelled(false)
                     .setUser(user)
                     .setDeliveryAddress(user.getLocations().iterator().next())
                     .setPaymentDetail(user.getPaymentDetails().iterator().next())
-                    .setTickets(boughtTicket)
+                    .setTickets(boughtTickets)
                     .build();
-                LOGGER.debug("saving order {}", order);
-                order = orderRepository.save(order);
-                tickets.removeAll(boughtTicket);
-                for (Ticket t : boughtTicket) {
+                for (Ticket t : boughtTickets) {
                     t.setOrder(order);
                 }
-                ticketRepository.saveAll(boughtTicket);
-            });
+
+                LOGGER.debug("Saving order: {}", order);
+                orderRepository.save(order);
+                ticketRepository.saveAll(boughtTickets);
+            }
         }
     }
 }

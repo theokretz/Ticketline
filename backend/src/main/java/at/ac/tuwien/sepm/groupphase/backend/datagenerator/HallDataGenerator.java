@@ -19,7 +19,7 @@ import java.util.Optional;
 @DependsOn({"locationDataGenerator"})
 public class HallDataGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int NUMBER_OF_HALLS_TO_GENERATE = 5;
+    private static final int NUMBER_OF_HALLS_TO_GENERATE = 20;
     private static final String TEST_HALL_NAME = "HALL";
     private static final int TEST_LOCATION_ID = 1;
     private final HallRepository hallRepository;

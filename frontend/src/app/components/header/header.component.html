@@ -27,6 +27,15 @@
         <a
           *ngIf="authService.isLoggedIn()"
           class="nav-link"
+          routerLink="/top-ten"
+          routerLinkActive="active"
+        >Top Events</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          *ngIf="authService.isLoggedIn()"
+          class="nav-link"
           routerLink="/merchandise"
           >Merchandise</a
         >
