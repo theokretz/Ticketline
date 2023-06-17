@@ -17,7 +17,7 @@ import java.util.List;
 public class ArtistDataGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int NUMBER_OF_MESSAGES_TO_GENERATE = 40;
+    private static final int NUMBER_OF_ARTISTS_TO_GENERATE = 40;
     private static final String TEST_ARTIST_NAME = "Artist";
 
 
@@ -34,9 +34,9 @@ public class ArtistDataGenerator {
         if (artistRepository.findAll().size() > 0) {
             LOGGER.debug("artist already generated");
         } else {
-            LOGGER.debug("generating {} artist entries", NUMBER_OF_MESSAGES_TO_GENERATE);
+            LOGGER.debug("generating {} artist entries", NUMBER_OF_ARTISTS_TO_GENERATE);
             List<Artist> artists = new ArrayList<>();
-            for (int i = 1; i <= NUMBER_OF_MESSAGES_TO_GENERATE; i++) {
+            for (int i = 1; i <= NUMBER_OF_ARTISTS_TO_GENERATE; i++) {
                 Artist artist = Artist.ArtistBuilder.aArtist()
                     .withName(TEST_ARTIST_NAME + " " + i)
                     .build();

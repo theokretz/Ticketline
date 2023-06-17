@@ -46,6 +46,8 @@ import { ResetComponent } from './components/reset/reset.component';
 import { SearchPerformancesByLocationComponent } from
     './components/search/search-performances-by-location/search-performances-by-location.component';
 import { PerformanceOnLocationComponent } from './components/performance/performance-on-location/performance-on-location.component';
+import { TopTenComponent } from './components/top-ten/top-ten.component';
+import { TopTenListComponent } from './components/top-ten/top-ten-list/top-ten-list.component';
 
 @NgModule({
   declarations: [
@@ -77,6 +79,8 @@ import { PerformanceOnLocationComponent } from './components/performance/perform
     ResetComponent,
     SearchPerformancesByLocationComponent,
     PerformanceOnLocationComponent,
+    TopTenComponent,
+    TopTenListComponent,
   ],
   imports: [
     BrowserModule,

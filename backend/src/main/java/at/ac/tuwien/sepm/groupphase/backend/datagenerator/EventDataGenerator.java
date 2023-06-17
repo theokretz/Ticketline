@@ -23,9 +23,10 @@ import java.util.Set;
 public class EventDataGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final int NUMBER_OF_EVENTS_TO_GENERATE = 5;
+    private static final int NUMBER_OF_EVENTS_TO_GENERATE = 60;
     private static final String TEST_EVENT_NAME = "EventName";
-    private static final String TEST_TYPE = "Type";
+    private static final String[] TEST_TYPE = {"Ballet", "Concert", "Opera", "Theatre", "Musical"};
+    private static final String[] IMAGE_PATH = {"cat.png", "cat_black.png", "duck.jpg", "turtle.png"};
     private static final Duration TEST_DURATION = Duration.ofHours(1);
     private static final String TEST_DESCRIPTION = "Description";
 
@@ -48,15 +49,17 @@ public class EventDataGenerator {
             Set<Artist> updatedArtists = new HashSet<>();
             for (int i = 1; i < NUMBER_OF_EVENTS_TO_GENERATE; i++) {
 
-                List<Artist> artistList = artists.subList(5 * i, (5 * i) + 5);
-
+                int startIndex = (5 * i) % artists.size();
+                int endIndex = Math.min(startIndex + 5, artists.size());
+                List<Artist> artistList = artists.subList(startIndex, endIndex);
 
                 Event event = Event.EventBuilder.aEvent()
                     .withName(TEST_EVENT_NAME + " " + i)
-                    .withType(TEST_TYPE + " " + i)
+                    .withType(TEST_TYPE[i % TEST_TYPE.length])
                     .withLength(TEST_DURATION)
                     .withDescription(TEST_DESCRIPTION + " " + i)
                     .withArtists(Set.of(artistList.get(0), artistList.get(1), artistList.get(2), artistList.get(3), artistList.get(4)))
+                    .withImagePath(IMAGE_PATH[i % IMAGE_PATH.length])
                     .build();
                 events.add(event);
 

@@ -23,6 +23,7 @@ import {
 import {
   PerformanceOnLocationComponent
 } from './components/performance/performance-on-location/performance-on-location.component';
+import {TopTenComponent} from './components/top-ten/top-ten.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -38,6 +39,7 @@ const routes: Routes = [
   { path: 'merchandise', component: MerchandiseComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'cart', component: CartComponent },
+  { path: 'top-ten', component: TopTenComponent},
   {
     path: 'search', children: [
       { path: 'artists', component: SearchEventByArtistComponent },
