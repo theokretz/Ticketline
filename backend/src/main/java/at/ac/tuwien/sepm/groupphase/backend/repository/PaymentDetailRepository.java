@@ -11,6 +11,8 @@ public interface PaymentDetailRepository extends JpaRepository<PaymentDetail, In
 
     Optional<PaymentDetail> findPaymentDetailById(Integer id);
 
+    PaymentDetail getPaymentDetailById(Integer id);
+
     /**
      * Find all paymentDetails by userid.
      *

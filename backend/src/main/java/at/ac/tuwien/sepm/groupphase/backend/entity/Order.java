@@ -40,7 +40,7 @@ public class Order {
     private PaymentDetail paymentDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private ApplicationUser user;
 
     @OneToMany(mappedBy = "order")
@@ -48,6 +48,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order")
     private Set<Transaction> transactions;
+
 
     public Integer getId() {
         return id;

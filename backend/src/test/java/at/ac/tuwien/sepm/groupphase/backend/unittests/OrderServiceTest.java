@@ -36,6 +36,7 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.SeatRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SectorRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
+import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -63,8 +64,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class OrderServiceTest {
-
+class OrderServiceTest {
+    @Autowired
+    private UserService userService;
     @Autowired
     private OrderRepository orderRepository;
 
@@ -80,8 +82,6 @@ public class OrderServiceTest {
     @Autowired
     private HallRepository hallRepository;
 
-    @Autowired
-    private NotUserRepository NotUserRepository;
     @Autowired
     private LocationRepository locationRepository;
 
@@ -185,7 +185,7 @@ public class OrderServiceTest {
         this.user2.setLocked(false);
         this.user2.setFailedLogin(0);
         this.user2.setPoints(10000);
-        NotUserRepository.save(user2);
+        notUserRepository.save(user2);
 
         paymentDetail = new PaymentDetail();
         paymentDetail.setCvv(222);
@@ -198,7 +198,7 @@ public class OrderServiceTest {
         paymentDetailSet.add(paymentDetail);
         user.setPaymentDetails(paymentDetailSet);
         user.setLocations(locationSet);
-        NotUserRepository.save(user);
+        notUserRepository.save(user);
 
         location.setUser(user);
         locationRepository.save(location);

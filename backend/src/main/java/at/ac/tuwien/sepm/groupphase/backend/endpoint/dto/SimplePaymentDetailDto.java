@@ -65,18 +65,24 @@ public class SimplePaymentDetailDto {
         if (cardNumber == null || cardHolder == null || cardHolder.isBlank() || cvv == null || expirationDate == null || user == null) {
             errors.add("All fields must be filled");
         }
-        if (cardNumber.length() != 16) {
-            errors.add("Card number must be 16 digits long");
+        if (cardNumber != null && !cardNumber.isBlank()) {
+            if (cardNumber.length() != 16) {
+                errors.add("Card number must be 16 digits long");
+            }
+
+            if (!cardNumber.matches("^\\d+$")) {
+                errors.add("Card number must be numeric");
+            }
         }
-        if (!cardNumber.matches("^\\d+$")) {
-            errors.add("Card number must be numeric");
-        }
-        if (cvv.toString().length() != 3) {
+        if (cvv != null && (cvv.toString().length() != 3)) {
             errors.add("CVV must be 3 digits long");
+
         }
-        if (expirationDate.isBefore(LocalDate.now())) {
+        if (expirationDate != null && (expirationDate.isBefore(LocalDate.now()))) {
             errors.add("Expiration date must be in the future");
+
         }
+
         return errors;
 
     }

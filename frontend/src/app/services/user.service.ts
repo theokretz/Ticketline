@@ -7,6 +7,7 @@ import { SimpleTicket } from '../dtos/ticket';
 import { Order } from '../dtos/order';
 import { CheckoutLocation, Location } from '../dtos/location';
 import { CheckoutPaymentDetail, PaymentDetail } from '../dtos/payment-detail';
+import {UserProfile} from '../dtos/user-profile';
 
 @Injectable({
   providedIn: 'root',
@@ -53,6 +54,30 @@ export class UserService {
   }
 
   /**
+   * Update a location of a user
+   *
+   * @param id the user id
+   * @param location the location to update
+   */
+  updateLocation(id: number, location: CheckoutLocation): Observable<CheckoutLocation> {
+    return this.httpClient.put<any>(
+        this.userBaseUri + id + '/locations',
+        location
+    );
+  }
+
+  /**
+   * Delete a location of a user
+   *
+   * @param id user id
+   * @param locationId of deleted location
+   */
+    deleteLocation(id: number, locationId: number): Observable<CheckoutLocation> {
+        return this.httpClient.delete<any>(
+            this.userBaseUri + id + '/locations' + '/' + locationId
+        );
+    }
+  /**
    * Create a payment detail for a user
    *
    * @param id the user id
@@ -67,5 +92,68 @@ export class UserService {
       this.userBaseUri + id + '/payment-details',
       paymentDetail
     );
+  }
+
+  /**
+   * Update a payment detail of a user
+   *
+   * @param id
+   * @param paymentDetail
+   */
+  updatePaymentDetail(
+    id: number,
+    paymentDetail: PaymentDetail
+    ): Observable<CheckoutPaymentDetail> {
+    return this.httpClient.put<any>(
+      this.userBaseUri + id + '/payment-details',
+      paymentDetail
+    );
+  }
+
+  /**
+   * Delete a payment detail of a user
+   *
+   * @param id
+   * @param paymentDetailId
+   */
+  deletePaymentDetail(
+      id: number,
+      paymentDetailId: number
+  ): Observable<CheckoutPaymentDetail> {
+    return this.httpClient.delete<any>(
+        this.userBaseUri + id + '/payment-details' + '/' + paymentDetailId
+    );
+  }
+
+  /**
+   * Get the user with the specified id
+   *
+   * @param id
+   * @return an Observable of the user
+   */
+   getUser(id: number): Observable<UserProfile> {
+    return this.httpClient.get<UserProfile>(this.userBaseUri + id);
+  }
+
+  /**
+   * Edit the user with the specified id
+   *
+   * @param id
+   * @param user
+   * @return an Observable of the edited user
+   */
+   editUser(id: number, user: UserProfile): Observable<UserProfile> {
+    return this.httpClient.put<UserProfile>(this.userBaseUri + id, user);
+  }
+
+  /**
+   * Delete the user with the specified id
+   *
+   *
+   * @param id
+   * @return an Observable of the deleted user
+   */
+  deleteUser(id: number): Observable<UserProfile> {
+    return this.httpClient.delete<UserProfile>(this.userBaseUri + id);
   }
 }

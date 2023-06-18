@@ -17,6 +17,7 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
         "locations",
         "paymentDetails",
         "paymentDetails.orders",
+        "orders",
     })
     ApplicationUser findApplicationUserById(Integer id);
 
@@ -52,5 +53,5 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
      * @return ApplicationUser with given token
      */
     Optional<ApplicationUser> getApplicationUserByPasswordResetToken(String token);
-    
+
 }

@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Entity
 @Table(name = "\"user\"")
 public class ApplicationUser {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,13 +55,13 @@ public class ApplicationUser {
     @OneToMany(mappedBy = "user")
     private Set<PaymentDetail> paymentDetails;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private Set<Reservation> reservations;
 
     @OneToMany(mappedBy = "user")
     private Set<Location> locations;
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
     private Set<News> news;
 
     public ApplicationUser() {
@@ -70,6 +72,19 @@ public class ApplicationUser {
         this.password = password;
         this.admin = admin;
     }
+
+    /* @PreRemove
+    private void preRemove() {
+        for (Order order : this.orders) {
+            order.setUser(null);
+        }
+        for (PaymentDetail paymentDetail : this.paymentDetails) {
+            paymentDetail.setUser(null);
+        }
+        for (Location location : this.locations) {
+            location.setUser(null);
+        }
+    }*/
 
 
     public Integer getId() {
@@ -202,28 +217,7 @@ public class ApplicationUser {
     public void setNews(Set<News> news) {
         this.news = news;
     }
-
-    //TODO remove toString in production
-    @Override
-    public String toString() {
-        return "User{"
-            + "id=" + id
-            + ", admin=" + admin
-            + ", firstName='" + firstName + '\''
-            + ", lastName='" + lastName + '\''
-            + ", email='" + email + '\''
-            + ", password='" + password + '\''
-            + ", points=" + points
-            + ", passwordResetToken='" + passwordResetToken + '\''
-            + ", passwordResetTs=" + passwordResetTs
-            + ", locked=" + locked
-            + ", orders=" + orders
-            + ", paymentDetails=" + paymentDetails
-            + ", reservations=" + reservations
-            + ", locations=" + locations
-            + '}';
-    }
-
+    
     public static final class UserBuilder {
         private Integer id;
         private Boolean admin;

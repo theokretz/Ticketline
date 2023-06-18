@@ -210,13 +210,7 @@ export class CartComponent implements OnInit {
       );
     });
   }
-  checkoutPointsValidation(usedPoints: number): void {
-    if (usedPoints > this.cart.userPoints) {
-      this.openMerchDialog();
-    } else {
-      this.checkout();
-    }
-  }
+
 
   openPaymentDialog(paymentDetails): Promise<number> {
     return new Promise((resolve, reject) => {
@@ -269,6 +263,13 @@ export class CartComponent implements OnInit {
     });
   }
 
+  checkoutPointsValidation(usedPoints: number): void {
+    if (usedPoints > this.cart.userPoints) {
+      this.openMerchDialog();
+    } else {
+      this.checkout();
+    }
+  }
   pointsUsed(): number {
     let points = 0;
     this.cartMerch.forEach((cartMerch) => {

@@ -5,7 +5,6 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutPaymen
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.orderpage.OrderPagePaymentDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import org.mapstruct.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -18,6 +17,8 @@ public abstract class PaymentDetailMapper {
         checkoutPaymentDetail.setPaymentDetailId(paymentDetail.getId());
         String cardNumber = paymentDetail.getCardNumber();
         checkoutPaymentDetail.setLastFourDigits(Integer.parseInt(cardNumber.substring(cardNumber.length() - 4)));
+        checkoutPaymentDetail.setCardHolder(paymentDetail.getCardHolder());
+        checkoutPaymentDetail.setExpirationDate(paymentDetail.getExpirationDate());
         return checkoutPaymentDetail;
     }
 

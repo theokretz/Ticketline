@@ -3,10 +3,13 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
@@ -14,10 +17,10 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.OrderRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PaymentDetailRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
-import org.h2.security.auth.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +36,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -53,15 +54,19 @@ public class CustomUserService implements UserService {
 
     private final LocationRepository locationRepository;
     private final PaymentDetailRepository paymentDetailRepository;
+    private final OrderRepository orderRepository;
+
 
     @Autowired
     public CustomUserService(NotUserRepository notUserRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer,
-                             LocationRepository locationRepository, PaymentDetailRepository paymentDetailRepository) {
+                             LocationRepository locationRepository, PaymentDetailRepository paymentDetailRepository, OrderRepository orderRepository) {
         this.notUserRepository = notUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
         this.paymentDetailRepository = paymentDetailRepository;
         this.locationRepository = locationRepository;
+
+        this.orderRepository = orderRepository;
     }
 
     /**
@@ -233,7 +238,7 @@ public class CustomUserService implements UserService {
     }
 
     @Override
-    public Location updateUserLocation(Integer id, LocationDto locationDto) throws ValidationException {
+    public Location updateUserLocation(Integer id, LocationDto locationDto) throws ValidationException, ConflictException {
         LOGGER.trace("updateUserLocation({},{})", id, locationDto);
         List<String> error = new ArrayList<>();
         if (locationDto == null || (error = locationDto.validate()).size() > 0) {
@@ -243,6 +248,15 @@ public class CustomUserService implements UserService {
         ApplicationUser user = notUserRepository.findApplicationUserById(id);
         if (user == null) {
             throw new NotFoundException("Could not find User");
+        }
+        List<Location> locations = locationRepository.findAllByUserId(id);
+        if (!locations.isEmpty()) {
+            for (Location loc : locations) {
+                if (loc.getPostalCode().equals(locationDto.getPostalCode()) && loc.getCity().equals(locationDto.getCity()) && loc.getCountry().equals(locationDto.getCountry()) && loc.getStreet().equals(locationDto.getStreet())) {
+                    error.add("Cannot add same location twice");
+                    throw new ConflictException("Location already exists", error);
+                }
+            }
         }
 
         Location location = Location.LocationBuilder.aLocation()
@@ -256,6 +270,38 @@ public class CustomUserService implements UserService {
     }
 
     @Override
+    public Location editUserLocation(Integer userId, CheckoutLocation locationDto) throws ValidationException, ConflictException {
+        LOGGER.trace("editUserLocation({},{})", userId, locationDto);
+        List<String> error = new ArrayList<>();
+        if (locationDto == null || !(error = locationDto.validate()).isEmpty()) {
+            throw new ValidationException("Location is not valid", error);
+        }
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        Location location = locationRepository.findLocationById(locationDto.getLocationId());
+        if (location == null) {
+            throw new NotFoundException("Could not find Location");
+        }
+        List<Location> locations = locationRepository.findAllByUserId(userId);
+        if (!locations.isEmpty()) {
+            for (Location loc : locations) {
+                if (loc.getPostalCode().equals(locationDto.getPostalCode()) && loc.getCity().equals(locationDto.getCity()) && loc.getCountry().equals(locationDto.getCountry()) && loc.getStreet().equals(locationDto.getStreet())) {
+                    error.add("Cannot add same location twice");
+                    throw new ConflictException("Location already exists", error);
+                }
+            }
+        }
+        location.setPostalCode(locationDto.getPostalCode());
+        location.setCity(locationDto.getCity());
+        location.setCountry(locationDto.getCountry());
+        location.setStreet(locationDto.getStreet());
+        return this.locationRepository.save(location);
+    }
+
+
+    @Override
     public void deleteUserLocation(Integer userId, Integer locationId) {
         LOGGER.trace("deleteUserLocation({},{})", userId, locationId);
         ApplicationUser user = notUserRepository.findApplicationUserById(userId);
@@ -266,7 +312,11 @@ public class CustomUserService implements UserService {
         if (location == null) {
             throw new NotFoundException("Could not find Location");
         }
-        locationRepository.delete(location);
+        location.setUser(null);
+        Set<Location> locations = user.getLocations();
+        locations.remove(location);
+        locationRepository.save(location);
+        notUserRepository.save(user);
     }
 
 
@@ -281,15 +331,25 @@ public class CustomUserService implements UserService {
     }
 
     @Override
-    public PaymentDetail updateUserPaymentDetails(Integer id, SimplePaymentDetailDto paymentDetails) throws ValidationException {
-        LOGGER.trace("updateUserPaymentDetails({},{})", id, paymentDetails);
-        ApplicationUser user = notUserRepository.findApplicationUserById(id);
+    public PaymentDetail updateUserPaymentDetails(Integer userId, SimplePaymentDetailDto paymentDetails) throws ValidationException, ConflictException {
+        LOGGER.trace("updateUserPaymentDetails({},{})", userId, paymentDetails);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
         if (user == null) {
             throw new NotFoundException("Could not find User");
         }
         List<String> error = new ArrayList<>();
-        if (paymentDetails == null || (error = paymentDetails.validate()).size() > 0) {
-            throw new ValidationException("PaymentDetailsDto is not valid", error);
+        if (paymentDetails == null || !(error = paymentDetails.validate()).isEmpty()) {
+            throw new ValidationException("Payment Detail is not valid", error);
+        }
+        List<PaymentDetail> paymentDetailList = paymentDetailRepository.findByUserId(userId);
+        if (!paymentDetailList.isEmpty()) {
+            for (PaymentDetail paymentDetail1 : paymentDetailList) {
+                if (paymentDetail1.getCardNumber().equals(paymentDetails.getCardNumber()) && paymentDetail1.getCardHolder().equals(paymentDetails.getCardHolder())
+                    && paymentDetail1.getExpirationDate().equals(paymentDetails.getExpirationDate()) && paymentDetail1.getCvv().equals(paymentDetails.getCvv())) {
+                    error.add("Cannot add same payment detail twice");
+                    throw new ConflictException("Payment Detail already exists", error);
+                }
+            }
         }
         PaymentDetail paymentDetail = PaymentDetail.PaymentDetailBuilder.aPaymentDetail()
             .withUser(user)
@@ -307,6 +367,39 @@ public class CustomUserService implements UserService {
     }
 
     @Override
+    public PaymentDetail editUserPaymentDetails(Integer userId, SimplePaymentDetailDto paymentDetails) throws ValidationException, ConflictException {
+        LOGGER.trace("editUserPaymentDetails({},{})", userId, paymentDetails);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        List<String> error = new ArrayList<>();
+        if (paymentDetails == null || !(error = paymentDetails.validate()).isEmpty()) {
+            throw new ValidationException("PaymentDetails is not valid", error);
+        }
+        PaymentDetail paymentDetail = paymentDetailRepository.getPaymentDetailById(paymentDetails.getId());
+        if (paymentDetail == null) {
+            throw new NotFoundException("Could not find Payment Detail");
+        }
+        List<PaymentDetail> paymentDetailList = paymentDetailRepository.findByUserId(userId);
+        if (!paymentDetailList.isEmpty()) {
+            for (PaymentDetail paymentDetail1 : paymentDetailList) {
+                if (paymentDetail1.getCardNumber().equals(paymentDetails.getCardNumber()) && paymentDetail1.getCardHolder().equals(paymentDetails.getCardHolder())
+                    && paymentDetail1.getExpirationDate().equals(paymentDetails.getExpirationDate()) && paymentDetail1.getCvv().equals(paymentDetails.getCvv())) {
+                    error.add("Cannot add same payment detail twice");
+                    throw new ConflictException("Payment Detail already exists", error);
+                }
+            }
+        }
+        paymentDetail.setCardHolder(paymentDetails.getCardHolder());
+        paymentDetail.setCardNumber(paymentDetails.getCardNumber());
+        paymentDetail.setCvv(paymentDetails.getCvv());
+        paymentDetail.setExpirationDate(paymentDetails.getExpirationDate());
+
+        return this.paymentDetailRepository.save(paymentDetail);
+    }
+
+    @Override
     public void deleteUserPaymentDetails(Integer userId, Integer paymentDetailsId) {
         LOGGER.trace("deleteUserPaymentDetails({},{})", userId, paymentDetailsId);
         ApplicationUser user = notUserRepository.findApplicationUserById(userId);
@@ -314,10 +407,68 @@ public class CustomUserService implements UserService {
             throw new NotFoundException("Could not find User");
         }
 
-        Optional<PaymentDetail> paymentDetail = paymentDetailRepository.findPaymentDetailById(paymentDetailsId);
-        if (paymentDetail.isEmpty()) {
-            throw new NotFoundException("Could not find PaymentDetail");
+        PaymentDetail paymentDetail = paymentDetailRepository.getPaymentDetailById(paymentDetailsId);
+        if (paymentDetail == null) {
+            throw new NotFoundException("Could not find Payment Detail");
         }
-        paymentDetailRepository.delete(paymentDetail.get());
+        paymentDetail.setUser(null);
+        Set<PaymentDetail> paymentDetails = user.getPaymentDetails();
+        paymentDetails.remove(paymentDetail);
+        paymentDetailRepository.save(paymentDetail);
+        notUserRepository.save(user);
+    }
+
+    @Override
+    public ApplicationUser getUser(Integer id) {
+        LOGGER.trace("getUser({})", id);
+        ApplicationUser user = notUserRepository.getApplicationUserById(id);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        return user;
+    }
+
+    @Override
+    public ApplicationUser updateUser(Integer userId, UserProfileDto user) throws ValidationException {
+        LOGGER.trace("updateUser({},{})", userId, user);
+        ApplicationUser applicationUser = notUserRepository.getApplicationUserById(userId);
+        if (applicationUser == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        List<String> error = new ArrayList<>();
+        if (user == null || !(error = user.validate()).isEmpty()) {
+            throw new ValidationException("Payment Detail is not valid", error);
+        }
+
+        applicationUser.setFirstName(user.getFirstName());
+        applicationUser.setLastName(user.getLastName());
+        applicationUser.setEmail(user.getEmail());
+        return notUserRepository.save(applicationUser);
+    }
+
+    @Override
+    public void deleteUser(Integer userId) {
+        LOGGER.trace("deleteUser({})", userId);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        Set<Order> orders = user.getOrders();
+        for (Order order : orders) {
+            order.setUser(null);
+            orderRepository.save(order);
+        }
+        Set<PaymentDetail> paymentDetails = user.getPaymentDetails();
+        for (PaymentDetail paymentDetail : paymentDetails) {
+            paymentDetail.setUser(null);
+            paymentDetailRepository.save(paymentDetail);
+        }
+        Set<Location> locations = user.getLocations();
+        for (Location location : locations) {
+            location.setUser(null);
+            locationRepository.save(location);
+        }
+
+        notUserRepository.delete(user);
     }
 }
