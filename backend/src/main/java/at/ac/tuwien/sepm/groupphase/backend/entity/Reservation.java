@@ -34,6 +34,7 @@ public class Reservation {
     @JoinColumn(name = "user_id", nullable = false)
     private ApplicationUser user;
 
+
     public Integer getId() {
         return id;
     }

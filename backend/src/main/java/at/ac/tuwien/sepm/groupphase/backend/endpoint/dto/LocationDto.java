@@ -7,11 +7,11 @@ import java.util.Locale;
 import java.util.Set;
 
 public class LocationDto {
-
     private Integer postalCode;
     private String city;
     private String country;
     private String street;
+
 
     public Integer getPostalCode() {
         return postalCode;
@@ -55,10 +55,10 @@ public class LocationDto {
         //regex for postal code
         final String postalCodeRegex = "^[0-9]{4,5}$";
         //regex for city
-        final String cityRegex = "^[a-zA-ZäöüÄÖÜ]+(([',. -][a-zA-ZäöüÄÖÜ\\s])?[a-zA-ZäöüÄÖÜ]*)*$";
+        final String cityRegex = "^[a-zA-ZäöüÄÖÜß]+(([',. -][a-zA-ZäöüÄÖÜß\\s])?[a-zA-ZäöüÄÖÜß]*)*$";
 
         //regex for street
-        final String streetRegex = "^[a-zA-Z0-9äöüÄÖÜ\\s-.,#]+$";
+        final String streetRegex = "^(?=.*[a-zA-ZäöüÄÖÜß])[a-zA-Z0-9äöüÄÖÜß\\s-.,#]+$";
 
         if (!postalCode.toString().matches(postalCodeRegex)) {
             errors.add("Invalid postal code format. Postal code must be 4 or 5 digits long");

@@ -3,7 +3,9 @@ package at.ac.tuwien.sepm.groupphase.backend.service;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
@@ -12,15 +14,16 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
-import org.h2.security.auth.AuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.security.Principal;
 import java.util.List;
 
+/**
+ * The interface User service.
+ */
 public interface UserService extends UserDetailsService {
 
     /**
@@ -49,7 +52,8 @@ public interface UserService extends UserDetailsService {
      *
      * @param userLoginDto login credentials
      * @return the JWT, if successful
-     * @throws org.springframework.security.authentication.BadCredentialsException if credentials are bad
+     * @throws BadCredentialsException the bad credentials exception
+     * @throws LockedException         the locked exception
      */
     String login(UserLoginDto userLoginDto) throws BadCredentialsException, LockedException;
 
@@ -66,7 +70,8 @@ public interface UserService extends UserDetailsService {
     /**
      * isUserAuthenticated makes sure that a requests authentication matches the given user id.
      *
-     * @param auth the authentication of the request
+     * @param userId the user id
+     * @param auth   the authentication of the request
      * @return true if the user is authenticated; false otherwise
      */
     boolean isUserAuthenticated(Integer userId, Authentication auth);
@@ -82,17 +87,28 @@ public interface UserService extends UserDetailsService {
     /**
      * updateUserLocation creates a new location for a user.
      *
-     * @param id the id of the user
+     * @param id          the id of the user
      * @param locationDto the location to create
      * @return the created location
      * @throws ValidationException if the DTO is not valid
      */
-    Location updateUserLocation(Integer id, LocationDto locationDto) throws ValidationException;
+    Location updateUserLocation(Integer id, LocationDto locationDto) throws ValidationException, ConflictException;
+
+
+    /**
+     * editUserLocation edits a existing location of a user.
+     *
+     * @param userId      the id of the user
+     * @param locationDto the location to edit
+     * @return the edited location
+     * @throws ValidationException if the DTO is not valid
+     */
+    Location editUserLocation(Integer userId, CheckoutLocation locationDto) throws ValidationException, ConflictException;
 
     /**
      * deleteUserLocation deletes a location of a user.
      *
-     * @param userId the id of the user
+     * @param userId     the id of the user
      * @param locationId the id of the location to delete
      */
     void deleteUserLocation(Integer userId, Integer locationId);
@@ -108,18 +124,56 @@ public interface UserService extends UserDetailsService {
     /**
      * updateUserPaymentDetails creates a new payment detail for a user.
      *
-     * @param id the id of the user
+     * @param userId         the id of the user
      * @param paymentDetails the payment detail to create
      * @return the created payment detail
      * @throws ValidationException if the DTO is not valid
      */
-    PaymentDetail updateUserPaymentDetails(Integer id, SimplePaymentDetailDto paymentDetails) throws ValidationException;
+    PaymentDetail updateUserPaymentDetails(Integer userId, SimplePaymentDetailDto paymentDetails) throws ValidationException, ConflictException;
+
+    /**
+     * editUserPaymentDetails edits a payment detail of a user.
+     *
+     * @param userId         the id of the user
+     * @param paymentDetails the payment detail to edit
+     * @return the edited payment detail
+     * @throws ValidationException if the DTO is not valid
+     */
+    PaymentDetail editUserPaymentDetails(Integer userId, SimplePaymentDetailDto paymentDetails) throws ValidationException, ConflictException;
 
     /**
      * deleteUserPaymentDetails deletes a payment detail of a user.
      *
-     * @param userId the id of the user
+     * @param userId           the id of the user
      * @param paymentDetailsId the id of the payment detail to delete
      */
     void deleteUserPaymentDetails(Integer userId, Integer paymentDetailsId);
+
+    /**
+     * getUser returns the user with the given id.
+     *
+     * @param userId the id of the user
+     * @return the user
+     */
+    ApplicationUser getUser(Integer userId);
+
+
+    /**
+     * Update user.
+     *
+     * @param userId the user id
+     * @param user   the user data to update
+     * @return the updated application user
+     * @throws ValidationException the validation exception
+     */
+    ApplicationUser updateUser(Integer userId, UserProfileDto user) throws ValidationException;
+
+
+    /**
+     * Delete user.
+     *
+     * @param userId the user id
+     */
+    void deleteUser(Integer userId);
+
 }

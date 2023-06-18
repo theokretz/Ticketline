@@ -63,11 +63,20 @@
       </li>
       <li class="nav-item">
         <a class="nav-link" *ngIf="authService.isLoggedIn()"
-        ><i class="bi bi-stop-circle-fill" style="font-size: 1rem;"></i> Points: {{userPoints  | async}}</a
+        ><i class="bi bi-stop-circle-fill" style="font-size: 1rem;"></i> Points: {{getPoints()}}</a
         >
       </li>
     </ul>
     <ul class="navbar-nav px-3" style="margin-left: auto">
+      <li class="nav-item">
+        <a
+          *ngIf="authService.isLoggedIn()"
+          routerLink="/profile"
+          class="nav-link"
+          style="margin-left: auto"
+        >Profile</a
+        >
+      </li>
       <li class="nav-item">
         <a
           *ngIf="!authService.isLoggedIn()"

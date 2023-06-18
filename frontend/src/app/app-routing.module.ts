@@ -17,6 +17,8 @@ import { EventDetailsComponent } from './components/event-details/event-details.
 import { ForgotPasswordComponent } from './components/login/forgot-password/forgot-password.component';
 import { ResetComponent } from './components/reset/reset.component';
 import { OrderDetailedComponent } from './components/order-detailed/order-detailed.component';
+import {ProfileComponent} from './components/profile/profile.component';
+import {EditProfileComponent} from './components/profile/edit-profile/edit-profile.component';
 import {
   SearchPerformancesByLocationComponent
 } from './components/search/search-performances-by-location/search-performances-by-location.component';
@@ -28,6 +30,8 @@ import {TopTenComponent} from './components/top-ten/top-ten.component';
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
+  {path: 'edit-profile', component: EditProfileComponent},
+  {path: 'profile', component: ProfileComponent},
   { path: 'news', canActivate: [AuthGuard], component: NewsComponent },
   { path: 'news/:id', component: NewsDetailedComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },

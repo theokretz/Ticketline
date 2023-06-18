@@ -14,7 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Profile("generateData")
@@ -30,6 +32,7 @@ public class UserDataGenerator {
     private static final String TEST_E_MAIL = "test@mail.com";
     private static final String TEST_PASSWORD = "password";
     private static final Integer TEST_POINTS = 50;
+    private static final int TEST_LOCATION_ID = 5;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -49,28 +52,32 @@ public class UserDataGenerator {
             LOGGER.debug("users already generated");
         } else {
             LOGGER.debug("generating {} user entries", NUMBER_OF_USERS_TO_GENERATE);
-            // find first location without user
-
-
             for (int i = 1; i < NUMBER_OF_USERS_TO_GENERATE; i++) {
-                Location firstWithoutUser = locationRepository.findFirstByUserIdIsNull();
-                ApplicationUser user = ApplicationUser.UserBuilder.aUser()
-                    .withAdmin(false)
-                    .withFirstName(TEST_FIRST_NAME + " " + i)
-                    .withLastName(TEST_LAST_NAME + " " + i)
-                    .withEmail(i + TEST_E_MAIL)
-                    .withPassword(passwordEncoder.encode(TEST_PASSWORD + i))
-                    .withPoints(TEST_POINTS + i)
-                    .withLocked(false)
-                    .withFailedLogin(0)
-                    .withLocations(Collections.singleton(firstWithoutUser))
-                    .build();
 
-                LOGGER.debug("saving user {}", user);
-                notUserRepository.save(user);
-                if (firstWithoutUser != null) {
-                    firstWithoutUser.setUser(user);
-                    locationRepository.save(firstWithoutUser);
+                Optional<Location> location = locationRepository.findById(TEST_LOCATION_ID + i);
+                if (location.isEmpty()) {
+                    LOGGER.debug("location {} not found", TEST_LOCATION_ID + i);
+                } else {
+                    Set<Location> locationSet = new HashSet<>();
+                    locationSet.add(location.get());
+                    ApplicationUser user = ApplicationUser.UserBuilder.aUser()
+                        .withAdmin(false)
+                        .withFirstName(TEST_FIRST_NAME + " " + i)
+                        .withLastName(TEST_LAST_NAME + " " + i)
+                        .withEmail(i + TEST_E_MAIL)
+                        .withPassword(passwordEncoder.encode(TEST_PASSWORD + i))
+                        .withPoints(TEST_POINTS + i)
+                        .withLocked(false)
+                        .withFailedLogin(0)
+                        .withLocations(locationSet)
+                        .build();
+
+                    LOGGER.debug("saving user {}", user);
+                    notUserRepository.save(user);
+                    if (locationSet.iterator().hasNext()) {
+                        locationSet.iterator().next().setUser(user);
+                        locationRepository.save(locationSet.iterator().next());
+                    }
                 }
             }
 

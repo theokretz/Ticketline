@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../services/auth.service';
 import {CartService} from '../../services/cart.service';
 import {ToastrService} from 'ngx-toastr';
-import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -11,14 +10,30 @@ import {Observable} from 'rxjs';
 })
 export class HeaderComponent implements OnInit {
   userId: number;
-  userPoints: Observable<number>;
+  userPoints: number;
   bannerError: string | null = null;
-  constructor(public authService: AuthService, private service: CartService,
-              private notification: ToastrService, private cartService: CartService) {
-  }
+  gotPoints = false;
 
-  ngOnInit() {
-    this.userId = this.authService.getUserId();
-    this.userPoints  = this.cartService.getCartPoints(this.userId);
+  constructor(public authService: AuthService,
+              private service: CartService,
+              private notification: ToastrService) {}
+  ngOnInit() {}
+  getPoints(): number {
+    if (this.authService.isLoggedIn() && !this.gotPoints) {
+      this.userId = this.authService.getUserId();
+
+      this.service.getCartPoints(this.userId).subscribe({
+        next: (data) => {
+          this.userPoints = data;
+        },
+        error: (error) => {
+            this.bannerError = error;
+            this.notification.error(error.error.details, 'Error while fetching points');
+        }
+      });
+    }
+    this.gotPoints = true;
+    return this.userPoints;
   }
 }
+

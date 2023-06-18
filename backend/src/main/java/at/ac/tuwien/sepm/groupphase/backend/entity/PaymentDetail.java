@@ -37,8 +37,9 @@ public class PaymentDetail {
     private Set<Order> orders;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private ApplicationUser user;
+
 
     public Integer getId() {
         return id;

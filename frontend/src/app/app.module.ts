@@ -43,6 +43,11 @@ import { OrderDetailedComponent } from './components/order-detailed/order-detail
 import { NewsDetailedComponent } from './components/news/news-detailed/news-detailed.component';
 import { ForgotPasswordComponent } from './components/login/forgot-password/forgot-password.component';
 import { ResetComponent } from './components/reset/reset.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { EditProfileComponent } from './components/profile/edit-profile/edit-profile.component';
+import { DeleteEventComponent } from './components/profile/delete-event/delete-event.component';
+import { EditPaymentDetailComponent } from './components/profile/edit-payment-detail/edit-payment-detail.component';
+import { EditLocationsComponent } from './components/profile/edit-locations/edit-locations.component';
 import { SearchPerformancesByLocationComponent } from
     './components/search/search-performances-by-location/search-performances-by-location.component';
 import { PerformanceOnLocationComponent } from './components/performance/performance-on-location/performance-on-location.component';
@@ -77,6 +82,11 @@ import { TopTenListComponent } from './components/top-ten/top-ten-list/top-ten-l
     OrderDetailedComponent,
     ForgotPasswordComponent,
     ResetComponent,
+    ProfileComponent,
+    EditProfileComponent,
+    DeleteEventComponent,
+    EditPaymentDetailComponent,
+    EditLocationsComponent,
     SearchPerformancesByLocationComponent,
     PerformanceOnLocationComponent,
     TopTenComponent,
