@@ -55,4 +55,14 @@ export class EventService {
   searchLocations(params: HttpParams): Observable<LocationSearch[]> {
     return this.http.get<LocationSearch[]>(this.baseUri + '/locations', {params});
   }
+
+  /**
+   * Get the events with the specified parameters
+   *
+   * @param params the parameters of the events that should be fetched
+   * @return an observable list of the found events
+   */
+  searchEvents(params: HttpParams): Observable<Event[]> {
+    return this.http.get<Event[]>(this.baseUri + '/events', {params});
+  }
 }

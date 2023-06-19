@@ -1,24 +1,13 @@
 package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.ArtistSearchDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserDto;
-import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.EventSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Hall;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
-import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ArtistRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.EventRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.HallRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.PaymentDetailRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceSectorRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.SeatRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.SectorRepository;
-import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.EventService;
 import at.ac.tuwien.sepm.groupphase.backend.service.PerformanceService;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +22,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,17 +56,22 @@ public class EventServiceTest {
     private ArtistSearchDto artistSearchDto3;
     private ArtistSearchDto SelenaGomez;
     private ArtistSearchDto Rihanna;
+    private EventSearchDto eventSearchDtoWithEmptyValues;
+    private EventSearchDto eventSearchDtoWithLength;
+    private EventSearchDto eventSearchDtoWithNameAndLength;
 
     @BeforeEach
     public void beforeAll() {
         event = new Event();
         event.setName("The Eras Tour 2");
-        event.setLength(Duration.ZERO);
+        event.setLength(Duration.ofHours(1L));
+        event.setType("Movie");
         eventRepository.save(event);
 
         event2 = new Event();
         event2.setName("The Eras Tour 3");
-        event2.setLength(Duration.ZERO);
+        event2.setLength(Duration.ofHours(2L));
+        event2.setType("Ballet");
         eventRepository.save(event2);
 
         eventSet = new HashSet<>();
@@ -127,6 +120,24 @@ public class EventServiceTest {
         Rihanna.setName("Rihanna");
         Rihanna.setId(artist2.getId());
 
+        eventSearchDtoWithEmptyValues = new EventSearchDto();
+        eventSearchDtoWithEmptyValues.setName(" ");
+        eventSearchDtoWithEmptyValues.setDescription("");
+        eventSearchDtoWithEmptyValues.setType("");
+        eventSearchDtoWithEmptyValues.setLength("");
+
+        eventSearchDtoWithLength = new EventSearchDto();
+        eventSearchDtoWithLength.setName("");
+        eventSearchDtoWithLength.setDescription("");
+        eventSearchDtoWithLength.setType("");
+        eventSearchDtoWithLength.setLength("PT1H30M");
+
+        eventSearchDtoWithNameAndLength = new EventSearchDto();
+        eventSearchDtoWithNameAndLength.setName(" 3");
+        eventSearchDtoWithNameAndLength.setType("ba");
+        eventSearchDtoWithNameAndLength.setLength("PT1H30M");
+
+
     }
 
     @Test
@@ -162,5 +173,46 @@ public class EventServiceTest {
     @Test
     void getAllEventsOfArtistWithNonExistentArtistShouldThrowNotFound() {
         Assertions.assertThrows(NotFoundException.class, () -> eventService.getAllEventsOfArtist(new ArtistSearchDto()));
+    }
+
+    @Test
+    void getAllEventsWithEmptyParamsReturnsAllEvents() {
+        Assertions.assertDoesNotThrow(() -> eventService.getAllEventsWithParameters(eventSearchDtoWithEmptyValues));
+
+
+        Assertions.assertEquals(2, eventService.getAllEventsWithParameters(eventSearchDtoWithEmptyValues).size());
+    }
+
+    @Test
+    void getAllEventsWithParamsWithLengthInRangeReturnsAllEvents() {
+        Assertions.assertDoesNotThrow(() -> eventService.getAllEventsWithParameters(eventSearchDtoWithLength));
+
+        Assertions.assertEquals(2, eventService.getAllEventsWithParameters(eventSearchDtoWithLength).size());
+    }
+
+    @Test
+    void getALlEventsWithParamsWithNameAndLengthInRangeReturnsOneEvent() {
+        Assertions.assertDoesNotThrow(() -> eventService.getAllEventsWithParameters(eventSearchDtoWithNameAndLength));
+
+        List<Event> events = eventService.getAllEventsWithParameters(eventSearchDtoWithNameAndLength);
+
+        Assertions.assertEquals(1, events.size());
+        Assertions.assertEquals("The Eras Tour 3", events.get(0).getName());
+    }
+
+    @Test
+    void getAllEventsWithLengthNotInRangeThrowsNotFound() {
+        eventSearchDtoWithNameAndLength.setLength("PT4H");
+        Assertions.assertThrows(NotFoundException.class, ()-> eventService.getAllEventsWithParameters(eventSearchDtoWithNameAndLength));
+
+    }
+
+    @Test
+    void getAllEventsWithParamsWithTypeLikeReturnsOneEvent() {
+        Assertions.assertDoesNotThrow(() -> eventService.getAllEventsWithParameters(eventSearchDtoWithNameAndLength));
+        List<Event> events = eventService.getAllEventsWithParameters(eventSearchDtoWithNameAndLength);
+
+        Assertions.assertEquals(1, events.size());
+        Assertions.assertEquals("Ballet", events.get(0).getType());
     }
 }

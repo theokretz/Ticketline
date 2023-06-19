@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedEventDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.ArtistSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.EventSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.LocationSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.ArtistMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.EventMapper;
@@ -14,7 +15,6 @@ import at.ac.tuwien.sepm.groupphase.backend.service.EventService;
 import at.ac.tuwien.sepm.groupphase.backend.service.LocationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +93,21 @@ public class SearchEndpoint {
                 locationSearchDtos.add(this.locationMapper.locationToLocationSearchDto(location));
             }
             return locationSearchDtos;
+        } catch (NotFoundException e) {
+            LOGGER.warn("Unable to find locations with the given parameters" + e.getMessage());
+            HttpStatus status = HttpStatus.OK;
+            return new ArrayList<>();
+        }
+    }
+
+    @Secured("ROLE_USER")
+    @GetMapping(value = "/events")
+    @Operation(summary = "Get all events with the given parameters", security = @SecurityRequirement(name = "apiKey"))
+    public List<EventSearchDto> getAllEventsWithParameters(EventSearchDto parameters) {
+        LOGGER.info("GET /api/v1/search/events {}", parameters);
+        try {
+            List<Event> events = this.eventService.getAllEventsWithParameters(parameters);
+            return this.eventMapper.eventToEventSearchDto(events);
         } catch (NotFoundException e) {
             LOGGER.warn("Unable to find locations with the given parameters" + e.getMessage());
             HttpStatus status = HttpStatus.OK;

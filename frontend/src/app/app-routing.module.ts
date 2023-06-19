@@ -26,6 +26,7 @@ import {
   PerformanceOnLocationComponent
 } from './components/performance/performance-on-location/performance-on-location.component';
 import {TopTenComponent} from './components/top-ten/top-ten.component';
+import {SearchEventsComponent} from './components/search/search-events/search-events.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -48,6 +49,7 @@ const routes: Routes = [
     path: 'search', children: [
       { path: 'artists', component: SearchEventByArtistComponent },
       { path: 'locations', component: SearchPerformancesByLocationComponent },
+      { path: 'events', component: SearchEventsComponent },
     ],
   },
   { path: ':id/event', component: EventDetailsComponent },
