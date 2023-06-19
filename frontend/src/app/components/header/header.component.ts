@@ -11,6 +11,7 @@ import {ToastrService} from 'ngx-toastr';
 export class HeaderComponent implements OnInit {
   userId: number;
   userPoints: number;
+  cartItems: number;
   bannerError: string | null = null;
   gotPoints = false;
 
@@ -34,6 +35,10 @@ export class HeaderComponent implements OnInit {
     }
     this.gotPoints = true;
     return this.userPoints;
+  }
+
+  getCartItems() {
+    return '10';
   }
 }
 

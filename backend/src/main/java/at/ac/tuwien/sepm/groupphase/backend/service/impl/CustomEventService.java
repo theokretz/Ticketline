@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.ArtistSearchDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.EventSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
@@ -13,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CustomEventService implements EventService {
@@ -46,5 +49,24 @@ public class CustomEventService implements EventService {
             throw new NotFoundException(String.format("Could not find artists associated with the given name", artistName));
         }
         return artists;
+    }
+
+    @Override
+    public List<Event> getAllEventsWithParameters(EventSearchDto parameters) {
+        LOGGER.debug("Find all events with parameters{}", parameters);
+        List<Event> events;
+        Duration length1 = Objects.equals(parameters.getLength(), "") ? null : Duration.parse(parameters.getLength()).minusMinutes(30L);
+        Duration length2 = Objects.equals(parameters.getLength(), "") ? null : Duration.parse(parameters.getLength()).plusMinutes(30L);
+        events = eventRepository.findAllEventsContaining(
+            parameters.getName(),
+            parameters.getDescription(),
+            parameters.getType(),
+            length1,
+            length2
+        );
+        if (events.isEmpty()) {
+            throw new NotFoundException(String.format("Could not find events with the given parameters", parameters));
+        }
+        return events;
     }
 }

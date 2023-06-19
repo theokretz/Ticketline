@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Duration;
 import java.util.List;
 
 
@@ -39,5 +40,25 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
             + "order by e.type, count(t.id) desc) "
             + "where row_num <= 10")
     List<EventTicketCountDto> findTopTenEventsByTicketCount();
+
+    @EntityGraph(attributePaths = {
+        "artists"
+    })
+    @Query("SELECT a FROM Event a  WHERE (:name is null or :name='' OR UPPER(a.name) LIKE UPPER(CONCAT( '%', :name, '%' )))"
+        + " AND (:description is null OR :description='' OR UPPER(a.description) LIKE UPPER(CONCAT( '%', :description, '%' )))"
+        + " AND (:type is null or :type='' OR UPPER(a.type) LIKE UPPER(CONCAT( '%', :type, '%' )))"
+        + " AND (:length1 is null OR ((a.length >= :length1) AND (a.length <= :length2)))")
+    List<Event> findAllEventsContaining(
+        @Param("name") String name,
+        @Param("description") String description,
+        @Param("type") String type,
+        @Param("length1") Duration length1,
+        @Param("length2") Duration length2);
+
+    @EntityGraph(attributePaths = {
+        "artists"
+    })
+    @Query("SELECT a FROM Event a WHERE a.length >= :length1 AND a.length <= :length2")
+    List<Event> findAllEventsWithLength(@Param("length1") Duration length1, @Param("length2") Duration length2);
 }
 

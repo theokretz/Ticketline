@@ -1,34 +1,17 @@
 .text-container {
   margin-top: 5%;
 }
+
 .search-text {
   font-family: 'Lohit Tamil', ui-rounded;
   font-size: 64px;
   color: #4F4F4F;
 }
 
-.by-artist {
+.event-text {
   font-family: 'Lohit Tamil', ui-rounded;
   font-size: 34px;
   color: #4F4F4F;
-}
-
-.search-form-container {
-  display: flex;
-  justify-content: center;
-}
-
-.example-form {
-  min-width: 150px;
-  max-width: 500px;
-  width: 100%;
-}
-
-.search-form-field {
-  display: flex;
-  width: 100%;
-  border: 1px solid #dcdcdc;
-  padding: 8px;
 }
 
 .event-container {
@@ -70,6 +53,4 @@
   color: #666;
   font-style: italic;
 }
-
-
 

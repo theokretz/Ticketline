@@ -53,6 +53,7 @@ import { SearchPerformancesByLocationComponent } from
 import { PerformanceOnLocationComponent } from './components/performance/performance-on-location/performance-on-location.component';
 import { TopTenComponent } from './components/top-ten/top-ten.component';
 import { TopTenListComponent } from './components/top-ten/top-ten-list/top-ten-list.component';
+import { SearchEventsComponent } from './components/search/search-events/search-events.component';
 
 @NgModule({
   declarations: [
@@ -91,6 +92,7 @@ import { TopTenListComponent } from './components/top-ten/top-ten-list/top-ten-l
     PerformanceOnLocationComponent,
     TopTenComponent,
     TopTenListComponent,
+    SearchEventsComponent,
   ],
   imports: [
     BrowserModule,

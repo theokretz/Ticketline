@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedEventDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.EventSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Event;
 import org.mapstruct.Mapper;
@@ -73,5 +73,29 @@ public abstract class EventMapper {
             eventDtos.add(currentEvent);
         }
         return eventDtos;
+    }
+
+    public List<EventSearchDto> eventToEventSearchDto(List<Event> events) {
+        List<EventSearchDto> eventSearchDtos = new ArrayList<>();
+        for (Event event : events) {
+            String artistsOfEvent = "";
+            Set<Artist> artists = event.getArtists();
+            Stream<Artist> artistStream = artists.stream().sorted(Comparator.comparing(Artist::getId));
+            for (Artist artist : artistStream.toList()) {
+                artistsOfEvent += artist.getName() + "; ";
+            }
+
+            EventSearchDto currentEvent = EventSearchDto.EventSearchDtoBuilder.aEventSearchDto()
+                .withId(event.getId())
+                .withName(event.getName())
+                .withType(event.getType())
+                .withDescription(event.getDescription())
+                .withLength(event.getLength().toString())
+                .withArtists(artistsOfEvent)
+                .withImagePath(event.getImagePath())
+                .build();
+            eventSearchDtos.add(currentEvent);
+        }
+        return eventSearchDtos;
     }
 }
