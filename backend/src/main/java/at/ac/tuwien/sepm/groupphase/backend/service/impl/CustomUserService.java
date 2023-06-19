@@ -252,7 +252,8 @@ public class CustomUserService implements UserService {
         List<Location> locations = locationRepository.findAllByUserId(id);
         if (!locations.isEmpty()) {
             for (Location loc : locations) {
-                if (loc.getPostalCode().equals(locationDto.getPostalCode()) && loc.getCity().equals(locationDto.getCity()) && loc.getCountry().equals(locationDto.getCountry()) && loc.getStreet().equals(locationDto.getStreet())) {
+                if (loc.getPostalCode().equals(locationDto.getPostalCode()) && loc.getCity().equals(locationDto.getCity())
+                    && loc.getCountry().equals(locationDto.getCountry()) && loc.getStreet().equals(locationDto.getStreet())) {
                     error.add("Cannot add same location twice");
                     throw new ConflictException("Location already exists", error);
                 }
@@ -287,7 +288,8 @@ public class CustomUserService implements UserService {
         List<Location> locations = locationRepository.findAllByUserId(userId);
         if (!locations.isEmpty()) {
             for (Location loc : locations) {
-                if (loc.getPostalCode().equals(locationDto.getPostalCode()) && loc.getCity().equals(locationDto.getCity()) && loc.getCountry().equals(locationDto.getCountry()) && loc.getStreet().equals(locationDto.getStreet())) {
+                if (loc.getPostalCode().equals(locationDto.getPostalCode()) && loc.getCity().equals(locationDto.getCity())
+                    && loc.getCountry().equals(locationDto.getCountry()) && loc.getStreet().equals(locationDto.getStreet())) {
                     error.add("Cannot add same location twice");
                     throw new ConflictException("Location already exists", error);
                 }
@@ -437,7 +439,7 @@ public class CustomUserService implements UserService {
         }
         List<String> error = new ArrayList<>();
         if (user == null || !(error = user.validate()).isEmpty()) {
-            throw new ValidationException("Payment Detail is not valid", error);
+            throw new ValidationException("User is not valid", error);
         }
 
         applicationUser.setFirstName(user.getFirstName());
