@@ -11,7 +11,7 @@
   <h1 class="text-center">Top 10 Events by tickets sold</h1>
   <div class="container-fluid">
     <div class="" *ngFor="let types of uniqueTypes">
-      <h2 class="ticketLine-color text-white rounded ps-1">Top Ten by {{types}}</h2>
+      <h2 class="ticketLine-color text-white rounded p-1 ps-3">Top Ten by {{types}}</h2>
       <app-top-ten-list [topTenList]="eventsByType[types]"></app-top-ten-list>
     </div>
   </div>
