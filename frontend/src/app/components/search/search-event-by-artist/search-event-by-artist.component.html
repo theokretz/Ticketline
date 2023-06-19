@@ -37,12 +37,12 @@
 <div class="event-container">
   <div class="event-card" *ngFor="let event of events" (click)="redirectToEvent(event.id)">
     <div class="row ">
-      <div class="col-3 ">
-        <img alt="Card image"
-             class="img-fluid"
-             src="https://www.overstockart.com/index.php?route=product/imagemerge&product_id=13403&option_value_id=16221&frame_id=193">
+      <div class="col-1" style="height: 15rem; width: 15rem; object-fit: cover">
+        <img class="rounded float-left img-fluid img-thumbnail border h-75 w-100"
+             src="http://localhost:8080/images/{{ event.imagePath }}"
+             alt="{{ event.name }} image ">
       </div>
-      <div class="col-9">
+      <div class="col-6">
         <div class="p-3 fw-bold fs-5">{{ event.name }}</div>
         <div class="fst-italic text-muted">
           <div>Type: {{ event.type }}</div>

@@ -52,12 +52,12 @@ public class SearchEndpoint {
     @Secured("ROLE_USER")
     @GetMapping(value = "/events-by-artist")
     @Operation(summary = "Get all events of the given artist", security = @SecurityRequirement(name = "apiKey"))
-    public List<DetailedEventDto> getAllEventsOfArtist(@Valid ArtistSearchDto artist) {
+    public List<EventSearchDto> getAllEventsOfArtist(@Valid ArtistSearchDto artist) {
         LOGGER.info("GET /api/v1/search/events-by-artist {}", artist);
 
         try {
             List<Event> events = this.eventService.getAllEventsOfArtist(artist);
-            return this.eventMapper.eventToDetailedEventDto(events);
+            return this.eventMapper.eventToEventSearchDto(events);
         } catch (NotFoundException e) {
             LOGGER.warn("Unable to find events of artist" + e.getMessage());
             HttpStatus status = HttpStatus.OK;

@@ -52,28 +52,6 @@ public abstract class EventMapper {
             .build();
     }
 
-    public List<DetailedEventDto> eventToDetailedEventDto(List<Event> events) {
-        List<DetailedEventDto> eventDtos = new ArrayList<>();
-        for (Event event : events) {
-            String artistsOfEvent = "";
-            Set<Artist> artists = event.getArtists();
-            Stream<Artist> artistStream = artists.stream().sorted(Comparator.comparing(Artist::getId));
-            for (Artist artist : artistStream.toList()) {
-                artistsOfEvent += artist.getName() + "; ";
-            }
-
-            DetailedEventDto currentEvent = DetailedEventDto.DetailedEventDtoBuilder.aDetailedEventDto()
-                .withId(event.getId())
-                .withName(event.getName())
-                .withType(event.getType())
-                .withDescription(event.getDescription())
-                .withLength(event.getLength())
-                .withArtists(artistsOfEvent)
-                .build();
-            eventDtos.add(currentEvent);
-        }
-        return eventDtos;
-    }
 
     public List<EventSearchDto> eventToEventSearchDto(List<Event> events) {
         List<EventSearchDto> eventSearchDtos = new ArrayList<>();
