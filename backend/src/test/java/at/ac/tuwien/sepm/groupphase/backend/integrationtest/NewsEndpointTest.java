@@ -23,12 +23,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -186,8 +189,7 @@ public class NewsEndpointTest implements TestData {
             () -> assertEquals(news.getSummary(), newsMapped.getSummary()),
             () -> assertEquals(news.getContent(), newsMapped.getContent()),
             () -> assertEquals(news.getPublicationDate(), newsMapped.getPublicationDate()),
-            () -> assertEquals(news.getEvent().getId(), newsMapped.getEvent().getId()),
-            () -> assertEquals(news.getImagePath(), newsMapped.getImagePath())
+            () -> assertEquals(news.getEvent().getId(), newsMapped.getEvent().getId())
         );
     }
 
@@ -205,13 +207,19 @@ public class NewsEndpointTest implements TestData {
     @Test
     public void givenNothing_whenPost_thenNewsWithAllSetPropertiesPlusIdAndPublishedDate() throws Exception {
         news.setPublicationDate(null);
-        DetailedNewsDto detailedNewsDto = newsMapper.newsToDetailedNewsDto(news);
-        String body = objectMapper.writeValueAsString(detailedNewsDto);
+        //DetailedNewsDto detailedNewsDto = newsMapper.newsToDetailedNewsDto(news);
+        byte[] imageBytes = new byte[55];
+        imageBytes[0] = 1;
+        imageBytes[1] = 2;
+        //MockMultipartFile mockFile = new MockMultipartFile("image", "filename.jpg", "image/jpeg", imageBytes);
+        MockMultipartHttpServletRequestBuilder requestBuilder = (MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders.multipart(NEWS_BASE_URI)
+            .param("title", news.getTitle())
+            .param("summary", news.getSummary())
+            .param("content", news.getContent())
+            .param("eventId", String.valueOf(news.getEvent().getId()))
+            .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES));
 
-        MvcResult mvcResult = this.mockMvc.perform(post(NEWS_BASE_URI)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body)
-                .header(securityProperties.getAuthHeader(), jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES)))
+        MvcResult mvcResult = this.mockMvc.perform(requestBuilder)
             .andDo(print())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -233,8 +241,7 @@ public class NewsEndpointTest implements TestData {
             () -> assertEquals(news.getSummary(), newsMapped.getSummary()),
             () -> assertEquals(news.getContent(), newsMapped.getContent()),
             () -> assertEquals(LocalDate.now(), newsMapped.getPublicationDate()),
-            () -> assertEquals(news.getEvent().getId(), newsMapped.getEvent().getId()),
-            () -> assertEquals(news.getImagePath(), newsMapped.getImagePath())
+            () -> assertEquals(news.getEvent().getId(), newsMapped.getEvent().getId())
         );
     }
 
