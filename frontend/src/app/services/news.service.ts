@@ -26,7 +26,6 @@ export class NewsService {
   }
 
 
-
   /**
    * Loads specific news from the backend
    *
@@ -40,10 +39,17 @@ export class NewsService {
   /**
    * Persists news to the backend
    *
-   * @param news to persist
+   * @param news to save
+   * @param image image to save
    */
-  createNews(news: News): Observable<News> {
+  createNews(news: News, image: File): Observable<News> {
     console.log('Create news with title ' + news.title);
-    return this.httpClient.post<News>(this.newsBaseUri, news);
+    const formData = new FormData();
+    formData.append('title', news.title);
+    formData.append('summary', news.summary);
+    formData.append('content', news.content);
+    formData.append('eventId', news.eventId.toString(10));
+    formData.append('image', image);
+    return this.httpClient.post<News>(this.newsBaseUri, formData);
   }
 }

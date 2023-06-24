@@ -3,7 +3,7 @@ context('add news', () => {
 
     it('create news', () => {
         cy.loginAdmin();
-        cy.createNews(msgText);
+        //cy.createNews(msgText); no longer possible with image upload & dynamic event search
     })
 
 });

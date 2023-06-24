@@ -26,7 +26,7 @@
   height: 100%;
 }
 
-.modal-picture-size{
+.modal-picture-size {
   height: 25vh;
 }
 
@@ -43,3 +43,7 @@
   height: 100%;
 }
 
+/* mat-form-field in front of modal */
+::ng-deep .cdk-overlay-container {
+  z-index: 9999;
+}
