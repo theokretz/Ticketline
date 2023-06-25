@@ -473,4 +473,14 @@ public class CustomUserService implements UserService {
 
         notUserRepository.delete(user);
     }
+
+    @Override
+    public Integer getUserPoints(Integer userId) {
+        LOGGER.trace("getUserPoints({})", userId);
+        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        return user.getPoints();
+    }
 }

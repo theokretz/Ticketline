@@ -19,6 +19,7 @@ import { CheckoutLocation } from '../../dtos/location';
 import { CreateDeliveryLocationComponent } from './create-delivery-location/create-delivery-location.component';
 import { Cart } from '../../dtos/cart';
 import { MerchandiseEventComponent } from '../merchandise/merchandise-event/merchandise-event.component';
+import {UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-cart',
@@ -38,7 +39,8 @@ export class CartComponent implements OnInit {
     private notification: ToastrService,
     private dialog: MatDialog,
     private router: Router,
-    private cookie: CookieService
+    private cookie: CookieService,
+    private  userService: UserService,
   ) {}
 
   ngOnInit(): void {
@@ -148,7 +150,7 @@ export class CartComponent implements OnInit {
               next: (orderResp) => {
                 this.notification.success('Successfully booked tickets');
                 this.cookie.delete('merchandise');
-                this.service.getCartPoints(this.authService.getUserId());
+                this.userService.getUserPoints(this.authService.getUserId());
                 if (orderResp !== null) {
                   this.router.navigate(['/orders/' + orderResp.id]);
                 } else {

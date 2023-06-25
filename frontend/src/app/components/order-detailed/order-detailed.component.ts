@@ -5,8 +5,8 @@ import { OrderPage } from 'src/app/dtos/order';
 import { ToastrService } from 'ngx-toastr';
 import { OrderPageTicket } from 'src/app/dtos/ticket';
 import { OrderMerchandise } from 'src/app/dtos/merchandise';
-import {CartService} from '../../services/cart.service';
 import {AuthService} from '../../services/auth.service';
+import {UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-order-detailed',
@@ -20,7 +20,7 @@ export class OrderDetailedComponent implements OnInit {
 
   constructor(
     private orderService: OrderService,
-    private cartService: CartService,
+    private userService: UserService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
@@ -124,7 +124,7 @@ export class OrderDetailedComponent implements OnInit {
           this.fetchOrder();
           this.selectedTickets = [];
           this.selectedMerchandise = [];
-          this.cartService.getCartPoints(this.authService.getUserId());
+          this.userService.getUserPoints(this.authService.getUserId());
         },
         error: (err) => {
           this.notification.error(err.error.detail, 'Failed canceling order');
@@ -149,7 +149,7 @@ export class OrderDetailedComponent implements OnInit {
           this.fetchOrder();
           this.selectedTickets = [];
           this.selectedMerchandise = [];
-          this.cartService.getCartPoints(this.authService.getUserId());
+          this.userService.getUserPoints(this.authService.getUserId());
         },
         error: (err) => {
           this.notification.error(err.error.detail, 'Failed canceling items');

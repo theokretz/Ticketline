@@ -259,4 +259,19 @@ public class UserEndpoint {
         }
     }
 
+    @PermitAll
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{id}/points")
+    @Operation(summary = "get user points", security = @SecurityRequirement(name = "apiKey"))
+    public Integer getUserPoints(@Valid @PathVariable Integer id) {
+        LOGGER.info("Get user points {}", id);
+        try {
+            return this.userService.getUserPoints(id);
+        } catch (NotFoundException e) {
+            LOGGER.warn("Error getting user points: " + e.getMessage());
+            HttpStatus status = HttpStatus.NOT_FOUND;
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        }
+    }
+
 }

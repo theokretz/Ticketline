@@ -493,7 +493,8 @@ public class UserServiceTest {
         assertThat(paymentDetail)
             .isNotNull()
             .extracting(PaymentDetail::getId, PaymentDetail::getCardNumber, PaymentDetail::getCardHolder, PaymentDetail::getExpirationDate, PaymentDetail::getCvv)
-            .containsExactly(updatePaymentDetail.getId(), updatePaymentDetail.getCardNumber(), updatePaymentDetail.getCardHolder(), updatePaymentDetail.getExpirationDate(), updatePaymentDetail.getCvv());
+            .containsExactly(updatePaymentDetail.getId(), updatePaymentDetail.getCardNumber(), updatePaymentDetail.getCardHolder(),
+                updatePaymentDetail.getExpirationDate(), updatePaymentDetail.getCvv());
     }
 
     @Test
@@ -563,7 +564,8 @@ public class UserServiceTest {
         assertThat(updatedLocation)
             .isNotNull()
             .extracting(Location::getId, Location::getStreet, Location::getCity, Location::getPostalCode, Location::getCountry)
-            .containsExactly(updatedLocation.getId(), updateLocation.getStreet(), updateLocation.getCity(), updateLocation.getPostalCode(), updateLocation.getCountry());
+            .containsExactly(updatedLocation.getId(), updateLocation.getStreet(), updateLocation.getCity(), updateLocation.getPostalCode(),
+                updateLocation.getCountry());
     }
 
     @Test
@@ -622,6 +624,19 @@ public class UserServiceTest {
     @Test
     void deleteLocationWithNotExistingLocationId_ShouldThrowNotFoundException() {
         assertThrows(NotFoundException.class, () -> service.deleteUserLocation(user2.getId(), 99));
+    }
+
+    //------------------------POINTS------------------------//
+    @Test
+    void getPoints_ShouldReturnPoints() {
+        int points = service.getUserPoints(applicationUser.getId());
+
+        assertThat(points).isEqualTo(0);
+    }
+
+    @Test
+    void getPointsWithNotExistingUserId_ShouldThrowNotFoundException() {
+        assertThrows(NotFoundException.class, () -> service.getUserPoints(99));
     }
 
     //------------------------SETUP Method------------------------//

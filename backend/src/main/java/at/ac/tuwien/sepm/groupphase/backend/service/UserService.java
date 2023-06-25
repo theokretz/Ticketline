@@ -176,4 +176,11 @@ public interface UserService extends UserDetailsService {
      */
     void deleteUser(Integer userId);
 
+    /**
+     * Gets user points.
+     *
+     * @param userId the user id
+     * @return the user points
+     */
+    Integer getUserPoints(Integer userId);
 }

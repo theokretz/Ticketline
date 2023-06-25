@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CartTicket } from '../dtos/ticket';
-import { BehaviorSubject, Observable } from 'rxjs';
+import {  Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Globals } from '../global/globals';
 import { CheckoutPaymentDetail } from '../dtos/payment-detail';
@@ -22,7 +22,7 @@ export interface DialogData {
 export class CartService {
   items: CartTicket[];
   cart: Observable<Cart>;
-  userPoints: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+
   private cartBaseUri: string = this.globals.backendUri;
   constructor(private http: HttpClient, private globals: Globals) {}
 
@@ -34,21 +34,6 @@ export class CartService {
    */
   getCartTickets(id: number): Observable<Cart> {
     return this.http.get<Cart>(this.cartBaseUri + '/users/' + id + '/cart');
-  }
-  /**
-   * Get the points in the cart of the specified user and update the userPoints subject
-   *
-   * @param id the id of the user, whose points should be fetched
-   * @return an observable of the points in the cart of the user
-   */
-  getCartPoints(id: number): Observable<number> {
-    this.cart = this.http.get<Cart>(
-      this.cartBaseUri + '/users/' + id + '/cart'
-    );
-    this.cart.subscribe((data) => {
-      this.userPoints.next(data.userPoints);
-    });
-    return this.userPoints;
   }
   /**
    * Remove a ticket from the specified user's cart
