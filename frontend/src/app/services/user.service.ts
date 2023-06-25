@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Globals } from '../global/globals';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import { Reservation } from '../dtos/reservation';
 import { SimpleTicket } from '../dtos/ticket';
 import { Order } from '../dtos/order';
@@ -13,6 +13,8 @@ import {UserProfile} from '../dtos/user-profile';
   providedIn: 'root',
 })
 export class UserService {
+  pointsHelper: Observable<number>;
+  userPoints: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   private userBaseUri: string = this.globals.backendUri + '/users/';
 
   constructor(private httpClient: HttpClient, private globals: Globals) {}
@@ -155,5 +157,19 @@ export class UserService {
    */
   deleteUser(id: number): Observable<UserProfile> {
     return this.httpClient.delete<UserProfile>(this.userBaseUri + id);
+  }
+
+  /**
+   * Get the points of the user with the specified id
+   *
+   * @param id
+   * @return an Observable of the points of the user
+   */
+  getUserPoints(id: number): Observable<number> {
+    this.pointsHelper = this.httpClient.get<number>(this.userBaseUri + id + '/points');
+    this.pointsHelper.subscribe((points) => {
+        this.userPoints.next(points);
+    });
+    return this.userPoints;
   }
 }
