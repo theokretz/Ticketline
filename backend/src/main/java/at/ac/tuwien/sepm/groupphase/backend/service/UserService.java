@@ -3,11 +3,12 @@ package at.ac.tuwien.sepm.groupphase.backend.service;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserPasswordChangeDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
@@ -217,4 +218,14 @@ public interface UserService extends UserDetailsService {
      * @return the user points
      */
     Integer getUserPoints(Integer userId);
+
+    /**
+     * Change password.
+     *
+     * @param id the id
+     * @param userPasswordChangeDto the user password change dto
+     * @throws ValidationException if any of the password requirements fail
+     * @throws NotFoundException if the user is not found
+     */
+    void changePassword(Integer id, UserPasswordChangeDto userPasswordChangeDto) throws ValidationException, NotFoundException;
 }

@@ -29,6 +29,7 @@ import {TopTenComponent} from './components/top-ten/top-ten.component';
 import {SearchEventsComponent} from './components/search/search-events/search-events.component';
 import {AdminViewComponent} from './components/admin-view/admin-view.component';
 import {AuthService} from './services/auth.service';
+import {EditPasswordComponent} from './components/profile/edit-password/edit-password.component';
 
 @Injectable({
   providedIn: 'root'
@@ -53,6 +54,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   {path: 'edit-profile', component: EditProfileComponent},
   {path: 'profile', component: ProfileComponent},
+  { path: 'edit-password', component: EditPasswordComponent },
   { path: 'news', canActivate: [AuthGuard], component: NewsComponent },
   { path: 'news/:id', component: NewsDetailedComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },

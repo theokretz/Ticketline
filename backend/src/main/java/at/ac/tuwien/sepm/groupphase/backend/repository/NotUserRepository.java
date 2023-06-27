@@ -77,5 +77,10 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
     @Query("UPDATE ApplicationUser u SET u.locked = :locked WHERE u.id = :id")
     void updateUserLocked(@Param("id") Integer id, @Param("locked") boolean locked);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE ApplicationUser u SET u.failedLogin = 0 WHERE u.id = :id")
+    void resetUserLoginAttempts(@Param("id") Integer id);
+
 
 }

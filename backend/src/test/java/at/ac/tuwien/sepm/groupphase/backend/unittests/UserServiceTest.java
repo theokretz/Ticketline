@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserPasswordChangeDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
@@ -99,6 +100,7 @@ public class UserServiceTest {
     private UserProfileDto invalidUser2;
     private UserProfileDto emptyUser;
     private ApplicationUser applicationUser;
+    private ApplicationUser applicationUserPassword;
     private ApplicationUser user2;
     private PaymentDetail paymentDetail;
     private SimplePaymentDetailDto updatePaymentDetail;
@@ -282,6 +284,49 @@ public class UserServiceTest {
         assertDoesNotThrow(() -> this.service.registerUser(newUser));
         assertDoesNotThrow(() -> this.service.login(newUserLogin));
         assertThrows(ConflictException.class, () -> this.service.registerUser(existingEmail));
+    }
+
+    //------------------------PASSWORD CHANGE------------------------//
+    @Test
+    void changePasswordWithValidInformationShouldChangePassword() {
+        UserPasswordChangeDto data = new UserPasswordChangeDto();
+        data.setOldPassword("Password123");
+        data.setNewPassword1("EpicPassword123");
+        data.setNewPassword2("EpicPassword123");
+        assertDoesNotThrow(() -> this.service.changePassword(2, data));
+        data.setOldPassword("EpicPassword123");
+        data.setNewPassword1("Password123");
+        data.setNewPassword2("Password123");
+        assertDoesNotThrow(() -> this.service.changePassword(2, data));
+    }
+
+    @Test
+    void changePasswordWithNotMatchingNewPasswordShouldThrowValidationError() {
+        UserPasswordChangeDto data = new UserPasswordChangeDto();
+        data.setOldPassword("Password123");
+        data.setNewPassword1("IsEverybodyGoingCrazy1");
+        data.setNewPassword2("MoralPanic1");
+        ValidationException error = assertThrows(ValidationException.class, () -> this.service.changePassword(2, data));
+        assertTrue(error.getMessage().contains("New passwords do not match"));
+    }
+
+    @Test
+    void changePasswordFailAttemptsTooOftenShouldLockUser() {
+        UserPasswordChangeDto data = new UserPasswordChangeDto();
+        data.setOldPassword("YouKnowMeTooWell");
+        data.setNewPassword1("HoneyWhiskey4ever");
+        data.setNewPassword2("HoneyWhiskey4ever");
+        for (int i = 0; i < 6; i++) {
+            ValidationException error = assertThrows(ValidationException.class, () -> this.service.changePassword(2, data));
+            assertTrue(error.getMessage().contains("Old password is not correct"));
+            if (i == 4) {
+                assertTrue(error.getMessage().contains("Your account has been locked due to too many failed attempts."));
+            } else if (i == 5) {
+                assertTrue(error.getMessage().contains("Your account has been locked"));
+            }
+        }
+        ApplicationUser user = this.repository.getApplicationUserById(2);
+        assertTrue(user.getLocked());
     }
 
 
@@ -649,6 +694,32 @@ public class UserServiceTest {
         notExistingUser.setEmail("test@email.com");
         notExistingUser.setPassword(CORRECT_PASSWORD);
 
+        applicationUserPassword = new ApplicationUser();
+        applicationUserPassword.setFirstName("Diyar");
+        applicationUserPassword.setLastName("Turan");
+        applicationUserPassword.setEmail("diyar@mail.com");
+        applicationUserPassword.setPassword(passwordEncoder.encode("Password123"));
+        applicationUserPassword.setId(44);
+        applicationUserPassword.setLocked(false);
+        applicationUserPassword.setAdmin(false);
+        applicationUserPassword.setPoints(0);
+        applicationUserPassword.setFailedLogin(0);
+        repository.save(applicationUserPassword);
+
+        this.applicationUserPassword = new ApplicationUser();
+        this.applicationUserPassword.setId(44);
+        this.applicationUserPassword.setFirstName("Diyar");
+        this.applicationUserPassword.setLastName("Turan");
+        this.applicationUserPassword.setEmail("diyar@mail.com");
+        this.applicationUserPassword.setPassword("Password123");
+        this.applicationUserPassword.setLocked(false);
+        this.applicationUserPassword.setAdmin(false);
+        this.applicationUserPassword.setPoints(0);
+        this.applicationUserPassword.setFailedLogin(0);
+
+
+        repository.save(this.applicationUserPassword);
+
         // CHECK PASSWORD
         shortPasswordWithNoUppercaseWithNoNumber = new UserRegisterDto();
         shortPasswordWithNoUppercaseWithNoNumber.setEmail(generateEmail());
@@ -849,7 +920,7 @@ public class UserServiceTest {
         user2.setFirstName("Theo");
         user2.setLastName("Kretz");
         user2.setEmail("kretz@mail.com");
-        user2.setPassword("Password123");
+        user2.setPassword(passwordEncoder.encode("Password123"));
         user2.setLocked(false);
         user2.setAdmin(false);
         user2.setPoints(0);
