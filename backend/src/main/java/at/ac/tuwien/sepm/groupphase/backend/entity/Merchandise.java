@@ -33,6 +33,9 @@ public class Merchandise {
     @Column(nullable = false, length = 1000)
     private String description;
 
+    @Column
+    private String imagePath;
+
 
     @OneToMany(mappedBy = "merchandise")
     private Set<MerchandiseOrdered> merchandiseMerchandiseOrdereds;
@@ -74,6 +77,14 @@ public class Merchandise {
         return merchandiseMerchandiseOrdereds;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
     public void setMerchandiseMerchandiseOrdereds(
         final Set<MerchandiseOrdered> merchandiseMerchandiseOrdereds) {
         this.merchandiseMerchandiseOrdereds = merchandiseMerchandiseOrdereds;
@@ -104,6 +115,7 @@ public class Merchandise {
         private Integer pointsReward;
         private String title;
         private String description;
+        private String imagePath;
         private Set<MerchandiseOrdered> merchandiseMerchandiseOrdereds;
 
         private MerchandiseBuilder() {
@@ -148,6 +160,11 @@ public class Merchandise {
             return this;
         }
 
+        public MerchandiseBuilder withImagePath(String imagePath) {
+            this.imagePath = imagePath;
+            return this;
+        }
+
         public Merchandise build() {
             Merchandise merchandise = new Merchandise();
             merchandise.setId(id);
@@ -156,6 +173,7 @@ public class Merchandise {
             merchandise.setPointsReward(pointsReward);
             merchandise.setTitle(title);
             merchandise.setDescription(description);
+            merchandise.setImagePath(imagePath);
             merchandise.setMerchandiseMerchandiseOrdereds(merchandiseMerchandiseOrdereds);
             return merchandise;
         }
