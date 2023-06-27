@@ -67,7 +67,7 @@
             <td>{{ ticket.sectorName }}</td>
             <td>{{ ticket.eventName }}</td>
             <td>{{ ticket.hallName }}</td>
-            <td>{{ ticket.performanceStart }}</td>
+            <td>{{ ticket.performanceStart | date : 'dd.MM.yyyy HH:mm' }}</td>
             <td>
               <ul class="list-group">
                 <li
@@ -171,6 +171,12 @@
             >
             {{ abs(transaction.deductedPoints) }}
           </p>
+          <button
+            class="btn btn-primary"
+            (click)="printReceipt(transaction.id)"
+          >
+            Print receipt
+          </button>
         </li>
       </ul>
     </div>

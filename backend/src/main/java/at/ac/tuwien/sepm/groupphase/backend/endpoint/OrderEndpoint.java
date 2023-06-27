@@ -11,6 +11,7 @@ import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/api/v1/orders")
+@RequestMapping(value = "/api/v1")
 public class OrderEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -45,7 +46,7 @@ public class OrderEndpoint {
     }
 
     @PermitAll
-    @DeleteMapping("/{id}/items")
+    @DeleteMapping("/orders/{id}/items")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Cancel items from order", security = @SecurityRequirement(name = "apiKey"))
     public void cancelItemsFromOrder(@Valid @PathVariable("id") Integer orderId, Authentication auth,
@@ -82,7 +83,7 @@ public class OrderEndpoint {
     }
 
     @PermitAll
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/orders/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Cancel order", security = @SecurityRequirement(name = "apiKey"))
     public void cancelOrder(@Valid @PathVariable("id") Integer orderId, Authentication auth) {
@@ -105,7 +106,7 @@ public class OrderEndpoint {
     }
 
     @PermitAll
-    @GetMapping("/{id}")
+    @GetMapping("/orders/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get order", security = @SecurityRequirement(name = "apiKey"))
     public OrderPageDto getOrder(@Valid @PathVariable("id") Integer orderId, Authentication auth) {
@@ -119,6 +120,27 @@ public class OrderEndpoint {
             throw new ResponseStatusException(status, e.getMessage(), e);
         } catch (NotFoundException e) {
             LOGGER.info("Error getting order: " + e.getMessage());
+            HttpStatus status = HttpStatus.NOT_FOUND;
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        }
+    }
+
+    @PermitAll
+    @GetMapping("/transactions/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get transaction", security = @SecurityRequirement(name = "apiKey"))
+    public void getTransaction(@Valid @PathVariable("id") Integer transactionId, Authentication auth, HttpServletResponse response) {
+        LOGGER.info("Get transaction {}", transactionId);
+        try {
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=\"example.pdf\"");
+            orderService.getTransaction((Integer) auth.getPrincipal(), transactionId, response);
+        } catch (UnauthorizedException e) {
+            LOGGER.info("Error getting transaction: " + e.getMessage());
+            HttpStatus status = HttpStatus.UNAUTHORIZED;
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        } catch (NotFoundException e) {
+            LOGGER.info("Error getting transaction: " + e.getMessage());
             HttpStatus status = HttpStatus.NOT_FOUND;
             throw new ResponseStatusException(status, e.getMessage(), e);
         }

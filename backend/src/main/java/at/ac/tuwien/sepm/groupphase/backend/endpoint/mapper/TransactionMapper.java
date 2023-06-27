@@ -19,6 +19,7 @@ public abstract class TransactionMapper {
 
     public OrderPageTransactionDto transactionToOrderPageTransactionDto(Transaction transaction) {
         OrderPageTransactionDto dto = new OrderPageTransactionDto();
+        dto.setId(transaction.getId());
         dto.setDeductedAmount(transaction.getDeductedAmount());
         dto.setDeductedPoints(transaction.getDeductedPoints());
         return dto;

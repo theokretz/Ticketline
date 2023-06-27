@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Globals } from '../global/globals';
 import { Observable } from 'rxjs';
@@ -8,7 +8,7 @@ import { OrderPage, OrderResponse } from '../dtos/order';
   providedIn: 'root',
 })
 export class OrderService {
-  private orderBaseUri: string = this.globals.backendUri + '/orders';
+  private orderBaseUri: string = this.globals.backendUri;
 
   constructor(private http: HttpClient, private globals: Globals) {}
 
@@ -19,11 +19,11 @@ export class OrderService {
    * @returns an observable of the order
    */
   getOrderById(id: number): Observable<OrderPage> {
-    return this.http.get<OrderPage>(this.orderBaseUri + '/' + id);
+    return this.http.get<OrderPage>(this.orderBaseUri + '/orders/' + id);
   }
 
   cancelOrder(id: number): Observable<any> {
-    return this.http.delete(this.orderBaseUri + '/' + id);
+    return this.http.delete(this.orderBaseUri + '/orders/' + id);
   }
 
   cancelItems(
@@ -42,8 +42,16 @@ export class OrderService {
     }
     const options = { params };
     return this.http.delete<OrderResponse>(
-      this.orderBaseUri + '/' + id + '/items',
+      this.orderBaseUri + '/orders/' + id + '/items',
       options
     );
+  }
+
+  getReceipt(transactionId: number): Observable<Blob> {
+    const headers = new HttpHeaders({ contentType: 'application/pdf' });
+    return this.http.get(this.orderBaseUri + '/transactions/' + transactionId, {
+      headers,
+      responseType: 'blob',
+    });
   }
 }

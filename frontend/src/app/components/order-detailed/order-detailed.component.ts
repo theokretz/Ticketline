@@ -5,8 +5,8 @@ import { OrderPage } from 'src/app/dtos/order';
 import { ToastrService } from 'ngx-toastr';
 import { OrderPageTicket } from 'src/app/dtos/ticket';
 import { OrderMerchandise } from 'src/app/dtos/merchandise';
-import {AuthService} from '../../services/auth.service';
-import {UserService} from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-order-detailed',
@@ -40,6 +40,7 @@ export class OrderDetailedComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.orderPage = res;
+          console.log(res);
         },
         error: (err) => {
           if (err.status === 404) {
@@ -156,5 +157,18 @@ export class OrderDetailedComponent implements OnInit {
           console.log(err);
         },
       });
+  }
+
+  printReceipt(transactionId: number): void {
+    this.orderService.getReceipt(transactionId).subscribe({
+      next: (pdfBlob: Blob) => {
+        const fileURL = URL.createObjectURL(pdfBlob);
+        window.open(fileURL, '_blank');
+      },
+      error: (err) => {
+        this.notification.error(err.error.detail, 'Failed printing receipt');
+        console.log(err);
+      },
+    });
   }
 }
