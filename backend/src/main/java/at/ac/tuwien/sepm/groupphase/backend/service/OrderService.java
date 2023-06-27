@@ -9,6 +9,7 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
@@ -68,4 +69,13 @@ public interface OrderService {
      * @throws UnauthorizedException if the user is not authorized to perform this action
      */
     Order getOrder(Integer userId, Integer orderId) throws UnauthorizedException;
+
+    /**
+     * Get a transaction.
+     *
+     * @param userId the user id
+     * @param transactionId the transaction id
+     * @param response the http response
+     */
+    void getTransaction(Integer userId, Integer transactionId, HttpServletResponse response) throws UnauthorizedException;
 }

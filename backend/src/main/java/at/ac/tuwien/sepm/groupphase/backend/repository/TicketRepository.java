@@ -53,7 +53,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      * @return the ticket list
      */
     @EntityGraph(attributePaths = {"performance", "reservation", "seat", "seat.sector", "performance.performanceSectors",
-        "performance.performanceSectors.sector"})
+        "performance.performanceSectors.sector", "performance.event", "performance.hall"})
     List<Ticket> findAllByIdIn(List<Integer> ids);
 
 
