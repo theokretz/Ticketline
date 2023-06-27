@@ -1,0 +1,55 @@
+<br>
+<h1>Admin page</h1>
+<br>
+<button type="button" class="btn btn-outline-success" [routerLink]="['users', 'register']"> Register new user</button>
+<div class="admin-user-list">
+  <br>
+  <div class="list-title">
+    <h3>List of users</h3>
+  </div>
+  <div class="list-switch">
+    <div class="checkbox-wrapper-3">
+      <input type="checkbox" id="cbx-3" (change)="toggleLocked()"/>
+      <label for="cbx-3" class="toggle"><span></span></label>
+    </div>
+    <div><h6><i class="bi-lock-fill"> Only show locked users</i></h6></div>
+  </div>
+  <div *ngIf="users && users.length === 0">
+    <br>
+    <h4>No users found</h4>
+  </div>
+  <div *ngIf="users && users.length !== 0">
+    <ul class="list-group">
+      <li class="list-group-item" *ngFor="let user of users">
+        <div class="list-items">
+          <div class="item-lock">
+            <i class="bi bi-lock-fill" *ngIf="user.locked"></i>
+            <i class="bi bi-unlock-fill" *ngIf="!user.locked"></i>
+          </div>
+          <div class="item-id">
+            <strong>ID: {{user.id}}</strong>
+          </div>
+          <div class="item-name">
+            <i class="bi bi-check2-circle" *ngIf="user.admin"> (Admin)</i>
+            {{user.firstName + ' ' + user.lastName}}
+          </div>
+          <div class="item-email">
+            <i>{{user.email}}</i>
+          </div>
+          <div class="item-button">
+            <button type="button" class="btn btn-warning" *ngIf="user.locked && !user.admin" (click)="unlockUser(user.id)">
+              <i class="bi-unlock-fill"></i> Unlock
+            </button>
+            <button type="button" class="btn btn-danger" *ngIf="!user.locked && !user.admin" (click)="lockUser(user.id)">
+              <i class="bi-lock-fill" ></i> Lock
+            </button>
+            <button type="button" class="btn btn-outline-success disabled"*ngIf="user.admin">
+              <i class="bi-person-bounding-box"></i> Admin
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<br>

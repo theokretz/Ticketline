@@ -2,6 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
@@ -25,6 +26,9 @@ public class UserRegisterDto {
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
+
+    @NotNull(message = "Admin status is required")
+    private boolean isAdmin;
 
     public String getEmail() {
         return email;
@@ -56,6 +60,14 @@ public class UserRegisterDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(boolean admin) {
+        isAdmin = admin;
     }
 
     /**
@@ -97,6 +109,7 @@ public class UserRegisterDto {
             + "email='" + email + '\''
             + ", firstName='" + firstName + '\''
             + ", lastName='" + lastName + '\''
+            + ", isAdmin='" + isAdmin + '\''
             // dont include password
             + '}';
     }
@@ -106,6 +119,7 @@ public class UserRegisterDto {
         private String firstName;
         private String lastName;
         private String password;
+        private boolean isAdmin;
 
         private UserRegisterDtoBuilder() {
         }
@@ -134,12 +148,18 @@ public class UserRegisterDto {
             return this;
         }
 
+        public UserRegisterDtoBuilder withIsAdmin(boolean isAdmin) {
+            this.isAdmin = isAdmin;
+            return this;
+        }
+
         public UserRegisterDto build() {
             UserRegisterDto userRegisterDto = new UserRegisterDto();
             userRegisterDto.setEmail(email);
             userRegisterDto.setFirstName(firstName);
             userRegisterDto.setLastName(lastName);
             userRegisterDto.setPassword(password);
+            userRegisterDto.setIsAdmin(isAdmin);
             return userRegisterDto;
         }
     }

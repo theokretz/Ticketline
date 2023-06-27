@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -10,20 +10,19 @@ import {RegisterRequest} from '../../dtos/authentication/user-registration';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
+  isAdmin = false;
   registerForm: UntypedFormGroup;
   submitted = false;
   // Error flag
   error = false;
   email = '';
-
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private notification: ToastrService,
     private formBuilder: UntypedFormBuilder,
-    private authService: AuthService,
+    public authService: AuthService,
   ) {
     this.registerForm = this.formBuilder.group({
       email: ['',
@@ -54,23 +53,48 @@ export class RegisterComponent {
           Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W]{8,}$/)
         ]
       ],
+      checkAdmin: [''],
     });
   }
 
+  ngOnInit(): void {
+    this.route.data.subscribe(data => {
+      if (data.isAdmin) {
+        this.isAdmin = data.isAdmin;
+      }
+    });
+  }
   createUser() {
+    let isAdmin = false;
+    if (this.isAdmin) {
+      const admin = this.registerForm.controls.checkAdmin.value;
+      console.log(admin);
+      if (admin === true) {
+        const doubleCheck = confirm('Are you sure you want to create an admin account?\nThe user will have full access to the system.');
+        if (!doubleCheck) {
+          return;
+        }
+        isAdmin = true;
+      }
+    }
+    console.log(isAdmin);
     this.submitted = true;
     if (this.registerForm.valid) {
       const userRegistration: RegisterRequest = new RegisterRequest(
         this.registerForm.controls.email.value,
         this.registerForm.controls.firstName.value,
         this.registerForm.controls.lastName.value,
-        this.registerForm.controls.password.value
+        this.registerForm.controls.password.value,
+        isAdmin
       );
-
-      this.authService.createUser(userRegistration).subscribe({
+      this.authService.createUser(userRegistration, this.isAdmin).subscribe({
         next: () => {
           this.notification.success('Registration successful');
-          this.router.navigate(['/login']);
+          if (!this.isAdmin) {
+            this.router.navigate(['/login']);
+          } else {
+            this.router.navigate(['/admin']);
+          }
         }, error: error => {
           this.notification.error('Registration failed');
           console.error(JSON.parse(error['error'])['detail']);

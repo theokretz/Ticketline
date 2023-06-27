@@ -1,9 +1,12 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import org.mapstruct.Mapper;
+
+import java.util.List;
 
 /**
  * The interface User mapper.
@@ -17,6 +20,14 @@ public interface UserMapper {
      * @return the user dto
      */
     UserDto applicationUserToDto(ApplicationUser user);
+
+    /**
+     * ApplicationUser to UserAdminDto.
+     *
+     * @param users the list of users
+     * @return a list of user admin DTOs
+     */
+    List<UserAdminDto> applicationUserToUserAdminDto(List<ApplicationUser> users);
 
     /**
      * Application user to profile dto user profile dto.
