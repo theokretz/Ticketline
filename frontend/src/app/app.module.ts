@@ -51,6 +51,7 @@ import { EditLocationsComponent } from './components/profile/edit-locations/edit
 import { SearchPerformancesByLocationComponent } from
     './components/search/search-performances-by-location/search-performances-by-location.component';
 import { PerformanceOnLocationComponent } from './components/performance/performance-on-location/performance-on-location.component';
+import { AdminViewComponent } from './components/admin-view/admin-view.component';
 import { TopTenComponent } from './components/top-ten/top-ten.component';
 import { TopTenListComponent } from './components/top-ten/top-ten-list/top-ten-list.component';
 import { SearchEventsComponent } from './components/search/search-events/search-events.component';
@@ -93,6 +94,7 @@ import { SearchEventsComponent } from './components/search/search-events/search-
     TopTenComponent,
     TopTenListComponent,
     SearchEventsComponent,
+    AdminViewComponent,
   ],
   imports: [
     BrowserModule,

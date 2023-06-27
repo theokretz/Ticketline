@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {Injectable, NgModule} from '@angular/core';
+import {CanActivate, Router, RouterModule, Routes} from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { AuthGuard } from './guards/auth.guard';
@@ -27,6 +27,26 @@ import {
 } from './components/performance/performance-on-location/performance-on-location.component';
 import {TopTenComponent} from './components/top-ten/top-ten.component';
 import {SearchEventsComponent} from './components/search/search-events/search-events.component';
+import {AdminViewComponent} from './components/admin-view/admin-view.component';
+import {AuthService} from './services/auth.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class RoleGuard implements CanActivate {
+
+  constructor(private authService: AuthService,
+              private router: Router) {}
+
+  canActivate(): boolean {
+    if (this.authService.getUserRole() === 'ADMIN') {
+      return true;
+    } else {
+      this.router.navigate(['/']);
+      return false;
+    }
+  }
+}
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -54,6 +74,8 @@ const routes: Routes = [
   },
   { path: ':id/event', component: EventDetailsComponent },
   { path: 'orders/:id', component: OrderDetailedComponent },
+  { path: 'admin', component: AdminViewComponent, canActivate: [RoleGuard] },
+  { path: 'admin/users/register', component: RegisterComponent, data: { isAdmin: true }, canActivate: [RoleGuard] },
   { path: '**', component: PageNotFoundComponent },
 ];
 

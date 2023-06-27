@@ -32,10 +32,16 @@ export class AuthService {
       .pipe(tap((authResponse: string) => this.setToken(authResponse)));
   }
 
-  createUser(registerRequest: RegisterRequest) {
-    return this.httpClient.post(this.authBaseUri + '/users', registerRequest, {
-      responseType: 'text',
-    });
+  createUser(registerRequest: RegisterRequest, isAdmin: boolean) {
+    if (!isAdmin) {
+      return this.httpClient.post(this.authBaseUri + '/users', registerRequest, {
+        responseType: 'text',
+      });
+    } else {
+      return this.httpClient.post(this.authBaseUri + '/admins', registerRequest, {
+        responseType: 'text',
+      });
+    }
   }
 
   /**

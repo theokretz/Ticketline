@@ -1,9 +1,12 @@
 package at.ac.tuwien.sepm.groupphase.backend.repository;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +23,21 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
         "orders",
     })
     ApplicationUser findApplicationUserById(Integer id);
+
+    /**
+     * Find all users.
+     *
+     * @return list of all users
+     */
+    List<ApplicationUser> findAll();
+
+    /**
+     * Find all users where locked is true.
+     *
+     * @return list of all locked users
+     */
+    @Query("SELECT DISTINCT u from ApplicationUser u WHERE u.locked = true")
+    List<ApplicationUser> findAllByLockedTrue();
 
     /**
      * Find all users with location & paymentdetails JOINED (eagerly).
@@ -53,5 +71,11 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
      * @return ApplicationUser with given token
      */
     Optional<ApplicationUser> getApplicationUserByPasswordResetToken(String token);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE ApplicationUser u SET u.locked = :locked WHERE u.id = :id")
+    void updateUserLocked(@Param("id") Integer id, @Param("locked") boolean locked);
+
 
 }

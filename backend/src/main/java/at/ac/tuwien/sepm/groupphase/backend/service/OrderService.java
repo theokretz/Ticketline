@@ -17,6 +17,14 @@ import java.util.List;
  */
 public interface OrderService {
 
+    /**
+     * Find all orders by user id.
+     *
+     * @param id the user id
+     * @return the list of orders by the user
+     * @throws NotFoundException if the user does not exist
+     * @throws ValidationException if the user id is not valid
+     */
     List<OrderHistoryDto> getOrderHistory(Integer id) throws NotFoundException, ValidationException;
 
     /**

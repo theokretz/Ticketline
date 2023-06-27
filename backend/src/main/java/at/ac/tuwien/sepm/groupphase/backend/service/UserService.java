@@ -3,6 +3,7 @@ package at.ac.tuwien.sepm.groupphase.backend.service;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
@@ -11,6 +12,8 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -25,6 +28,27 @@ import java.util.List;
  * The interface User service.
  */
 public interface UserService extends UserDetailsService {
+
+    /**
+     * Get all users.
+     *
+     * @param showLocked if true, only locked users are returned
+     * @return list of users
+     */
+    List<UserAdminDto> getAllUsers(boolean showLocked);
+
+    /**
+     * Set user status.
+     *
+     * @param id the id of the user to be edited
+     * @param requester the id of the user who requested the operation
+     * @param lock specifies if the operation should be locking or unlocking
+     * @throws UnauthorizedException if the user is not authorized to perform this operation
+     * @throws NotFoundException if the user is not found
+     * @throws ValidationException if the user is already locked/unlocked or if the user is an admin
+     */
+    void setUserStatus(Integer id, Integer requester, boolean lock) throws UnauthorizedException, NotFoundException, ValidationException;
+
 
     /**
      * Find a user in the context of Spring Security based on the email address
@@ -46,6 +70,16 @@ public interface UserService extends UserDetailsService {
      * @return a application user
      */
     ApplicationUser findApplicationUserByEmail(String email);
+
+    /**
+     * Checks if a user is an admin.
+     *
+     * @param userId the id
+     * @return true if the user is an admin; false otherwise
+     * @throws ValidationException if the id is not valid
+     * @throws NotFoundException   if the user does not exist
+     */
+    boolean isUserAdmin(Integer userId) throws ValidationException, NotFoundException;
 
     /**
      * Log in a user.

@@ -3,18 +3,21 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.OrderRepository;
@@ -36,7 +39,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Set;
+import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -56,17 +63,68 @@ public class CustomUserService implements UserService {
     private final PaymentDetailRepository paymentDetailRepository;
     private final OrderRepository orderRepository;
 
+    private final UserMapper userMapper;
 
     @Autowired
     public CustomUserService(NotUserRepository notUserRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer,
-                             LocationRepository locationRepository, PaymentDetailRepository paymentDetailRepository, OrderRepository orderRepository) {
+                             LocationRepository locationRepository, PaymentDetailRepository paymentDetailRepository, UserMapper userMapper,
+                             OrderRepository orderRepository) {
         this.notUserRepository = notUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
         this.paymentDetailRepository = paymentDetailRepository;
         this.locationRepository = locationRepository;
-
         this.orderRepository = orderRepository;
+        this.userMapper = userMapper;
+    }
+
+    @Override
+    public List<UserAdminDto> getAllUsers(boolean showLocked) {
+        LOGGER.debug("Get all users");
+        List<ApplicationUser> applicationUsers;
+        if (showLocked) {
+            applicationUsers = notUserRepository.findAllByLockedTrue();
+        } else {
+            applicationUsers = notUserRepository.findAll();
+        }
+        return userMapper.applicationUserToUserAdminDto(applicationUsers);
+    }
+
+    @Override
+    public void setUserStatus(Integer id, Integer requester, boolean lock) throws UnauthorizedException, NotFoundException, ValidationException {
+        LOGGER.debug("Toggle user status");
+        List<String> validationErrors = new ArrayList<>();
+        if (requester == null) {
+            validationErrors.add("No requester given");
+        }
+        if (requester < 0) {
+            validationErrors.add("Requester id must be positive");
+        }
+        ApplicationUser applicationUser = notUserRepository.getApplicationUserById(id);
+        ApplicationUser requesterUser = notUserRepository.getApplicationUserById(requester);
+        if (applicationUser == null) {
+            throw new NotFoundException(String.format("Could not find the user with the id %d", id));
+        }
+        if (!requesterUser.getAdmin()) {
+            throw new UnauthorizedException("Action not allowed",
+                Collections.singletonList("Only admins can change the user status"));
+        }
+        if (id == null) {
+            validationErrors.add("No id given");
+        }
+        if (id < 0) {
+            validationErrors.add("Id must be positive");
+        }
+        if (applicationUser.getAdmin()) {
+            validationErrors.add("Cannot change status of an admin");
+        }
+        if (applicationUser.getLocked() == lock) {
+            validationErrors.add("User is already in the desired state");
+        }
+        if (!validationErrors.isEmpty()) {
+            throw new ValidationException("Validation failed:", validationErrors);
+        }
+        notUserRepository.updateUserLocked(id, lock);
     }
 
     /**
@@ -113,6 +171,26 @@ public class CustomUserService implements UserService {
             return applicationUser.get();
         }
         throw new NotFoundException(String.format("Could not find the user with the email address %s", email));
+    }
+
+    @Override
+    public boolean isUserAdmin(Integer userId) throws ValidationException, NotFoundException {
+        LOGGER.debug("Check if user is admin");
+        List<String> validationErrors = new ArrayList<>();
+        if (userId == null) {
+            validationErrors.add("Requester id is null");
+        }
+        if (userId < 0) {
+            validationErrors.add("Requester id is negative");
+        }
+        ApplicationUser applicationUser = notUserRepository.getApplicationUserById(userId);
+        if (applicationUser == null) {
+            throw new NotFoundException(String.format("Could not find the user with the id %d", userId));
+        }
+        if (!validationErrors.isEmpty()) {
+            throw new ValidationException("Failed to validate user", validationErrors);
+        }
+        return applicationUser.getAdmin();
     }
 
     /**
@@ -178,7 +256,7 @@ public class CustomUserService implements UserService {
 
         //id is auto generated
         ApplicationUser applicationUser = ApplicationUser.UserBuilder.aUser()
-            .withAdmin(false)
+            .withAdmin(userRegisterDto.getIsAdmin())
             .withEmail(userRegisterDto.getEmail())
             .withFirstName(userRegisterDto.getFirstName())
             .withLastName(userRegisterDto.getLastName())
