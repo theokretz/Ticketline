@@ -5,6 +5,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutPaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserPasswordChangeDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.LocationMapper;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.PaymentDetailMapper;
@@ -272,6 +273,26 @@ public class UserEndpoint {
         } catch (NotFoundException e) {
             LOGGER.warn("Error getting user points: " + e.getMessage());
             HttpStatus status = HttpStatus.NOT_FOUND;
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        }
+    }
+
+    @Secured("ROLE_USER")
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/password")
+    @Operation(summary = "change user password", security = @SecurityRequirement(name = "apiKey"))
+    public void changePassword(@RequestBody UserPasswordChangeDto userPasswordChangeDto) {
+        Integer authentication = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LOGGER.info("Change password of {}", authentication);
+        try {
+            this.userService.changePassword(authentication, userPasswordChangeDto);
+        } catch (NotFoundException e) {
+            LOGGER.warn("Error finding user: " + e.getMessage());
+            HttpStatus status = HttpStatus.NOT_FOUND;
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        } catch (ValidationException e) {
+            LOGGER.warn("Error changing password: " + e.getMessage());
+            HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
             throw new ResponseStatusException(status, e.getMessage(), e);
         }
     }

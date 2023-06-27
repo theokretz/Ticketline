@@ -8,6 +8,7 @@ import { Order } from '../dtos/order';
 import { CheckoutLocation, Location } from '../dtos/location';
 import { CheckoutPaymentDetail, PaymentDetail } from '../dtos/payment-detail';
 import {UserProfile} from '../dtos/user-profile';
+import {PasswordChange} from '../dtos/passwordReset/passwordChange';
 
 @Injectable({
   providedIn: 'root',
@@ -171,5 +172,8 @@ export class UserService {
         this.userPoints.next(points);
     });
     return this.userPoints;
+  }
+  changePassword(data: PasswordChange): Observable<any> {
+    return this.httpClient.post<any>(this.userBaseUri + 'password', data);
   }
 }

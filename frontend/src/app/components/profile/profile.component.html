@@ -34,6 +34,7 @@
         <button type="button" class="btn btn-light" routerLink="/order-history"><i class="bi-clock-history"></i> Order History</button>
         <button type="button" class="btn btn-light" routerLink="/reservations"><i class="bi-calendar-check"></i> Reservations</button>
         <button type="button" class="btn btn-light" routerLink="/edit-profile"><i class="bi-pencil" routerLink="/edit-profile"></i> Edit Profile</button>
+        <button type="button" class="btn btn-secondary" routerLink="/edit-password"><i class="bi-key" routerLink="/edit-profile"></i> Edit Password</button>
         <button *ngIf="!user.admin" type="button" class="btn btn-danger" (click)="deleteUserDialogDecision()"><i class="bi-trash"></i> Delete Profile</button>
     </div>
     </div>

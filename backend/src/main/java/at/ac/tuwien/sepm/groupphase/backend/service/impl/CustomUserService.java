@@ -3,11 +3,12 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserPasswordChangeDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
@@ -45,9 +46,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class CustomUserService implements UserService {
@@ -125,6 +123,7 @@ public class CustomUserService implements UserService {
             throw new ValidationException("Validation failed:", validationErrors);
         }
         notUserRepository.updateUserLocked(id, lock);
+        notUserRepository.resetUserLoginAttempts(id);
     }
 
     /**
@@ -560,5 +559,45 @@ public class CustomUserService implements UserService {
             throw new NotFoundException("Could not find User");
         }
         return user.getPoints();
+    }
+
+    @Override
+    public void changePassword(Integer id, UserPasswordChangeDto userPasswordChangeDto) throws ValidationException, NotFoundException {
+        LOGGER.trace("changePassword({},{})", id, userPasswordChangeDto);
+        ApplicationUser user = notUserRepository.findApplicationUserById(id);
+        if (user == null) {
+            throw new NotFoundException("Could not find User");
+        }
+        List<String> error = new ArrayList<>();
+        if (userPasswordChangeDto == null || !(error = userPasswordChangeDto.validate()).isEmpty()) {
+            throw new ValidationException("Invalid data", error);
+        }
+        if (passwordEncoder.matches(userPasswordChangeDto.getOldPassword(), user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(userPasswordChangeDto.getNewPassword1()));
+            user.setFailedLogin(0);
+            notUserRepository.save(user);
+        } else {
+            if (!user.getAdmin()) {
+                error.add("Old password is not correct");
+                user.setFailedLogin(user.getFailedLogin() + 1);
+                if (user.getFailedLogin() >= maxFailedLogin) {
+                    user.setLocked(true);
+                    notUserRepository.save(user);
+                    throw new ValidationException("Old password is not correct",
+                        List.of("Your account has been locked due to too many failed attempts. "
+                            + "Please contact the administrator to unlock your account"));
+                } else if (user.getFailedLogin() >= maxFailedLogin - 1) {
+                    notUserRepository.save(user);
+                    throw new ValidationException("Old password is not correct",
+                        List.of("You have one more attempt before your account is locked"));
+                }
+                notUserRepository.save(user);
+                throw new ValidationException("Old password is not correct", error);
+            } else {
+                error.add("Old password is not correct");
+                notUserRepository.save(user);
+                throw new ValidationException("Old password is not correct", error);
+            }
+        }
     }
 }
