@@ -30,6 +30,7 @@ import {SearchEventsComponent} from './components/search/search-events/search-ev
 import {AdminViewComponent} from './components/admin-view/admin-view.component';
 import {AuthService} from './services/auth.service';
 import {EditPasswordComponent} from './components/profile/edit-password/edit-password.component';
+import {SearchPerformancesComponent} from './components/search/search-performances/search-performances.component';
 
 @Injectable({
   providedIn: 'root'
@@ -72,6 +73,7 @@ const routes: Routes = [
       { path: 'artists', component: SearchEventByArtistComponent },
       { path: 'locations', component: SearchPerformancesByLocationComponent },
       { path: 'events', component: SearchEventsComponent },
+      { path: 'performances', component: SearchPerformancesComponent}
     ],
   },
   { path: ':id/event', component: EventDetailsComponent },
