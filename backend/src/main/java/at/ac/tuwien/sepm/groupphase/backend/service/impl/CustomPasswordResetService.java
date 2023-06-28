@@ -5,6 +5,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserPasswordResetR
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.security.JwtTokenizer;
@@ -40,6 +41,19 @@ public class CustomPasswordResetService implements PasswordResetService {
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
         this.mailService = mailService;
+    }
+
+
+    @Override
+    public void sendResetToken(Integer id) throws ValidationException, NotFoundException {
+        LOGGER.info("sendResetToken({})", id);
+        ApplicationUser user = notUserRepository.findApplicationUserById(id);
+        if (user == null) {
+            throw new NotFoundException("User not found");
+        }
+        UserPasswordResetRequestDto request = new UserPasswordResetRequestDto();
+        request.setEmail(user.getEmail());
+        sendResetToken(request);
     }
 
     @Override
