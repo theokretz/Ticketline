@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.News;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,7 +32,9 @@ public interface NewsService {
      *
      * @param news    to publish
      * @param eventId the id of the event
+     * @param image   the image of the news entry
      * @return published news entry
+     * @throws ValidationException if the image is not of type jpg, jpeg, gif or png
      */
-    News publishNews(News news, Integer eventId);
+    News publishNews(News news, Integer eventId, MultipartFile image) throws ValidationException;
 }
