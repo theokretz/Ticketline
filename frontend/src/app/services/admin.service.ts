@@ -18,6 +18,12 @@ export class AdminService {
     );
   }
 
+  resetPassword(id: number): Observable<User> {
+    return this.httpClient.post<null>(
+      this.userBaseUri + '/users/' + id + '/reset-password', null
+    );
+  }
+
   lockUser(id: number): Observable<User> {
     return this.httpClient.post<null>(
       this.userBaseUri + '/users/' + id + '/lock', null

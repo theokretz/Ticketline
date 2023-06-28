@@ -29,7 +29,7 @@ public class MailService {
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true");
+        props.put("mail.debug", "false");
 
         // You can also configure other properties if needed, e.g., SSL/TLS settings
 
@@ -42,7 +42,6 @@ public class MailService {
         message.setSubject(subject);
         message.setText(text);
         mailSender.send(message);
-        LOGGER.info("Email sent to: " + to);
     }
 
     public void sendPasswordResetEmail(ApplicationUser user, String token) {
@@ -56,6 +55,5 @@ public class MailService {
                 + "http://localhost:4200/#/reset/" + token;
         message.setText(text);
         mailSender.send(message);
-        LOGGER.info("Password Reset sent to: " + userEmail + " with token: " + token);
     }
 }

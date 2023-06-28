@@ -6,6 +6,7 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepm.groupphase.backend.service.PasswordResetService;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -33,10 +34,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class AdminEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final UserService userService;
+    private final PasswordResetService passwordResetService;
 
     @Autowired
-    public AdminEndpoint(UserService userService) {
+    public AdminEndpoint(UserService userService, PasswordResetService passwordResetService) {
         this.userService = userService;
+        this.passwordResetService = passwordResetService;
     }
 
     @Secured("ROLE_ADMIN")
@@ -46,6 +49,25 @@ public class AdminEndpoint {
     public List<UserAdminDto> getAllUsers(@RequestParam boolean locked) {
         LOGGER.info(String.format("GET /api/v1/userlist: get all users (locked: %s)", locked));
         return userService.getAllUsers(locked);
+    }
+
+    @Secured("ROLE_ADMIN")
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/users/{id}/reset-password")
+    @Operation(summary = "reset user password", security = @SecurityRequirement(name = "apiKey"))
+    public void resetUserPassword(@PathVariable("id") Integer id) {
+        LOGGER.info(String.format("POST /api/v1/users/%s/resetpassword: reset user (ID: %s) password", id, id));
+        try {
+            long var = System.currentTimeMillis();
+            passwordResetService.sendResetToken(id);
+            System.out.println("Time taken (ENDPOINT): " + (System.currentTimeMillis() - var));
+        } catch (NotFoundException e) {
+            LOGGER.info("User not found:" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (ValidationException e) {
+            LOGGER.info("Validation error:" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        }
     }
 
     @Secured("ROLE_ADMIN")

@@ -14,15 +14,15 @@
 }
 
 .item-name {
-  width: 40%;
+  width: 35%;
 }
 
 .item-email {
-  width: 40%;
+  width: 35%;
 }
 
 .item-button {
-  width: 10%;
+  width: 20%;
   display: flex;
   justify-content: flex-end;
 }
@@ -31,6 +31,10 @@
   display: flex;
   justify-content: start;
   padding: 0.25rem;
+}
+
+#reset {
+  margin-left: 1rem;
 }
 
 // ------

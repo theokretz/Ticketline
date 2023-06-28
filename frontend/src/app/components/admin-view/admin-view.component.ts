@@ -24,6 +24,17 @@ export class AdminViewComponent implements OnInit {
       }
     });
   }
+  resetPassword(id: number): void {
+    this.service.resetPassword(id).subscribe({
+      next: () => {
+        this.notification.success('Password reset for user with ID ' + id);
+      },
+      error: (error) => {
+        console.error('Could not reset password', error);
+        this.notification.error(error.error.detail);
+      }
+    });
+  }
   lockUser(id: number): void {
     this.service.lockUser(id).subscribe({
       next: () => {

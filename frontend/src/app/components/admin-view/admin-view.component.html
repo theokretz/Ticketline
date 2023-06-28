@@ -43,7 +43,10 @@
             <button type="button" class="btn btn-danger" *ngIf="!user.locked && !user.admin" (click)="lockUser(user.id)">
               <i class="bi-lock-fill" ></i> Lock
             </button>
-            <button type="button" class="btn btn-outline-success disabled"*ngIf="user.admin">
+            <button type="button" id="reset" class="btn btn-outline-secondary" *ngIf="!user.admin" (click)="resetPassword(user.id)">
+              <i class="bi-key-fill" ></i> Reset
+            </button>
+            <button type="button" class="btn btn-outline-success disabled" *ngIf="user.admin">
               <i class="bi-person-bounding-box"></i> Admin
             </button>
           </div>
