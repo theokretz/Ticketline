@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedPerformanceDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.PerformanceSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 
 import java.util.List;
@@ -31,4 +32,12 @@ public interface PerformanceService {
      * @return a list of performances with a location matching the given id
      */
     List<Performance> getPerformancesOfLocationById(Integer id);
+
+    /**
+     * Get the performances with filtered by the given parameters.
+     *
+     * @param parameters the parameters with which the performances should be filtered
+     * @return a list of the found performances
+     */
+    List<Performance> getAllPerformancesWithParameters(PerformanceSearchDto parameters);
 }

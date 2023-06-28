@@ -31,8 +31,8 @@ export class SearchEventsComponent implements OnInit {
   searchEvents() {
     this.searchPerformed = true;
     const params = new HttpParams()
-      .set('name', this.searchName.replace(/\s/g, ''))
-      .set('description', this.searchDescription.replace(/\s/g, ''))
+      .set('name', this.searchName)
+      .set('description', this.searchDescription)
       .set('type', this.searchType.replace(/\s/g, ''))
       .set('length', this.searchLength);
     this.eventService.searchEvents(params).pipe(

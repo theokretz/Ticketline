@@ -55,8 +55,17 @@ public class CustomEventService implements EventService {
     public List<Event> getAllEventsWithParameters(EventSearchDto parameters) {
         LOGGER.debug("Find all events with parameters{}", parameters);
         List<Event> events;
-        Duration length1 = Objects.equals(parameters.getLength(), "") ? null : Duration.parse(parameters.getLength()).minusMinutes(30L);
-        Duration length2 = Objects.equals(parameters.getLength(), "") ? null : Duration.parse(parameters.getLength()).plusMinutes(30L);
+        Duration length1;
+        Duration length2;
+
+        // handle case where length of event is null
+        if (parameters.getLength() == null) {
+            length1 = null;
+            length2 = null;
+        } else {
+            length1 = Objects.equals(parameters.getLength(), "") ? null : Duration.parse(parameters.getLength()).minusMinutes(30L);
+            length2 = Objects.equals(parameters.getLength(), "") ? null : Duration.parse(parameters.getLength()).plusMinutes(30L);
+        }
         events = eventRepository.findAllEventsContaining(
             parameters.getName(),
             parameters.getDescription(),

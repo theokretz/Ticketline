@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Globals } from '../global/globals';
-import { Performance } from '../dtos/performance';
+import {Performance, PerformanceSearch} from '../dtos/performance';
 
 @Injectable({
   providedIn: 'root',
@@ -41,5 +41,15 @@ export class PerformanceService {
    */
   getPerformancesOnLocationById(id: number): Observable<Performance[]> {
     return this.httpClient.get<Performance[]>(this.performanceBaseUri + '/location/' + id);
+  }
+
+  /**
+   * Get the performances with the specified parameters
+   *
+   * @param params the parameters of the events that should be fetched
+   * @return an observable list of the found performances
+   */
+  searchPerformances(params: HttpParams): Observable<PerformanceSearch[]> {
+    return this.httpClient.get<PerformanceSearch[]>(this.globals.backendUri + '/search/performances', {params});
   }
 }

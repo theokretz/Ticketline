@@ -11,3 +11,13 @@ export class Performance {
   tickets: PerformanceTicket[][];
   performanceSector: Map<number, Sector>;
 }
+
+export class PerformanceSearch {
+  id: number;
+  eventName: string;
+  hallName: string;
+  location: Location;
+  dateTime: Date;
+  price: number;
+  imagePath: string;
+}
