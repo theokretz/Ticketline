@@ -321,7 +321,7 @@ public class CustomUserService implements UserService {
         if (locationDto == null || (error = locationDto.validate()).size() > 0) {
             throw new ValidationException("LocationDto is not valid", error);
         }
-
+        locationDto.validateApi();
         ApplicationUser user = notUserRepository.findApplicationUserById(id);
         if (user == null) {
             throw new NotFoundException("Could not find User");
@@ -350,10 +350,12 @@ public class CustomUserService implements UserService {
     @Override
     public Location editUserLocation(Integer userId, CheckoutLocation locationDto) throws ValidationException, ConflictException {
         LOGGER.trace("editUserLocation({},{})", userId, locationDto);
+
         List<String> error = new ArrayList<>();
         if (locationDto == null || !(error = locationDto.validate()).isEmpty()) {
             throw new ValidationException("Location is not valid", error);
         }
+        locationDto.validateApi();
         ApplicationUser user = notUserRepository.findApplicationUserById(userId);
         if (user == null) {
             throw new NotFoundException("Could not find User");

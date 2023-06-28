@@ -4,6 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.Collections;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
+import com.cloudmersive.client.invoker.auth.ApiKeyAuth;
+import com.cloudmersive.client.invoker.ApiClient;
+import com.cloudmersive.client.invoker.ApiException;
+import com.cloudmersive.client.invoker.Configuration;
+import com.cloudmersive.client.AddressApi;
+import com.cloudmersive.client.model.NormalizeAddressResponse;
+import com.cloudmersive.client.model.ValidateAddressRequest;
 
 public class CheckoutLocation {
     private Integer locationId;
@@ -81,5 +91,33 @@ public class CheckoutLocation {
             errors.add("Invalid street format.");
         }
         return errors;
+    }
+
+    public void validateApi() throws ValidationException, ConflictException {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+        ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("Apikey");
+        apiKey.setApiKey("548fac77-8ac5-4a31-91e6-ae7fb0a6a169");
+
+        AddressApi apiInstance = new AddressApi();
+        ValidateAddressRequest input = new ValidateAddressRequest(); // ValidateAddressRequest | Input parse request
+        input.streetAddress(this.street);
+        input.city(this.city);
+        input.stateOrProvince("");
+        input.postalCode(this.postalCode.toString());
+        input.countryFullName("");
+        input.countryCode(this.country);
+        NormalizeAddressResponse result = null;
+        try {
+            result = apiInstance.addressNormalizeAddress(input);
+            System.out.println(result);
+        } catch (ApiException e) {
+            throw new ConflictException("Cloudmersive API returned an error", Collections.singletonList(e.getMessage()));
+        }
+        if (result == null) {
+            throw new ConflictException("API did not return anything", Collections.singletonList("Are Cloudmersive servers online?"));
+        }
+        if (!result.isValidAddress()) {
+            throw new ValidationException("Address is not valid", Collections.singletonList("Please check your input"));
+        }
     }
 }
