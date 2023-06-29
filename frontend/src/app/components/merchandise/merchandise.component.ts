@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { MerchandiseService } from '../../services/merchandise.service';
-import { BookingMerchandise, Merchandise } from '../../dtos/merchandise';
-import { ToastrService } from 'ngx-toastr';
-import { CookieService } from 'ngx-cookie-service';
-import { AuthService } from '../../services/auth.service';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {MerchandiseService} from '../../services/merchandise.service';
+import {BookingMerchandise, Merchandise} from '../../dtos/merchandise';
+import {ToastrService} from 'ngx-toastr';
+import {CookieService} from 'ngx-cookie-service';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-merchandise',
@@ -26,7 +26,8 @@ export class MerchandiseComponent implements OnInit {
     private merchandiseService: MerchandiseService,
     private cookie: CookieService,
     private authService: AuthService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.reloadMerch(false);
@@ -46,7 +47,7 @@ export class MerchandiseComponent implements OnInit {
   }
 
   addMerchToCart(id: number, quantity: number): void {
-    if (id >= 0 && quantity >= 0) {
+    if (id >= 0 && quantity > 0 && Number.isInteger(quantity)) {
       if (this.getCartMerch(id) === undefined) {
         this.addMerch(id, quantity);
         this.notification.info('Added to Cart');
@@ -69,6 +70,7 @@ export class MerchandiseComponent implements OnInit {
     const value: BookingMerchandise = this.getCartMerch(id);
     return value === undefined ? '0' : value.quantity.toString();
   }
+
   getMerchCheck(): void {
     if (this.isChecked) {
       this.reloadMerch(true);
@@ -84,7 +86,7 @@ export class MerchandiseComponent implements OnInit {
       //update quantity
       this.getCartMerch(id).quantity = quantity;
     } else {
-      this.cart.push({ id, quantity });
+      this.cart.push({id, quantity});
     }
   }
 

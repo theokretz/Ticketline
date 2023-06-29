@@ -35,19 +35,15 @@ import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
-import com.lowagie.text.Header;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfCell;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfTable;
 import com.lowagie.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,13 +100,13 @@ public class CustomOrderService implements OrderService {
         LOGGER.info("Find all orders for user with id {}", id);
         List<String> validationErrors = new ArrayList<>();
         if (id == null) {
-            throw new NotFoundException(String.format("No id has been provided"));
+            throw new NotFoundException("No id has been provided");
         }
         if (id <= 0) {
             validationErrors.add("Id can't be a negative number");
         }
         if (!validationErrors.isEmpty()) {
-            throw new ValidationException(String.format("Validation failed:"), validationErrors);
+            throw new ValidationException("Validation failed:", validationErrors);
         }
         ApplicationUser user = notUserRepository.getApplicationUserById(id);
         if (user == null) {
@@ -124,7 +120,7 @@ public class CustomOrderService implements OrderService {
         return allOrdersDto;
     }
 
-    @Transactional(rollbackFor = { ConflictException.class, ValidationException.class })
+    @Transactional(rollbackFor = {ConflictException.class, ValidationException.class})
     @Override
     public OrderDto buyTickets(Integer userId, BookingDto bookingDto) throws ConflictException, ValidationException {
         LOGGER.debug("Buy Tickets from Cart, userId: {}", userId);
@@ -345,8 +341,7 @@ public class CustomOrderService implements OrderService {
     }
 
 
-
-    @Transactional(rollbackFor = { UnauthorizedException.class, ConflictException.class, ValidationException.class })
+    @Transactional(rollbackFor = {UnauthorizedException.class, ConflictException.class, ValidationException.class})
     @Override
     public void cancelItems(Integer userId, Integer orderId, Integer[] tickets, Integer[] merchandise) throws UnauthorizedException, ConflictException, ValidationException {
         LOGGER.debug("cancelItems({}, {}, {}, {})", userId, orderId, tickets, merchandise);
@@ -437,7 +432,7 @@ public class CustomOrderService implements OrderService {
         }
     }
 
-    @Transactional(rollbackFor = { UnauthorizedException.class, ConflictException.class, ValidationException.class })
+    @Transactional(rollbackFor = {UnauthorizedException.class, ConflictException.class, ValidationException.class})
     @Override
     public void cancelOrder(Integer userId, Integer orderId) throws UnauthorizedException, ConflictException {
         LOGGER.debug("cancelOrder({}, {})", userId, orderId);
@@ -602,12 +597,12 @@ public class CustomOrderService implements OrderService {
             PdfPTable meta = new PdfPTable(2);
             meta.setSpacingAfter(20);
 
-            Paragraph transactionNumber =  new Paragraph("Rechnung Nr: " + transaction.getId());
+            Paragraph transactionNumber = new Paragraph("Rechnung Nr: " + transaction.getId());
             PdfPCell numberCell = new PdfPCell(transactionNumber);
             numberCell.setBorder(Rectangle.NO_BORDER);
             numberCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 
-            Paragraph transactionDate =  new Paragraph(transaction.getTransactionTs().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")));
+            Paragraph transactionDate = new Paragraph(transaction.getTransactionTs().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")));
             PdfPCell dateCell = new PdfPCell(transactionDate);
             dateCell.setBorder(Rectangle.NO_BORDER);
             dateCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
