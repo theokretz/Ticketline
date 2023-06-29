@@ -3,22 +3,22 @@ package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserPasswordChangeDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserPasswordChangeDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.OrderRepository;
@@ -40,12 +40,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Set;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Optional;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CustomUserService implements UserService {
@@ -511,7 +511,7 @@ public class CustomUserService implements UserService {
     }
 
     @Override
-    public ApplicationUser updateUser(Integer userId, UserProfileDto user) throws ValidationException {
+    public ApplicationUser updateUser(Integer userId, UserProfileDto user) throws ValidationException, ConflictException {
         LOGGER.trace("updateUser({},{})", userId, user);
         ApplicationUser applicationUser = notUserRepository.getApplicationUserById(userId);
         if (applicationUser == null) {
@@ -521,7 +521,11 @@ public class CustomUserService implements UserService {
         if (user == null || !(error = user.validate()).isEmpty()) {
             throw new ValidationException("User is not valid", error);
         }
-
+        Optional<ApplicationUser> users = notUserRepository.findApplicationUsersByEmail(user.getEmail());
+        if (users.isPresent() && !users.get().getId().equals(userId)) {
+            error.add("Email already exists");
+            throw new ConflictException("User is not valid", error);
+        }
         applicationUser.setFirstName(user.getFirstName());
         applicationUser.setLastName(user.getLastName());
         applicationUser.setEmail(user.getEmail());

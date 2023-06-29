@@ -3,12 +3,12 @@ package at.ac.tuwien.sepm.groupphase.backend.service;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserPasswordChangeDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserLoginDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserPasswordChangeDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserRegisterDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
@@ -41,12 +41,12 @@ public interface UserService extends UserDetailsService {
     /**
      * Set user status.
      *
-     * @param id the id of the user to be edited
+     * @param id        the id of the user to be edited
      * @param requester the id of the user who requested the operation
-     * @param lock specifies if the operation should be locking or unlocking
+     * @param lock      specifies if the operation should be locking or unlocking
      * @throws UnauthorizedException if the user is not authorized to perform this operation
-     * @throws NotFoundException if the user is not found
-     * @throws ValidationException if the user is already locked/unlocked or if the user is an admin
+     * @throws NotFoundException     if the user is not found
+     * @throws ValidationException   if the user is already locked/unlocked or if the user is an admin
      */
     void setUserStatus(Integer id, Integer requester, boolean lock) throws UnauthorizedException, NotFoundException, ValidationException;
 
@@ -201,7 +201,7 @@ public interface UserService extends UserDetailsService {
      * @return the updated application user
      * @throws ValidationException the validation exception
      */
-    ApplicationUser updateUser(Integer userId, UserProfileDto user) throws ValidationException;
+    ApplicationUser updateUser(Integer userId, UserProfileDto user) throws ValidationException, ConflictException;
 
 
     /**
@@ -222,10 +222,10 @@ public interface UserService extends UserDetailsService {
     /**
      * Change password.
      *
-     * @param id the id
+     * @param id                    the id
      * @param userPasswordChangeDto the user password change dto
      * @throws ValidationException if any of the password requirements fail
-     * @throws NotFoundException if the user is not found
+     * @throws NotFoundException   if the user is not found
      */
     void changePassword(Integer id, UserPasswordChangeDto userPasswordChangeDto) throws ValidationException, NotFoundException;
 }

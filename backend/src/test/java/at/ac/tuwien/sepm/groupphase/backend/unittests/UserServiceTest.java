@@ -121,6 +121,9 @@ public class UserServiceTest {
     @AfterEach
     void tearDown() {
         repository.deleteAll();
+        paymentDetailRepository.deleteAll();
+        locationRepository.deleteAll();
+        orderRepository.deleteAll();
     }
 
     private String generateEmail() {
@@ -454,7 +457,7 @@ public class UserServiceTest {
 
     //------------------------UPDATE USER------------------------//
     @Test
-    void updateUser_ShouldUpdateUser() throws ValidationException {
+    void updateUser_ShouldUpdateUser() throws ValidationException, ConflictException {
         ApplicationUser user = service.updateUser(1, updateUser);
 
         assertThat(user)
@@ -710,7 +713,7 @@ public class UserServiceTest {
         this.applicationUserPassword.setId(44);
         this.applicationUserPassword.setFirstName("Diyar");
         this.applicationUserPassword.setLastName("Turan");
-        this.applicationUserPassword.setEmail("diyar@mail.com");
+        this.applicationUserPassword.setEmail("diyar1@mail.com");
         this.applicationUserPassword.setPassword("Password123");
         this.applicationUserPassword.setLocked(false);
         this.applicationUserPassword.setAdmin(false);
@@ -855,7 +858,7 @@ public class UserServiceTest {
         applicationUser = new ApplicationUser();
         applicationUser.setFirstName("Diyar");
         applicationUser.setLastName("Turan");
-        applicationUser.setEmail("diyar@mail.com");
+        applicationUser.setEmail(generateEmail());
         applicationUser.setPassword("Password123");
         applicationUser.setId(123);
         applicationUser.setLocked(false);
@@ -891,7 +894,7 @@ public class UserServiceTest {
         this.applicationUser.setId(1);
         this.applicationUser.setFirstName("Diyar");
         this.applicationUser.setLastName("Turan");
-        this.applicationUser.setEmail("diyar@mail.com");
+        this.applicationUser.setEmail(generateEmail());
         this.applicationUser.setPassword("Password123");
         this.applicationUser.setLocked(false);
         this.applicationUser.setAdmin(false);
