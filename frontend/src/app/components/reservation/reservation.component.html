@@ -1,11 +1,13 @@
 <br>
 <h1>Your Reservations</h1>
+<p>Reservations will expire 30 minutes before the performance begins.</p>
 <div *ngIf="reservations.length <= 0">
   <p>You have zero open reservations.</p>
 </div>
 <div *ngIf="reservations.length > 0">
   <p>You have ({{ reservations.length }}) open reservations.</p>
 </div>
+
 
 <div class="row my-5">
   <div class="col-xl-3 col-lg-4 p-2" *ngFor="let reservation of reservations">
@@ -19,7 +21,7 @@
           <span class="float-start">Expires</span>
           <span class="d-block text-end">{{
             reservation.expirationTs | date : 'short'
-          }}</span>
+            }}</span>
         </h6>
         <ul class="list-group list-group-flush">
           <ul class="list-group list-group-flush">
@@ -27,19 +29,19 @@
               <strong class="float-start">Row</strong>
               <span class="d-block text-end">{{
                 reservation.ticket.seat.row
-              }}</span>
+                }}</span>
             </li>
             <li class="list-group-item p-1">
               <strong class="float-start">Number</strong>
               <span class="d-block text-end">{{
                 reservation.ticket.seat.number
-              }}</span>
+                }}</span>
             </li>
             <li class="list-group-item p-1">
               <strong class="float-start">Section</strong>
               <span class="d-block text-end">{{
                 reservation.ticket.seat.sector
-              }}</span>
+                }}</span>
             </li>
           </ul>
           <li class="list-group-item p-1 align-self-center">
