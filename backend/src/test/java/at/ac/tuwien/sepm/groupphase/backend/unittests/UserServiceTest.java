@@ -120,9 +120,9 @@ public class UserServiceTest {
 
     @AfterEach
     void tearDown() {
-        repository.deleteAll();
-        paymentDetailRepository.deleteAll();
         locationRepository.deleteAll();
+        paymentDetailRepository.deleteAll();
+        repository.deleteAll();
         orderRepository.deleteAll();
     }
 
@@ -547,37 +547,37 @@ public class UserServiceTest {
 
     @Test
     void editPaymentDetailWithNotExistingUserId_ShouldThrowNotFoundException() {
-        assertThrows(NotFoundException.class, () -> service.updateUserPaymentDetails(99, updatePaymentDetail));
+        assertThrows(NotFoundException.class, () -> service.addUserPaymentDetails(99, updatePaymentDetail));
     }
 
     @Test
     void editPaymentDetailWithInvalidDto_ShouldThrowValidationException() {
-        assertThrows(ValidationException.class, () -> service.updateUserPaymentDetails(user2.getId(), invalidPaymentDetail));
+        assertThrows(ValidationException.class, () -> service.addUserPaymentDetails(user2.getId(), invalidPaymentDetail));
     }
 
     @Test
     void editPaymentDetailWithNullDto_ShouldThrowValidationException() {
-        assertThrows(ValidationException.class, () -> service.updateUserPaymentDetails(user2.getId(), null));
+        assertThrows(ValidationException.class, () -> service.addUserPaymentDetails(user2.getId(), null));
     }
 
     @Test
     void editPaymentDetailWithInvalidCardNumber_ShouldThrowValidationException() {
-        assertThrows(ValidationException.class, () -> service.updateUserPaymentDetails(user2.getId(), invalidCardNumberPaymentDetail));
+        assertThrows(ValidationException.class, () -> service.addUserPaymentDetails(user2.getId(), invalidCardNumberPaymentDetail));
     }
 
     @Test
     void editPaymentDetailWithInvalidCardHolder_ShouldThrowValidationException() {
-        assertThrows(ValidationException.class, () -> service.updateUserPaymentDetails(user2.getId(), invalidCardHolderPaymentDetail));
+        assertThrows(ValidationException.class, () -> service.addUserPaymentDetails(user2.getId(), invalidCardHolderPaymentDetail));
     }
 
     @Test
     void editPaymentDetailWithInvalidExpirationDate_ShouldThrowValidationException() {
-        assertThrows(ValidationException.class, () -> service.updateUserPaymentDetails(user2.getId(), invalidExpirationDatePaymentDetail));
+        assertThrows(ValidationException.class, () -> service.addUserPaymentDetails(user2.getId(), invalidExpirationDatePaymentDetail));
     }
 
     @Test
     void editPaymentDetailWithInvalidCvv_ShouldThrowValidationException() {
-        assertThrows(ValidationException.class, () -> service.updateUserPaymentDetails(user2.getId(), invalidCvvPaymentDetail));
+        assertThrows(ValidationException.class, () -> service.addUserPaymentDetails(user2.getId(), invalidCvvPaymentDetail));
     }
 
 
@@ -611,8 +611,8 @@ public class UserServiceTest {
 
         assertThat(updatedLocation)
             .isNotNull()
-            .extracting(Location::getId, Location::getStreet, Location::getCity, Location::getPostalCode, Location::getCountry)
-            .containsExactly(updatedLocation.getId(), updateLocation.getStreet(), updateLocation.getCity(), updateLocation.getPostalCode(),
+            .extracting(Location::getStreet, Location::getCity, Location::getPostalCode, Location::getCountry)
+            .containsExactly(updateLocation.getStreet(), updateLocation.getCity(), updateLocation.getPostalCode(),
                 updateLocation.getCountry());
     }
 

@@ -127,7 +127,7 @@ public interface UserService extends UserDetailsService {
      * @return the created location
      * @throws ValidationException if the DTO is not valid
      */
-    Location updateUserLocation(Integer id, LocationDto locationDto) throws ValidationException, ConflictException;
+    Location addUserLocation(Integer id, LocationDto locationDto) throws ValidationException, ConflictException;
 
 
     /**
@@ -164,7 +164,7 @@ public interface UserService extends UserDetailsService {
      * @return the created payment detail
      * @throws ValidationException if the DTO is not valid
      */
-    PaymentDetail updateUserPaymentDetails(Integer userId, SimplePaymentDetailDto paymentDetails) throws ValidationException, ConflictException;
+    PaymentDetail addUserPaymentDetails(Integer userId, SimplePaymentDetailDto paymentDetails) throws ValidationException, ConflictException;
 
     /**
      * editUserPaymentDetails edits a payment detail of a user.

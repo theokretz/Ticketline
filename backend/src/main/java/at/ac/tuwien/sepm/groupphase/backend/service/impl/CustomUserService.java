@@ -309,7 +309,7 @@ public class CustomUserService implements UserService {
     }
 
     @Override
-    public Location updateUserLocation(Integer id, LocationDto locationDto) throws ValidationException, ConflictException {
+    public Location addUserLocation(Integer id, LocationDto locationDto) throws ValidationException, ConflictException {
         LOGGER.trace("updateUserLocation({},{})", id, locationDto);
         List<String> error = new ArrayList<>();
         if (locationDto == null || (error = locationDto.validate()).size() > 0) {
@@ -341,6 +341,7 @@ public class CustomUserService implements UserService {
         return this.locationRepository.save(location);
     }
 
+
     @Override
     public Location editUserLocation(Integer userId, CheckoutLocation locationDto) throws ValidationException, ConflictException {
         LOGGER.trace("editUserLocation({},{})", userId, locationDto);
@@ -368,11 +369,16 @@ public class CustomUserService implements UserService {
                 }
             }
         }
-        location.setPostalCode(locationDto.getPostalCode());
-        location.setCity(locationDto.getCity());
-        location.setCountry(locationDto.getCountry());
-        location.setStreet(locationDto.getStreet());
-        return this.locationRepository.save(location);
+
+        reusableLocationDelete(user, location);
+        Location toSave = Location.LocationBuilder.aLocation()
+            .withUser(user)
+            .withPostalCode(locationDto.getPostalCode())
+            .withCity(locationDto.getCity())
+            .withCountry(locationDto.getCountry())
+            .withStreet(locationDto.getStreet())
+            .build();
+        return this.locationRepository.save(toSave);
     }
 
 
@@ -387,6 +393,10 @@ public class CustomUserService implements UserService {
         if (location == null) {
             throw new NotFoundException("Could not find Location");
         }
+        reusableLocationDelete(user, location);
+    }
+
+    private void reusableLocationDelete(ApplicationUser user, Location location) {
         location.setUser(null);
         Set<Location> locations = user.getLocations();
         locations.remove(location);
@@ -406,8 +416,8 @@ public class CustomUserService implements UserService {
     }
 
     @Override
-    public PaymentDetail updateUserPaymentDetails(Integer userId, SimplePaymentDetailDto paymentDetails) throws ValidationException, ConflictException {
-        LOGGER.trace("updateUserPaymentDetails({},{})", userId, paymentDetails);
+    public PaymentDetail addUserPaymentDetails(Integer userId, SimplePaymentDetailDto paymentDetails) throws ValidationException, ConflictException {
+        LOGGER.trace("addUserPaymentDetails({},{})", userId, paymentDetails);
         ApplicationUser user = notUserRepository.findApplicationUserById(userId);
         if (user == null) {
             throw new NotFoundException("Could not find User");
@@ -416,16 +426,7 @@ public class CustomUserService implements UserService {
         if (paymentDetails == null || !(error = paymentDetails.validate()).isEmpty()) {
             throw new ValidationException("Payment Detail is not valid", error);
         }
-        List<PaymentDetail> paymentDetailList = paymentDetailRepository.findByUserId(userId);
-        if (!paymentDetailList.isEmpty()) {
-            for (PaymentDetail paymentDetail1 : paymentDetailList) {
-                if (paymentDetail1.getCardNumber().equals(paymentDetails.getCardNumber()) && paymentDetail1.getCardHolder().equals(paymentDetails.getCardHolder())
-                    && paymentDetail1.getExpirationDate().equals(paymentDetails.getExpirationDate()) && paymentDetail1.getCvv().equals(paymentDetails.getCvv())) {
-                    error.add("Cannot add same payment detail twice");
-                    throw new ConflictException("Payment Detail already exists", error);
-                }
-            }
-        }
+        checkPaymentForDuplicates(userId, paymentDetails, error);
         PaymentDetail paymentDetail = PaymentDetail.PaymentDetailBuilder.aPaymentDetail()
             .withUser(user)
             .withCardNumber(paymentDetails.getCardNumber())
@@ -434,6 +435,10 @@ public class CustomUserService implements UserService {
             .withCvv(paymentDetails.getCvv())
             .build();
 
+        return reusablePaymentDetailSave(user, paymentDetail);
+    }
+
+    private PaymentDetail reusablePaymentDetailSave(ApplicationUser user, PaymentDetail paymentDetail) {
         PaymentDetail saved = this.paymentDetailRepository.save(paymentDetail);
         Set<PaymentDetail> userPaymentDetails = user.getPaymentDetails();
         userPaymentDetails.add(saved);
@@ -456,6 +461,28 @@ public class CustomUserService implements UserService {
         if (paymentDetail == null) {
             throw new NotFoundException("Could not find Payment Detail");
         }
+        if (paymentDetail.getOrders().isEmpty()) {
+            checkPaymentForDuplicates(userId, paymentDetails, error);
+            paymentDetail.setCardHolder(paymentDetails.getCardHolder());
+            paymentDetail.setCardNumber(paymentDetails.getCardNumber());
+            paymentDetail.setCvv(paymentDetails.getCvv());
+            paymentDetail.setExpirationDate(paymentDetails.getExpirationDate());
+
+            return this.paymentDetailRepository.save(paymentDetail);
+        } else {
+            reusablePaymentDetailDelete(user, paymentDetail);
+            PaymentDetail newPaymentDetail = PaymentDetail.PaymentDetailBuilder.aPaymentDetail()
+                .withUser(user)
+                .withCardNumber(paymentDetails.getCardNumber())
+                .withCardHolder(paymentDetails.getCardHolder())
+                .withExpirationDate(paymentDetails.getExpirationDate())
+                .withCvv(paymentDetails.getCvv())
+                .build();
+            return reusablePaymentDetailSave(user, newPaymentDetail);
+        }
+    }
+
+    private void checkPaymentForDuplicates(Integer userId, SimplePaymentDetailDto paymentDetails, List<String> error) throws ConflictException {
         List<PaymentDetail> paymentDetailList = paymentDetailRepository.findByUserId(userId);
         if (!paymentDetailList.isEmpty()) {
             for (PaymentDetail paymentDetail1 : paymentDetailList) {
@@ -466,12 +493,6 @@ public class CustomUserService implements UserService {
                 }
             }
         }
-        paymentDetail.setCardHolder(paymentDetails.getCardHolder());
-        paymentDetail.setCardNumber(paymentDetails.getCardNumber());
-        paymentDetail.setCvv(paymentDetails.getCvv());
-        paymentDetail.setExpirationDate(paymentDetails.getExpirationDate());
-
-        return this.paymentDetailRepository.save(paymentDetail);
     }
 
     @Override
@@ -486,6 +507,10 @@ public class CustomUserService implements UserService {
         if (paymentDetail == null) {
             throw new NotFoundException("Could not find Payment Detail");
         }
+        reusablePaymentDetailDelete(user, paymentDetail);
+    }
+
+    private void reusablePaymentDetailDelete(ApplicationUser user, PaymentDetail paymentDetail) {
         paymentDetail.setUser(null);
         Set<PaymentDetail> paymentDetails = user.getPaymentDetails();
         paymentDetails.remove(paymentDetail);
