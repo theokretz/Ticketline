@@ -14,7 +14,7 @@ import {ToastrService} from 'ngx-toastr';
 })
 export class SearchEventByArtistComponent implements OnInit {
   search: false;
-  searchName: string;
+  searchName = '';
   artists: Artist[] = [];
   events: Event[] = [];
   searchForm: FormGroup;
