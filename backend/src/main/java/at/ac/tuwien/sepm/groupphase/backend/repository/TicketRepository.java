@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.repository;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleTicketDto;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 /**
  * The interface Ticket repository.
  */
-public interface TicketRepository extends JpaRepository<Ticket, Long> {
+public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
 
     /**
@@ -109,4 +110,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      */
     @EntityGraph(attributePaths = {"reservation"})
     Set<Ticket> findReservationsAndTicketsByPerformanceId(Integer id);
+
+    /**
+     * Find all tickets matching the performance id.
+     *
+     * @param performance the performance
+     * @return the ticket set
+     */
+    List<Ticket> findAllByPerformance(Performance performance);
+
 }

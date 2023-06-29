@@ -27,6 +27,13 @@ public class JwtTokenizer {
         this.securityProperties = securityProperties;
     }
 
+    /**
+     * creates a JWT token for the given user and roles.
+     *
+     * @param user  the user
+     * @param roles the roles
+     * @return the JWT token
+     */
     public String getAuthToken(String user, List<String> roles) {
         byte[] signingKey = securityProperties.getJwtSecret().getBytes();
 

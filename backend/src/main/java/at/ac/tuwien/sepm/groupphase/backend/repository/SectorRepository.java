@@ -15,4 +15,5 @@ public interface SectorRepository extends JpaRepository<Sector, Integer> {
      * @return the sector list
      */
     List<Sector> findAllByHallId(Integer hallId);
+    
 }

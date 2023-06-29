@@ -1,7 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.repository;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,10 +9,21 @@ import java.util.List;
 
 
 public interface LocationRepository extends JpaRepository<Location, Integer> {
+
+    /**
+     * find all locations by user id.
+     *
+     * @param userId id of user
+     * @return list of locations
+     */
     List<Location> findAllByUserId(Integer userId);
 
-    Location findFirstByUserIdIsNull();
-
+    /**
+     * find location by id.
+     *
+     * @param locationId id of location
+     * @return location
+     */
     Location findLocationById(Integer locationId);
 
 

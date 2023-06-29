@@ -17,13 +17,31 @@ import java.util.Optional;
  */
 public interface PerformanceRepository extends JpaRepository<Performance, Integer> {
 
+    /**
+     * find all performances by id.
+     *
+     * @param id id of performance
+     * @return performance
+     */
     Optional<Performance> findAllPerformancesById(Integer id);
 
+    /**
+     * find all performances by event id.
+     *
+     * @param id id of event
+     * @return performance
+     */
     @EntityGraph(attributePaths = {
-        "event", "hall", "event.artists", "hall.location"
+        "event", "hall", "event.artists", "hall.location", "performanceSectors"
     })
     List<Performance> findAllByEvent_Id(Integer id);
 
+    /**
+     * find all performances by hall id.
+     *
+     * @param id id of hall
+     * @return performance
+     */
     @EntityGraph(attributePaths = {
         "event", "hall", "hall.location"
     })
@@ -31,7 +49,17 @@ public interface PerformanceRepository extends JpaRepository<Performance, Intege
     List<Performance> findAllByHallLocation_Id(@Param("id") Integer id);
 
 
-
+    /**
+     * filter performances by given parameters.
+     *
+     * @param dateTimeFrom start date of performance
+     * @param dateTimeTill end date of performance
+     * @param eventName    name of event
+     * @param hallName     name of hall
+     * @param lowerPrice   lower price of performance
+     * @param upperPrice   upper price of performance
+     * @return list of performances
+     */
     @EntityGraph(attributePaths = {
         "event", "hall", "hall.location", "performanceSectors"
     })

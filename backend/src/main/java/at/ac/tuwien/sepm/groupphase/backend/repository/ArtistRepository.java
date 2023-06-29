@@ -1,10 +1,12 @@
 package at.ac.tuwien.sepm.groupphase.backend.repository;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.Artist;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface ArtistRepository extends JpaRepository<Artist, Integer> {
@@ -24,6 +26,22 @@ public interface ArtistRepository extends JpaRepository<Artist, Integer> {
      */
     List<Artist> findByNameContainingIgnoreCase(String name);
 
+    /**
+     * find artist by name.
+     *
+     * @param name name of artist
+     * @return artist
+     */
+    Optional<Artist> findByName(String name);
+
+    /**
+     * find all artists by event id.
+     *
+     * @param id id of event
+     * @return list of artists
+     */
+    @EntityGraph(attributePaths = {"events"})
+    List<Artist> findAllByEventsId(Integer id);
 
 
 }

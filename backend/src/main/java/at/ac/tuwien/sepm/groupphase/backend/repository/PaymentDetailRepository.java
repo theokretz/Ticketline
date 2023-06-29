@@ -4,12 +4,9 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 
 public interface PaymentDetailRepository extends JpaRepository<PaymentDetail, Integer> {
-
-    Optional<PaymentDetail> findPaymentDetailById(Integer id);
 
     PaymentDetail getPaymentDetailById(Integer id);
 
@@ -21,5 +18,11 @@ public interface PaymentDetailRepository extends JpaRepository<PaymentDetail, In
      */
     List<PaymentDetail> findByUserId(Integer id);
 
+    /**
+     * find paymentDetails by userId.
+     *
+     * @param userId id of the user
+     * @return the looked up paymentDetails
+     */
     List<PaymentDetail> findPaymentDetailsByUserId(Integer userId);
 }

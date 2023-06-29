@@ -8,7 +8,7 @@ import {ToastrService} from 'ngx-toastr';
 import {debounceTime} from 'rxjs';
 import {HttpParams} from '@angular/common/http';
 import {EventService} from '../../services/event.service';
-import {Event} from '../../dtos/event';
+import {Event} from '../../dtos/createEvent/event';
 
 @Component({
   selector: 'app-news',

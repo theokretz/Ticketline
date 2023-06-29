@@ -11,7 +11,8 @@ export class PerformanceService {
   private performanceBaseUri: string =
     this.globals.backendUri + '/performances';
 
-  constructor(private httpClient: HttpClient, private globals: Globals) {}
+  constructor(private httpClient: HttpClient, private globals: Globals) {
+  }
 
   /**
    * Get the performance with the specified id

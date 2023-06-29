@@ -14,6 +14,12 @@ import java.util.Optional;
 
 public interface NotUserRepository extends JpaRepository<ApplicationUser, Integer> {
 
+    /**
+     * find application user by id.
+     *
+     * @param id id of application user
+     * @return application user
+     */
     @EntityGraph(attributePaths = {
         "reservations",
         "reservations.ticket",
@@ -72,11 +78,22 @@ public interface NotUserRepository extends JpaRepository<ApplicationUser, Intege
      */
     Optional<ApplicationUser> getApplicationUserByPasswordResetToken(String token);
 
+    /**
+     * update locked status of user.
+     *
+     * @param id     of user to update.
+     * @param locked status to set
+     */
     @Transactional
     @Modifying
     @Query("UPDATE ApplicationUser u SET u.locked = :locked WHERE u.id = :id")
     void updateUserLocked(@Param("id") Integer id, @Param("locked") boolean locked);
 
+    /**
+     * reset user login attempts.
+     *
+     * @param id of user to update.
+     */
     @Transactional
     @Modifying
     @Query("UPDATE ApplicationUser u SET u.failedLogin = 0 WHERE u.id = :id")

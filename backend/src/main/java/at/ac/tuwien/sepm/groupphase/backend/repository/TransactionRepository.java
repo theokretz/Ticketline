@@ -7,6 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
 
+    /**
+     * get transaction by id.
+     *
+     * @param id id of transaction
+     * @return transaction
+     */
     @EntityGraph(attributePaths = {
         "order",
         "order.deliveryAddress",

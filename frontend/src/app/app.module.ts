@@ -57,6 +57,7 @@ import { TopTenListComponent } from './components/top-ten/top-ten-list/top-ten-l
 import { SearchEventsComponent } from './components/search/search-events/search-events.component';
 import { EditPasswordComponent } from './components/profile/edit-password/edit-password.component';
 import { SearchPerformancesComponent } from './components/search/search-performances/search-performances.component';
+import { EventComponent } from './components/event/event.component';
 
 @NgModule({
   declarations: [
@@ -99,6 +100,7 @@ import { SearchPerformancesComponent } from './components/search/search-performa
     AdminViewComponent,
     EditPasswordComponent,
     SearchPerformancesComponent,
+    EventComponent,
   ],
   imports: [
     BrowserModule,

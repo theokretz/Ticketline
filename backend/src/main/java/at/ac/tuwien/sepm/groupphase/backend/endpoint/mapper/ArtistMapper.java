@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.ArtistDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.ArtistSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Artist;
 import org.mapstruct.IterableMapping;
@@ -19,4 +20,6 @@ public interface ArtistMapper {
 
     @IterableMapping(qualifiedByName = "EventArtistSearch")
     List<ArtistSearchDto> artistToEventArtistSearchDto(List<Artist> artists);
+
+    List<ArtistDto> artistToArtistDto(List<Artist> artists);
 }

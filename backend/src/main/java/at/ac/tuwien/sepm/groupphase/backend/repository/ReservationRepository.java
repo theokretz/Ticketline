@@ -17,8 +17,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
      * @param id the id of the user
      * @return the list of reservations/the cart of the user
      */
-
-
     List<Reservation> findReservationByUserId(Integer id);
 
 

@@ -70,8 +70,6 @@ public class CustomPasswordResetService implements PasswordResetService {
             //check if the user is already in the reset process
             if (applicationUser.getPasswordResetToken() != null && applicationUser.getPasswordResetTs() != null) {
                 // If the user is already in the reset process -> resend the email
-                //TODO only allow this maybe once every minute -> store the last time the email was sent in Entity
-                // -> check if the last time the email was sent is more than a minute ago
                 if (LocalDateTime.now().isBefore(applicationUser.getPasswordResetTs())) {
                     String token = applicationUser.getPasswordResetToken();
                     //resend the email

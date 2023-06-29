@@ -44,6 +44,7 @@ public abstract class EventMapper {
         }
 
         return DetailedEventDto.DetailedEventDtoBuilder.aDetailedEventDto()
+            .withId(event.getId())
             .withName(event.getName())
             .withType(event.getType())
             .withLength(event.getLength())

@@ -1,4 +1,6 @@
-package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
+package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.hall;
+
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 
 public class DetailedHallDto {
     private String name;
@@ -24,7 +26,8 @@ public class DetailedHallDto {
         private String name;
         private LocationDto location;
 
-        private DetailedHallDtoBuilder() {}
+        private DetailedHallDtoBuilder() {
+        }
 
         public static DetailedHallDtoBuilder aDetailedHallDto() {
             return new DetailedHallDtoBuilder();
