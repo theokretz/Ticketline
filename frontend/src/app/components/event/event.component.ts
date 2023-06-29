@@ -178,7 +178,7 @@ export class EventComponent implements OnInit {
               console.log('receiving');
               console.log(eventResponse);
               this.notification.success('Event created successfully');
-              this.router.navigate([eventResponse.id + '/event']);
+              this.router.navigate(['/events/' + eventResponse.id]);
             }, error: error => {
               this.notification.error(error.error.detail);
             },

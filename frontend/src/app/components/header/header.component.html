@@ -35,9 +35,6 @@
       </li>
       <li class="nav-item">
         <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/cart">
-          <span class="badge rounded-pill badge-notification bg-danger">{{
-            getCartItems()
-          }}</span>
           <i class="bi bi-cart-fill"> </i>
           Cart
         </a>

@@ -76,6 +76,7 @@ const routes: Routes = [
   { path: 'orders/:id',canActivate: [AuthGuard], component: OrderDetailedComponent },
   { path: 'admin', component: AdminViewComponent, canActivate: [RoleGuard] },
   { path: 'admin/users/register', component: RegisterComponent, data: { isAdmin: true }, canActivate: [RoleGuard] },
+  { path: 'admin/events/create', component: EventComponent, canActivate: [RoleGuard] },
   { path: '**', component: PageNotFoundComponent },
 ];
 

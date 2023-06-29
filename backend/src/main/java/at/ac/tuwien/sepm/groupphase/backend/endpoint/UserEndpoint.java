@@ -67,7 +67,7 @@ public class UserEndpoint {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized update");
         }
         try {
-            Location saved = this.userService.updateUserLocation(id, locationDto);
+            Location saved = this.userService.addUserLocation(id, locationDto);
             return this.locationMapper.locationToCheckoutLocation(saved);
         } catch (ValidationException e) {
             LOGGER.warn("Request was formatted incorrectly:" + e.getMessage());
@@ -135,7 +135,7 @@ public class UserEndpoint {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized update");
         }
         try {
-            PaymentDetail saved = this.userService.updateUserPaymentDetails(id, paymentDetails);
+            PaymentDetail saved = this.userService.addUserPaymentDetails(id, paymentDetails);
             return this.paymentDetailMapper.paymentDetailToCheckoutPaymentDetail(saved);
         } catch (NotFoundException e) {
             LOGGER.warn("Cannot create new payment detail: " + e.getMessage());
