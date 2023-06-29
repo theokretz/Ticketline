@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -48,13 +49,13 @@ import { EditProfileComponent } from './components/profile/edit-profile/edit-pro
 import { DeleteEventComponent } from './components/profile/delete-event/delete-event.component';
 import { EditPaymentDetailComponent } from './components/profile/edit-payment-detail/edit-payment-detail.component';
 import { EditLocationsComponent } from './components/profile/edit-locations/edit-locations.component';
-import { SearchPerformancesByLocationComponent } from
-    './components/search/search-performances-by-location/search-performances-by-location.component';
+import { SearchPerformancesByLocationComponent } from './components/search/search-performances-by-location/search-performances-by-location.component';
 import { PerformanceOnLocationComponent } from './components/performance/performance-on-location/performance-on-location.component';
 import { AdminViewComponent } from './components/admin-view/admin-view.component';
 import { TopTenComponent } from './components/top-ten/top-ten.component';
 import { TopTenListComponent } from './components/top-ten/top-ten-list/top-ten-list.component';
 import { SearchEventsComponent } from './components/search/search-events/search-events.component';
+import { HighchartsChartModule } from 'highcharts-angular';
 import { EditPasswordComponent } from './components/profile/edit-password/edit-password.component';
 import { SearchPerformancesComponent } from './components/search/search-performances/search-performances.component';
 import { EventComponent } from './components/event/event.component';
@@ -130,6 +131,7 @@ import { EventComponent } from './components/event/event.component';
     MatToolbarModule,
     MatAutocompleteModule,
     MatButtonToggleModule,
+    HighchartsChartModule,
   ],
   providers: [httpInterceptorProviders, CookieService],
   bootstrap: [AppComponent],

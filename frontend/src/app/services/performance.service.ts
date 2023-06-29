@@ -31,7 +31,9 @@ export class PerformanceService {
    * @return an observable list of the performances of the event
    */
   public getPerformancesOfEventWithId(id: number): Observable<Performance[]> {
-    return this.httpClient.get<Performance[]>(this.performanceBaseUri + '/event/' + id);
+    return this.httpClient.get<Performance[]>(
+      this.performanceBaseUri + '/events/' + id
+    );
   }
 
   /**
@@ -41,7 +43,9 @@ export class PerformanceService {
    * @return an observable list of the found performances on this location
    */
   getPerformancesOnLocationById(id: number): Observable<Performance[]> {
-    return this.httpClient.get<Performance[]>(this.performanceBaseUri + '/location/' + id);
+    return this.httpClient.get<Performance[]>(
+      this.performanceBaseUri + '/locations/' + id
+    );
   }
 
   /**

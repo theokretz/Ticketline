@@ -10,7 +10,7 @@ import {ToastrService} from 'ngx-toastr';
 @Component({
   selector: 'app-search-event-by-artist',
   templateUrl: './search-event-by-artist.component.html',
-  styleUrls: ['./search-event-by-artist.component.scss']
+  styleUrls: ['./search-event-by-artist.component.scss'],
 })
 export class SearchEventByArtistComponent implements OnInit {
   search: false;
@@ -24,64 +24,73 @@ export class SearchEventByArtistComponent implements OnInit {
     private eventService: EventService,
     private formBuilder: FormBuilder,
     private router: Router,
-    private notification: ToastrService,
-  ) {
-  }
+    private notification: ToastrService
+  ) {}
 
   ngOnInit(): void {
     this.searchForm = this.formBuilder.group({
-      searchBar: ''
+      searchBar: '',
     });
   }
 
   onChanges(): void {
-    this.searchForm.get('searchBar').valueChanges.pipe(
-      debounceTime(500)).subscribe({
-      next: data => {
-        this.searchName = data;
-        this.searchArtists();
-      },
-      error: error => {
-        console.error('Error fetching artists', error);
-        this.notification.error('Could not fetch artists', error);
-      }
-    });
-
+    this.searchForm
+      .get('searchBar')
+      .valueChanges.pipe(debounceTime(500))
+      .subscribe({
+        next: (data) => {
+          this.searchName = data;
+          this.searchArtists();
+        },
+        error: (error) => {
+          console.error('Error fetching artists', error);
+          this.notification.error('Could not fetch artists', error);
+        },
+      });
   }
 
   searchArtists() {
-    this.eventService.searchArtistsByName(this.searchName).pipe(
-      debounceTime(600)).subscribe({
-      next: data => {
-        this.artists = data;
-        if (this.artists.length === 0 && this.notification.currentlyActive === 0) {
-          this.notification.error('No artists match your search');
-        }
-      },
-      error: error => {
-        console.error('Error fetching artists', error);
-        this.notification.error('Could not fetch artists', error);
-      }
-    });
+    this.eventService
+      .searchArtistsByName(this.searchName)
+      .pipe(debounceTime(600))
+      .subscribe({
+        next: (data) => {
+          this.artists = data;
+          if (
+            this.artists.length === 0 &&
+            this.notification.currentlyActive === 0
+          ) {
+            this.notification.error('No artists match your search');
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching artists', error);
+          this.notification.error('Could not fetch artists', error);
+        },
+      });
   }
 
   searchEvents() {
-    const selectedArtist = this.artists.find(artist => artist.name === this.searchForm.value.searchBar);
-    this.eventService.searchEventsByArtistName(selectedArtist.id, this.searchName).pipe(
-      debounceTime(600)).subscribe({
-      next: data => {
-        this.events = data;
-        this.searchPerformed = true;
-      },
-      error: error => {
-        console.error('Error fetching events of artists', error);
-        this.notification.error('Could not fetch events of artists', error);
-      }
-    });
+    const selectedArtist = this.artists.find(
+      (artist) => artist.name === this.searchForm.value.searchBar
+    );
+    this.eventService
+      .searchEventsByArtistName(selectedArtist.id, this.searchName)
+      .pipe(debounceTime(600))
+      .subscribe({
+        next: (data) => {
+          this.events = data;
+          this.searchPerformed = true;
+        },
+        error: (error) => {
+          console.error('Error fetching events of artists', error);
+          this.notification.error('Could not fetch events of artists', error);
+        },
+      });
   }
 
   redirectToEvent(eventId: number) {
-    this.router.navigate([eventId + '/event']);
+    this.router.navigate(['events/' + eventId]);
   }
 
   formatLength(event: Event): string {

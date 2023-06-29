@@ -9,7 +9,7 @@ import {debounceTime} from 'rxjs';
 @Component({
   selector: 'app-search-events',
   templateUrl: './search-events.component.html',
-  styleUrls: ['./search-events.component.scss']
+  styleUrls: ['./search-events.component.scss'],
 })
 export class SearchEventsComponent implements OnInit {
   events: Event[] = [];
@@ -22,11 +22,10 @@ export class SearchEventsComponent implements OnInit {
   constructor(
     private eventService: EventService,
     private notification: ToastrService,
-    private router: Router) {
-  }
+    private router: Router
+  ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   searchEvents() {
     this.searchPerformed = true;
@@ -35,16 +34,18 @@ export class SearchEventsComponent implements OnInit {
       .set('description', this.searchDescription)
       .set('type', this.searchType.replace(/\s/g, ''))
       .set('length', this.searchLength);
-    this.eventService.searchEvents(params).pipe(
-      debounceTime(600)).subscribe({
-      next: data => {
-        this.events = data;
-      },
-      error: error => {
-        console.error('Error fetching events with given parameters');
-        this.notification.error(error.message, 'Could not fetch events');
-      }
-    });
+    this.eventService
+      .searchEvents(params)
+      .pipe(debounceTime(600))
+      .subscribe({
+        next: (data) => {
+          this.events = data;
+        },
+        error: (error) => {
+          console.error('Error fetching events with given parameters');
+          this.notification.error(error.message, 'Could not fetch events');
+        },
+      });
   }
 
   formatLength(event: Event): string {
@@ -58,7 +59,7 @@ export class SearchEventsComponent implements OnInit {
   }
 
   redirectToEvent(id: number) {
-    this.router.navigate([id + '/event']);
+    this.router.navigate(['events/' + id]);
   }
 
   clearFilter() {
