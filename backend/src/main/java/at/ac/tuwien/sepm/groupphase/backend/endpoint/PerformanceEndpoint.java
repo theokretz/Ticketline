@@ -59,7 +59,7 @@ public class PerformanceEndpoint {
     }
 
     @Secured("ROLE_USER")
-    @GetMapping("/event/{id}")
+    @GetMapping("/events/{id}")
     @Operation(summary = "Get all performances of the event with the given id", security = @SecurityRequirement(name = "apiKey"))
     public List<DetailedPerformanceDto> getPerformancesOfEvent(@Valid @PathVariable("id") Integer id) {
         LOGGER.info("GET api/v1/performances/event/{}", id);
@@ -78,7 +78,7 @@ public class PerformanceEndpoint {
     }
 
     @Secured("ROLE_USER")
-    @GetMapping("/location/{id}")
+    @GetMapping("/locations/{id}")
     @Operation(summary = "Get all performances whose location is with the given id", security = @SecurityRequirement(name = "apiKey"))
     public List<DetailedPerformanceDto> getPerformancesOfLocation(@Valid @PathVariable("id") Integer id) {
         LOGGER.info("GET api/v1/performances/location/{}", id);
