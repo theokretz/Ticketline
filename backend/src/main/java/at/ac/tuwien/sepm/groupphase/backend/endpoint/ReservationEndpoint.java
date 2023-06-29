@@ -9,11 +9,11 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,12 +43,16 @@ public class ReservationEndpoint {
     }
 
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/users/{id}/reservations")
     @Operation(summary = "get user reservations data", security = @SecurityRequirement(name = "apiKey"))
-    public List<DetailedReservationDto> findUserReservations(@Valid @PathVariable("id") Integer userId) {
-        //TODO: authenticate that id = userid
+    public List<DetailedReservationDto> findUserReservations(@Valid @PathVariable("id") Integer userId, Authentication auth) {
+        Integer authentication = (Integer) auth.getPrincipal();
+        if (!authentication.equals(userId)) {
+            LOGGER.warn("Unauthorized reservation request");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized reservation request\"");
+        }
 
         try {
             List<Reservation> reservations = reservationService.findReservationsByUserIdAndCart(userId, false);
@@ -61,7 +65,7 @@ public class ReservationEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "/reservations/{id}")
     @Operation(summary = "delete user reservation", security = @SecurityRequirement(name = "apiKey"))

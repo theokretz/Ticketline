@@ -1,6 +1,6 @@
-<br />
+<br/>
 <h1>Your Orders</h1>
-<br />
+<br/>
 <div class="ticket-container">
   <div *ngIf="orders && orders.length === 0">
     <h5>You don't have any orders from the past</h5>
@@ -15,91 +15,90 @@
           }"
         >
           <tbody class="order-body">
-            <tr class="order-header-data">
-              <td>
-                <strong>Order date:</strong>{{ dateToString(order.orderTs) }}
-              </td>
-              <td><strong>Total price:</strong>{{ totalPrice(order) }} €</td>
-              <td
-                *ngIf="order.totalPoints > 0 && !order.cancelled"
-                id="points-received"
+          <tr class="order-header-data">
+            <td>
+              <strong>Order date:</strong>{{ dateToString(order.orderTs) }}
+            </td>
+            <td><strong>Total price:</strong>{{ totalPrice(order) }} €</td>
+            <td
+              *ngIf="order.totalPoints > 0 && !order.cancelled"
+              id="points-received"
+            >
+              <b
+              >{{ order.totalPoints }}
+                <i class="bi bi-stop-circle-fill" style="font-size: 1rem"></i>
+                RECEIVED</b
               >
-                <b
-                  >{{ order.totalPoints }}
-                  <i class="bi bi-stop-circle-fill" style="font-size: 1rem"></i>
-                  RECEIVED</b
-                >
-              </td>
-              <td
-                *ngIf="order.totalPoints < 0 && !order.cancelled"
-                id="points-used"
+            </td>
+            <td
+              *ngIf="order.totalPoints < 0 && !order.cancelled"
+              id="points-used"
+            >
+              <b
+              >{{ order.totalPoints * -1 }}
+                <i class="bi bi-stop-circle-fill" style="font-size: 1rem"></i>
+                DEDUCTED</b
               >
-                <b
-                  >{{ order.totalPoints * -1 }}
-                  <i class="bi bi-stop-circle-fill" style="font-size: 1rem"></i>
-                  DEDUCTED</b
-                >
-              </td>
-              <td
-                *ngIf="order.totalPoints > 0 && order.cancelled"
-                id="points-used-refund"
+            </td>
+            <td
+              *ngIf="order.totalPoints > 0 && order.cancelled"
+              id="points-used-refund"
+            >
+              <b
+              >{{ order.totalPoints }}
+                <i class="bi bi-stop-circle-fill" style="font-size: 1rem"></i>
+                REFUNDED</b
               >
-                <b
-                  >{{ order.totalPoints }}
-                  <i class="bi bi-stop-circle-fill" style="font-size: 1rem"></i>
-                  REFUNDED</b
-                >
-              </td>
-              <td *ngIf="order.cancelled" id="cancelled">
-                <b
-                  ><i class="bi bi-x-octagon-fill" style="font-size: 1rem"></i>
-                  CANCELLED</b
-                >
-              </td>
-            </tr>
-            <tr class="order-header-data2">
-              <div
-                class="order-header-btn"
-                *ngIf="order.tickets.length + order.merchandises.length !== 0"
+            </td>
+            <td *ngIf="order.cancelled" id="cancelled">
+              <b
+              ><i class="bi bi-x-octagon-fill" style="font-size: 1rem"></i>
+                CANCELLED</b
               >
-                <a
-                  type="button"
-                  class="btn btn-primary"
-                  id="button-tickets-detail"
-                  aria-expanded="false"
-                  routerLink="/orders/{{ order.id }}"
-                >
-                  <b>
-                    <i class="bi bi-search"></i>
-                    Details
-                  </b>
-                </a>
-              </div>
-              <div
-                class="order-header-btn"
-                *ngIf="order.tickets.length + order.merchandises.length !== 0"
+            </td>
+          </tr>
+          <tr class="order-header-data2">
+            <div
+              class="order-header-btn"
+            >
+              <a
+                type="button"
+                class="btn btn-primary"
+                id="button-tickets-detail"
+                aria-expanded="false"
+                routerLink="/orders/{{ order.id }}"
               >
-                <button
-                  type="button"
-                  class="btn btn-primary"
-                  id="button-tickets"
-                  data-bs-toggle="collapse"
-                  [attr.data-bs-target]="'#collapseAll' + order.id"
-                  aria-expanded="false"
-                  [attr.aria-controls]="'collapseAll' + order.id"
-                >
-                  <b>
-                    <i class="bi bi-basket3"></i>
-                    {{ order.tickets.length + order.merchandises.length }}
-                    {{
-                      order.tickets.length + order.merchandises.length === 1
-                        ? 'Purchase'
-                        : 'Purchases'
-                    }}
-                  </b>
-                </button>
-              </div>
-            </tr>
+                <b>
+                  <i class="bi bi-search"></i>
+                  Details
+                </b>
+              </a>
+            </div>
+            <div
+              class="order-header-btn"
+              *ngIf="order.tickets.length + order.merchandises.length !== 0"
+            >
+              <button
+                type="button"
+                class="btn btn-primary"
+                id="button-tickets"
+                data-bs-toggle="collapse"
+                [attr.data-bs-target]="'#collapseAll' + order.id"
+                aria-expanded="false"
+                [attr.aria-controls]="'collapseAll' + order.id"
+              >
+                <b>
+                  <i class="bi bi-basket3"></i>
+                  {{ order.tickets.length + order.merchandises.length }}
+                  {{
+                  order.tickets.length + order.merchandises.length === 1
+                    ? 'Purchase'
+                    : 'Purchases'
+                  }}
+                </b>
+              </button>
+            </div>
+          </tr>
           </tbody>
         </table>
 
