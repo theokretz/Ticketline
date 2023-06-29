@@ -150,7 +150,9 @@ public class CustomCartService implements CartService {
                 continue;
             }
             // check if ticket is already bought
-            if (ticket.getOrder() != null || (ticket.getReservation() != null && ticket.getReservation().getExpirationTs().isAfter(LocalDateTime.now()))) {
+            if (ticket.getOrder() != null || (ticket.getReservation() != null
+                && ticket.getReservation().getExpirationTs().isAfter(LocalDateTime.now())
+                && !ticket.getReservation().getUser().getId().equals(userId))) {
                 // if ticket cannot be reserved, check if it is standing
                 Sector sector = ticket.getSeat().getSector();
                 if (sector.getStanding()) {
