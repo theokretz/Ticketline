@@ -18,6 +18,7 @@
                [matAutocomplete]="auto"
                formControlName="searchBar"
                (input)="onChanges()"
+               (click)="searchArtists()"
         >
         <mat-autocomplete #auto="matAutocomplete">
           <mat-option *ngFor="let artist of artists" [value]="artist.name">
