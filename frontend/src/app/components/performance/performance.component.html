@@ -1,7 +1,7 @@
 <div *ngIf="performance; else loading">
   <h1 class="my-5">{{ performance.eventName }}</h1>
   <h2>{{ performance.hallName }}</h2>
-  <h2></h2>
+  <h2>{{ performance.dateTime | date : 'dd.MM.yyyy HH:mm' }}</h2>
   <h3 class="mt-5">Tickets</h3>
 
   <div class="d-flex justify-content-around">
@@ -27,7 +27,7 @@
         = Selected
       </div>
     </div>
-    <div id="selected-container">
+    <div id="selected-container" *ngIf="!hasPerformancePassed()">
       <h4>Selected Tickets:</h4>
       <div class="d-flex justify-content-between mb-3">
         <span class="py-2">Total: {{ totalTicketPrice() }}€</span>

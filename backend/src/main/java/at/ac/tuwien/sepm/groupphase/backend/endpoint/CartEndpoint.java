@@ -60,8 +60,13 @@ public class CartEndpoint {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/{id}/cart")
     @Operation(summary = "get cart of a user", security = @SecurityRequirement(name = "apiKey"))
-    public CartDto getCart(@Valid @PathVariable("id") Integer userId) {
+    public CartDto getCart(@Valid @PathVariable("id") Integer userId, Authentication auth) {
         LOGGER.info("GET /api/v1/users/{}/cart", userId);
+        Integer authentication = (Integer) auth.getPrincipal();
+        if (!authentication.equals(userId)) {
+            LOGGER.warn("Unauthorized cart get");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized checkout request\"");
+        }
         try {
             return cartService.getCart(userId);
         } catch (NotFoundException e) {
@@ -75,11 +80,13 @@ public class CartEndpoint {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/{id}/cart/tickets")
     @Operation(summary = "put tickets in the cart", security = @SecurityRequirement(name = "apiKey"))
-    public List<SimpleReservationDto> addTicketToCart(@Valid @PathVariable("id") Integer userId, @Valid @RequestBody List<SimpleTicketDto> tickets) {
-        //TODO: authenticate that id = userid
-        //@RequestHeader("Authorization") String token,
+    public List<SimpleReservationDto> addTicketToCart(@Valid @PathVariable("id") Integer userId, @Valid @RequestBody List<SimpleTicketDto> tickets, Authentication auth) {
         LOGGER.info("GET /api/v1/users/{}/cart/tickets", tickets);
-
+        Integer authentication = (Integer) auth.getPrincipal();
+        if (!authentication.equals(userId)) {
+            LOGGER.warn("Unauthorized add ticket to cart");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized checkout request\"");
+        }
         try {
             List<Reservation> reservations = cartService.reserveTickets(userId, tickets);
             return reservationMapper.reservationToSimpleReservationDto(reservations);
@@ -99,9 +106,13 @@ public class CartEndpoint {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "/{id}/cart/tickets/{ticketId}")
     @Operation(summary = "delete ticket from cart", security = @SecurityRequirement(name = "apiKey"))
-    public void deleteTicketFromCart(@Valid @PathVariable("id") Integer userId, @Valid @PathVariable("ticketId") Integer ticketId) {
-        //TODO: authenticate that id = userid
+    public void deleteTicketFromCart(@Valid @PathVariable("id") Integer userId, @Valid @PathVariable("ticketId") Integer ticketId, Authentication auth) {
         LOGGER.info("DELETE /api/v1/users/{}/cart/tickets/{}", userId, ticketId);
+        Integer authentication = (Integer) auth.getPrincipal();
+        if (!authentication.equals(userId)) {
+            LOGGER.warn("Unauthorized delete ticket from cart");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized checkout request\"");
+        }
         try {
             cartService.deleteTicketFromCart(userId, ticketId);
         } catch (NotFoundException e) {

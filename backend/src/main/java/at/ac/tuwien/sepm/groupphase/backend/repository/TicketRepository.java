@@ -43,7 +43,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
      * @param ids the ticket ids
      * @return the ticket list
      */
-    @EntityGraph(attributePaths = {"reservation", "seat", "seat.sector"})
+    @EntityGraph(attributePaths = {"reservation", "seat", "seat.sector", "performance"})
     @Query("SELECT t FROM Ticket t WHERE t.id IN :ids")
     List<Ticket> findAllByIds(@Param("ids") List<Integer> ids);
 

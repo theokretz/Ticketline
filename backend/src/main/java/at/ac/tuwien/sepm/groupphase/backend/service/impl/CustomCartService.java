@@ -122,7 +122,6 @@ public class CustomCartService implements CartService {
 
         Optional<ApplicationUser> user = notUserRepository.findById(userId);
 
-        //TODO: add authentication and check if userId is the same as the logged in user
 
         if (user.isEmpty()) {
             throw new NotFoundException("User not found");
@@ -145,13 +144,13 @@ public class CustomCartService implements CartService {
         List<Reservation> reserved = new ArrayList<>();
         Map<Integer, List<Ticket>> ticketsBySector = new HashMap<>();
         for (Ticket ticket : foundTickets) {
-            // if ticket is already in cart
-            if (ticket.getReservation() != null && ticket.getReservation().getCart()) {
-                conflictMsg.add("Ticket " + ticket.getId() + " is already in cart");
+            // check if ticket performance is in the past
+            if (ticket.getPerformance().getDatetime().minusMinutes(30).isBefore(LocalDateTime.now())) {
+                conflictMsg.add("Ticket " + ticket.getId() + " is in the past or starting too soon");
                 continue;
             }
             // check if ticket is already bought
-            if (ticket.getOrder() != null && (ticket.getReservation() != null && ticket.getReservation().getExpirationTs().isBefore(LocalDateTime.now()))) {
+            if (ticket.getOrder() != null || (ticket.getReservation() != null && ticket.getReservation().getExpirationTs().isAfter(LocalDateTime.now()))) {
                 // if ticket cannot be reserved, check if it is standing
                 Sector sector = ticket.getSeat().getSector();
                 if (sector.getStanding()) {
@@ -173,13 +172,13 @@ public class CustomCartService implements CartService {
                         continue;
                     }
                 }
-                conflictMsg.add("Ticket: " + ticket.getId() + " cannot be reserved, because it is already reserved or bought");
+                conflictMsg.add("Ticket: " + ticket.getId() + " cannot be added to cart, because it is already reserved or bought");
                 continue;
             }
             addTicketToReserved(user.get(), reserved, ticket);
         }
         if (conflictMsg.size() > 0) {
-            throw new ConflictException("At least one ticket is already reserved or bought", conflictMsg);
+            throw new ConflictException("Error adding tickets to cart", conflictMsg);
         }
         LOGGER.info("reserving tickets {}", tickets);
         reservationRepository.saveAll(reserved);
