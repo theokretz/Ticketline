@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Artist} from '../dtos/artist';
+import {Artist} from '../dtos/createEvent/artist';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Globals} from '../global/globals';
-import {Event} from '../dtos/event';
+import {Event} from '../dtos/createEvent/event';
 import {LocationSearch} from '../dtos/location';
+import {CreateEvent} from '../dtos/createEvent/createEvent';
 
 
 @Injectable({
@@ -13,6 +14,7 @@ import {LocationSearch} from '../dtos/location';
 export class EventService {
 
   private baseUri: string = this.globals.backendUri + '/search';
+
 
   constructor(
     private http: HttpClient,
@@ -29,7 +31,7 @@ export class EventService {
   searchArtistsByName(artistName: string): Observable<Artist[]> {
     const params = new HttpParams()
       .set('name', artistName);
-    return this.http.get<Artist[]>(this.baseUri + '/artists', { params });
+    return this.http.get<Artist[]>(this.baseUri + '/artists', {params});
   }
 
   /**
@@ -43,7 +45,7 @@ export class EventService {
     const params = new HttpParams()
       .set('id', artistId)
       .set('name', artistName);
-    return this.http.get<Event[]>(this.baseUri + '/events-by-artist', { params });
+    return this.http.get<Event[]>(this.baseUri + '/events-by-artist', {params});
   }
 
   /**
@@ -64,5 +66,9 @@ export class EventService {
    */
   searchEvents(params: HttpParams): Observable<Event[]> {
     return this.http.get<Event[]>(this.baseUri + '/events', {params});
+  }
+
+  createEvent(event: CreateEvent): Observable<Event> {
+    return this.http.post<Event>(this.globals.backendUri + '/events', event);
   }
 }

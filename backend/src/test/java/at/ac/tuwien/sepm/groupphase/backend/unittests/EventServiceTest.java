@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.createevent.CreateDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.ArtistSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.EventSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Artist;
@@ -8,6 +9,11 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Hall;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.ArtistRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.EventRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceSectorRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SeatRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.SectorRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepm.groupphase.backend.service.EventService;
 import at.ac.tuwien.sepm.groupphase.backend.service.PerformanceService;
 import org.junit.jupiter.api.Assertions;
@@ -32,16 +38,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@ActiveProfiles("test")
+@ActiveProfiles(profiles = {"test"})
 public class EventServiceTest {
     @Autowired
     PerformanceService performanceService;
     @Autowired
     EventService eventService;
+
     @Autowired
     private EventRepository eventRepository;
     @Autowired
     private ArtistRepository artistRepository;
+    @Autowired
+    private SectorRepository sectorRepository;
+    @Autowired
+    private PerformanceRepository performanceRepository;
+    @Autowired
+    private PerformanceSectorRepository performanceSectorRepository;
+    @Autowired
+    private SeatRepository seatRepository;
+    @Autowired
+    private TicketRepository ticketRepository;
+
     private Event event;
     private Set<Event> eventSet;
     private Event event2;
@@ -59,6 +77,9 @@ public class EventServiceTest {
     private EventSearchDto eventSearchDtoWithEmptyValues;
     private EventSearchDto eventSearchDtoWithLength;
     private EventSearchDto eventSearchDtoWithNameAndLength;
+
+    private CreateDto createDto;
+
 
     @BeforeEach
     public void beforeAll() {
@@ -203,7 +224,7 @@ public class EventServiceTest {
     @Test
     void getAllEventsWithLengthNotInRangeThrowsNotFound() {
         eventSearchDtoWithNameAndLength.setLength("PT4H");
-        Assertions.assertThrows(NotFoundException.class, ()-> eventService.getAllEventsWithParameters(eventSearchDtoWithNameAndLength));
+        Assertions.assertThrows(NotFoundException.class, () -> eventService.getAllEventsWithParameters(eventSearchDtoWithNameAndLength));
 
     }
 
@@ -215,4 +236,6 @@ public class EventServiceTest {
         Assertions.assertEquals(1, events.size());
         Assertions.assertEquals("Ballet", events.get(0).getType());
     }
+
+
 }

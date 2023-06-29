@@ -51,6 +51,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
+    /**
+     * get the authentication token from the request header.
+     *
+     * @param request the request
+     * @return the authentication token
+     * @throws JwtException             if the token is invalid
+     * @throws IllegalArgumentException if the token is malformed
+     */
     private UsernamePasswordAuthenticationToken getAuthToken(HttpServletRequest request)
         throws JwtException, IllegalArgumentException {
         String token = request.getHeader(securityProperties.getAuthHeader());

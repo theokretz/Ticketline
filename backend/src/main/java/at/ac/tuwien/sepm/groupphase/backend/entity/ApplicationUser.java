@@ -13,7 +13,6 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-//TODO: replace this class with a correct ApplicationUser Entity implementation
 @Entity
 @Table(name = "\"user\"")
 public class ApplicationUser {
@@ -217,7 +216,7 @@ public class ApplicationUser {
     public void setNews(Set<News> news) {
         this.news = news;
     }
-    
+
     public static final class UserBuilder {
         private Integer id;
         private Boolean admin;

@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.dto;
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.hall.DetailedHallDto;
+
 public class DetailedSectorDto {
     private String name;
     private Boolean standing;

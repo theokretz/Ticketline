@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface EventRepository extends JpaRepository<Event, Integer> {
@@ -60,5 +61,17 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     })
     @Query("SELECT a FROM Event a WHERE a.length >= :length1 AND a.length <= :length2")
     List<Event> findAllEventsWithLength(@Param("length1") Duration length1, @Param("length2") Duration length2);
+
+
+    /**
+     * find all events with name LIKE the given.
+     *
+     * @param name name of event.
+     * @return list of all found events.
+     */
+    @EntityGraph(attributePaths = {
+        "artists", "artists.name", "performances", "performances.performanceSectors"
+    })
+    List<Optional<Event>> findByName(String name);
 }
 

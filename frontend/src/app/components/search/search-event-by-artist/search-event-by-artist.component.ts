@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {EventService} from '../../../services/event.service';
-import {Artist} from '../../../dtos/artist';
+import {Artist} from '../../../dtos/createEvent/artist';
 import {debounceTime} from 'rxjs';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {Event} from '../../../dtos/event';
+import {Event} from '../../../dtos/createEvent/event';
 import {Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
 

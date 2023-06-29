@@ -265,6 +265,7 @@ public class CustomUserService implements UserService {
             .withFailedLogin(0)
             .build();
 
+
         //check if user with same email already exists
         if (notUserRepository.findApplicationUsersByEmail(userRegisterDto.getEmail()).isPresent()) {
             error.add(String.format("User with email: {%s} already exists", userRegisterDto.getEmail()));

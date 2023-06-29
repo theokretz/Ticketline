@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Event} from '../../../dtos/event';
+import {Event} from '../../../dtos/createEvent/event';
 import {HttpParams} from '@angular/common/http';
 import {EventService} from '../../../services/event.service';
 import {ToastrService} from 'ngx-toastr';

@@ -27,6 +27,12 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     List<Order> getAllOrdersByUserId(Integer id);
 
 
+    /**
+     * get order by id.
+     *
+     * @param id id of order
+     * @return order
+     */
     @EntityGraph(attributePaths = {
         "tickets",
         "transactions",
@@ -34,6 +40,12 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     })
     Order getOrderById(Integer id);
 
+    /**
+     * get order by id.
+     *
+     * @param id id of order
+     * @return order
+     */
     @EntityGraph(attributePaths = {
         "tickets",
         "tickets.performance",
@@ -47,6 +59,12 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     })
     Order getOrderHereById(Integer id);
 
+    /**
+     * get order by id.
+     *
+     * @param id id of order
+     * @return order
+     */
     @EntityGraph(attributePaths = {
         "deliveryAddress",
         "paymentDetail",
