@@ -8,12 +8,12 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,7 +38,7 @@ public class BookingEndpoint {
         this.orderService = orderService;
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Buy Tickets from Cart", security = @SecurityRequirement(name = "apiKey"))

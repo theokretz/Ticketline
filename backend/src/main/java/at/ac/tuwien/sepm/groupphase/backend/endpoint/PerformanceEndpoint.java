@@ -8,7 +8,6 @@ import at.ac.tuwien.sepm.groupphase.backend.service.EventService;
 import at.ac.tuwien.sepm.groupphase.backend.service.PerformanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ public class PerformanceEndpoint {
     }
 
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @GetMapping(value = "/{id}")
     @Operation(summary = "Get detailed information about a specific performance", security = @SecurityRequirement(name = "apiKey"))
     public DetailedPerformanceDto getPerformancePlan(@Valid @PathVariable Integer id) {

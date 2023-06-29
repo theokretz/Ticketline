@@ -4,7 +4,6 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimplePaymentDetailDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutLocation;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutPaymentDetail;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserAdminDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserPasswordChangeDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserProfileDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.LocationMapper;
@@ -19,7 +18,6 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +57,7 @@ public class UserEndpoint {
     }
 
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/{id}/locations")
     @Operation(summary = "update Location from user", security = @SecurityRequirement(name = "apiKey"))
@@ -80,7 +78,7 @@ public class UserEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}/locations")
     @Operation(summary = "edit existing Location from user", security = @SecurityRequirement(name = "apiKey"))
@@ -106,7 +104,7 @@ public class UserEndpoint {
     }
 
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}/locations/{locationId}")
     @Operation(summary = "delete Location from user", security = @SecurityRequirement(name = "apiKey"))
@@ -126,7 +124,7 @@ public class UserEndpoint {
     }
 
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{id}/payment-details")
     @Operation(summary = "update Payment Detail from user", security = @SecurityRequirement(name = "apiKey"))
@@ -151,7 +149,7 @@ public class UserEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}/payment-details")
     @Operation(summary = "edit existing Payment Detail from user", security = @SecurityRequirement(name = "apiKey"))
@@ -177,7 +175,7 @@ public class UserEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}/payment-details/{paymentDetailsId}")
     @Operation(summary = "delete Payment Detail from user", security = @SecurityRequirement(name = "apiKey"))
@@ -196,7 +194,7 @@ public class UserEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     @Operation(summary = "get user data", security = @SecurityRequirement(name = "apiKey"))
@@ -217,7 +215,7 @@ public class UserEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
     @Operation(summary = "update user data", security = @SecurityRequirement(name = "apiKey"))
@@ -242,7 +240,7 @@ public class UserEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{id}")
     @Operation(summary = "delete user", security = @SecurityRequirement(name = "apiKey"))
@@ -262,7 +260,7 @@ public class UserEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}/points")
     @Operation(summary = "get user points", security = @SecurityRequirement(name = "apiKey"))

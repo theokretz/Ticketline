@@ -10,17 +10,16 @@ import at.ac.tuwien.sepm.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepm.groupphase.backend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -45,7 +44,7 @@ public class OrderEndpoint {
         this.orderMapper = orderMapper;
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @DeleteMapping("/orders/{id}/items")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Cancel items from order", security = @SecurityRequirement(name = "apiKey"))
@@ -82,7 +81,7 @@ public class OrderEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @DeleteMapping("/orders/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Cancel order", security = @SecurityRequirement(name = "apiKey"))
@@ -105,7 +104,7 @@ public class OrderEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @GetMapping("/orders/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get order", security = @SecurityRequirement(name = "apiKey"))
@@ -125,7 +124,7 @@ public class OrderEndpoint {
         }
     }
 
-    @PermitAll
+    @Secured("ROLE_USER")
     @GetMapping("/transactions/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get transaction", security = @SecurityRequirement(name = "apiKey"))
