@@ -89,7 +89,7 @@ public class LocationDto {
     public void validateApi() throws ValidationException, ConflictException {
         ApiClient defaultClient = Configuration.getDefaultApiClient();
         ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("Apikey");
-        apiKey.setApiKey("548fac77-8ac5-4a31-91e6-ae7fb0a6a169");
+        apiKey.setApiKey("d7eba15e-71e5-470e-af71-2862e95a5c1c");
 
         AddressApi apiInstance = new AddressApi();
         ValidateAddressRequest input = new ValidateAddressRequest(); // ValidateAddressRequest | Input parse request

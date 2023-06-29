@@ -229,6 +229,11 @@ public class CustomOrderService implements OrderService {
                     conflictMsg.add("Ticket " + ticket.getId() + " is already bought or reserved");
                     continue;
                 }
+                LocalDateTime expirationTs = ticket.getPerformance().getDatetime().minusMinutes(30);
+                if (expirationTs.isBefore(LocalDateTime.now())) {
+                    conflictMsg.add("Ticket " + ticket.getId() + " is for a performance starting too soon or already in the past");
+                    continue;
+                }
 
                 if (bookingTicketDto.getReservation()) {
                     // reserve ticket
@@ -237,7 +242,7 @@ public class CustomOrderService implements OrderService {
                         .withId(id)
                         .withTicket(ticket)
                         .withCart(false)
-                        .withExpirationTs(ticket.getPerformance().getDatetime().minusMinutes(30))
+                        .withExpirationTs(expirationTs)
                         .withUser(user)
                         .build();
                     reservationsToSave.add(reservation);

@@ -31,6 +31,9 @@ public class CustomReservationService implements ReservationService {
     public List<Reservation> findReservationsByUserIdAndCart(Integer id, Boolean cart) {
         LOGGER.debug("Find reservations with user id {} and cart {}", id, cart);
         List<Reservation> reservations = reservationRepository.findAllWithNamedReservationByUserIdAndCart(id, cart);
+        if (!cart) {
+            reservations.removeIf(reservation -> java.time.LocalDateTime.now().isAfter(reservation.getExpirationTs()));
+        }
         return reservations;
     }
 

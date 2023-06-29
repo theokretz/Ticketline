@@ -16,6 +16,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Order;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Seat;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Sector;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
@@ -32,6 +33,7 @@ import at.ac.tuwien.sepm.groupphase.backend.repository.OrderRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PaymentDetailRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PerformanceSectorRepository;
+import at.ac.tuwien.sepm.groupphase.backend.repository.ReservationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SeatRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.SectorRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.TicketRepository;
@@ -106,6 +108,9 @@ class OrderServiceTest {
     @Autowired
     private NotUserRepository notUserRepository;
 
+    @Autowired
+    private ReservationRepository reservationRepository;
+
     private Performance performance;
     private ApplicationUser user;
     private Location location;
@@ -133,6 +138,7 @@ class OrderServiceTest {
 
     private BookingDto bookingDto;
     private BookingDto bookingDto2;
+    private BookingDto bookingDto3;
     private BookingDto bookingDtoOnlyMerch;
     private BookingDto bookingDtoOnlyMerch2;
     private BookingDto bookingDtoOnlyMerch3;
@@ -191,7 +197,7 @@ class OrderServiceTest {
         paymentDetail.setCvv(222);
         paymentDetail.setCardHolder("hallo");
         paymentDetail.setCardNumber("23123131");
-        paymentDetail.setExpirationDate(LocalDate.now());
+        paymentDetail.setExpirationDate(LocalDate.now().plusDays(10));
         paymentDetail.setUser(user);
 
         paymentDetailSet = new HashSet<>();
@@ -210,7 +216,7 @@ class OrderServiceTest {
         hallRepository.save(hall);
 
         this.performance = new Performance();
-        this.performance.setDatetime(LocalDateTime.now());
+        this.performance.setDatetime(LocalDateTime.now().plusDays(10));
         this.performance.setEvent(event);
         this.performance.setHall(hall);
         this.performanceRepository.save(performance);

@@ -51,6 +51,9 @@ export class PerformanceComponent implements OnInit {
               )
             )
           );
+          if (this.hasPerformancePassed()) {
+            this.clearSelectedTickets();
+          }
         },
         error: (err) => {
           if (err.status === 404) {
@@ -80,6 +83,13 @@ export class PerformanceComponent implements OnInit {
   }
 
   toggleTicket(ticket: PerformanceTicket): void {
+    if (this.hasPerformancePassed()) {
+      this.clearSelectedTickets();
+      this.notification.warning(
+        'You cannot reserve tickets for this performance anymore.',
+      );
+      return;
+    }
     if (!ticket) {
       return;
     }
@@ -260,5 +270,14 @@ export class PerformanceComponent implements OnInit {
           this.fetchPerformance();
         },
       });
+  }
+
+  hasPerformancePassed(): boolean {
+    const performanceDateTime = new Date(this.performance.dateTime);
+    performanceDateTime.setMinutes(
+      performanceDateTime.getMinutes() - 30
+    );
+    const now = new Date();
+    return performanceDateTime < now;
   }
 }
