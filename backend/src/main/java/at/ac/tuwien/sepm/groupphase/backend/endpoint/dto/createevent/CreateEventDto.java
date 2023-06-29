@@ -70,8 +70,8 @@ public class CreateEventDto {
         }
         if (length == null) {
             errors.add("Length must not be null");
-        } else if (length <= 0 || length > 1000) {
-            errors.add("Length must be greater than 0 and less than 1000");
+        } else if (length <= 0) {
+            errors.add("Length must be greater than 0");
         }
 
         if (description == null || description.isBlank() || description.isEmpty()) {

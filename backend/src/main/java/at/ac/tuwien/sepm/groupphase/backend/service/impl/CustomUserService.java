@@ -200,7 +200,6 @@ public class CustomUserService implements UserService {
      */
     @Override
     public String login(UserLoginDto userLoginDto) throws BadCredentialsException, LockedException {
-
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (userDetails != null
             && userDetails.isAccountNonExpired()
@@ -223,7 +222,7 @@ public class CustomUserService implements UserService {
                         if (user.getFailedLogin() >= maxFailedLogin) {
                             user.setLocked(true);
                             this.notUserRepository.save(user);
-                            throw new LockedException(String.format("User {%s} is locked", user.getEmail()));
+                            throw new LockedException(String.format("User %s is locked", user.getEmail()));
                         }
 
                     });
@@ -234,7 +233,7 @@ public class CustomUserService implements UserService {
                 return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
             }
         }
-        throw new LockedException(String.format("User {%s} is locked", userLoginDto.getEmail()));
+        throw new LockedException(String.format("User %s is locked", userLoginDto.getEmail()));
     }
 
     /**
@@ -252,7 +251,6 @@ public class CustomUserService implements UserService {
             throw new ValidationException("UserRegisterDto is not valid", error);
         }
         LOGGER.trace("registerUser({})", userRegisterDto);
-
         //id is auto generated
         ApplicationUser applicationUser = ApplicationUser.UserBuilder.aUser()
             .withAdmin(userRegisterDto.getIsAdmin())
@@ -264,18 +262,14 @@ public class CustomUserService implements UserService {
             .withLocked(false)
             .withFailedLogin(0)
             .build();
-
-
         //check if user with same email already exists
         if (notUserRepository.findApplicationUsersByEmail(userRegisterDto.getEmail()).isPresent()) {
-            error.add(String.format("User with email: {%s} already exists", userRegisterDto.getEmail()));
+            error.add(String.format("User with email: %s already exists", userRegisterDto.getEmail()));
             throw new ConflictException("Email Conflict", error);
         }
         ApplicationUser saved;
         //if save() throws an error then something dramatic happened
         saved = notUserRepository.save(applicationUser);
-        //TODO remove sout and toString() in ApplicationUser  in production
-        LOGGER.info("{}", saved);
         //check if entity is the same as DTO (except password)
         if (saved.getEmail().equals(userRegisterDto.getEmail())
             && saved.getFirstName().equals(userRegisterDto.getFirstName())
@@ -283,7 +277,6 @@ public class CustomUserService implements UserService {
             LOGGER.trace(String.format("successful registration of user: %s", saved));
             return "success";
         } else {
-
             //should not happen
             throw new FatalException(
                 String.format(

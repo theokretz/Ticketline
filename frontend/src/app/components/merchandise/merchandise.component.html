@@ -2,8 +2,8 @@
 <h1>Merchandise</h1>
 <div class="merch-header">
   <div class="checkbox-wrapper-3">
-    <input type="checkbox" id="cbx-3" (change)="getMerchCheck()" [(ngModel)]="isChecked"/>
-    <label for="cbx-3" class="toggle"><span></span></label>
+    <input (change)="getMerchCheck()" [(ngModel)]="isChecked" id="cbx-3" type="checkbox"/>
+    <label class="toggle" for="cbx-3"><span></span></label>
   </div>
   <div>
     <h6>Show redeemable with <b><i class="bi bi-stop-circle-fill"></i> Points</b></h6>
@@ -23,7 +23,9 @@
             <div class="card-body">
               <h5 class="card-title">{{merch.title}}</h5>
               <p class="card-text">{{merch.description}}</p>
-              <p class="card-text">{{isChecked ? merch.pointsPrice + "   " : merch.price + "€"}}<i *ngIf="isChecked" class="bi bi-stop-circle-fill"> Points</i></p>
+              <p class="card-text">{{isChecked ? merch.pointsPrice + "   " : merch.price + "€"}}<i *ngIf="isChecked"
+                                                                                                   class="bi bi-stop-circle-fill">
+                Points</i></p>
               <div class="container-fluid">
                 <div class="row">
                   <!-- If the item is in the card, show the quantity as placeholder -->
@@ -39,39 +41,4 @@
       </div>
     </div>
   </div>
-
-
-  <!-- FILTER
-  <div class="p-2">
-    <form class=" container d-flex mb-3">
-      <div class="col-sm-2">
-        <label class="col-form-label" for="searchValue">
-          Name
-        </label>
-        <input class="form-control" id="searchValue" name="searchValue" type="text">
-      </div>
-
-      <div class="col-sm-2">
-        <label class="col-form-label" for="searchValue">
-          Preis
-        </label>
-        <select class="form-select">
-          <option selected>Auswählen</option>
-          <option value="1">0-50</option>
-          <option value="1">50-100</option>
-          <option value="1">100-150</option>
-          <option value="1">150+</option>
-        </select>
-      </div>
-
-      <div class="col-sm-2 parent-container d-flex align-items-end">
-        <div class="child-element">
-          <input (click)="reloadMerch()" class="btn btn-primary" type="submit" value="zurücksetzen">
-        </div>
-      </div>
-    </form>
-  </div>
-  -->
-
-
 </div>

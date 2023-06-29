@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -17,6 +17,7 @@ export class RegisterComponent implements OnInit {
   // Error flag
   error = false;
   email = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -64,6 +65,7 @@ export class RegisterComponent implements OnInit {
       }
     });
   }
+
   createUser() {
     let isAdmin = false;
     if (this.isAdmin) {
@@ -96,8 +98,7 @@ export class RegisterComponent implements OnInit {
             this.router.navigate(['/admin']);
           }
         }, error: error => {
-          this.notification.error('Registration failed');
-          console.error(JSON.parse(error['error'])['detail']);
+          this.notification.error(JSON.parse(error['error'])['detail']);
           this.error = true;
         }
       });

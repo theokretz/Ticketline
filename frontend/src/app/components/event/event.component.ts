@@ -56,7 +56,7 @@ export class EventComponent implements OnInit {
     this.eventForm = this.formBuilder.group({
       eventName: ['', [Validators.required]],
       type: ['', [Validators.required]],
-      length: ['', [Validators.required, Validators.pattern('^[0-9]{3}$')]],
+      length: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       description: ['', [Validators.required]],
       image: [null, [Validators.required]],
       performances: this.formBuilder.array([

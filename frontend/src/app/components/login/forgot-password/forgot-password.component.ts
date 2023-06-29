@@ -30,7 +30,7 @@ export class ForgotPasswordComponent implements OnInit {
     const req: PasswordResetRequest = {email: value.email};
     this.authService.sendResetPasswordEmail(req).subscribe({
       next: () => {
-        this.notification.success('Password reset link sent to ' + value.email);
+        this.notification.success('Password reset link sent to ' + value.email + ', if user exists');
 
       }, error: error => {
         if (error.status === HttpStatusCode.UnprocessableEntity) {
