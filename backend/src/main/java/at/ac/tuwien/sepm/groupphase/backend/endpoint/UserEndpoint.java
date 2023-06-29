@@ -237,6 +237,10 @@ public class UserEndpoint {
             LOGGER.warn("Error updating user: " + e.getMessage());
             HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
             throw new ResponseStatusException(status, e.getMessage(), e);
+        } catch (ConflictException e) {
+            LOGGER.warn("Error updating user: " + e.getMessage());
+            HttpStatus status = HttpStatus.CONFLICT;
+            throw new ResponseStatusException(status, e.getMessage(), e);
         }
     }
 
