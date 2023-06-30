@@ -1,6 +1,11 @@
-export class Sector{
+import {Hall} from './createEvent/hall';
+
+export class Sector {
+  sectorId?: number;
   name: string;
   standing: boolean;
-  price: number;
-  pointsReward: number;
+  hall?: Hall;
+  hallId?: number;
+  price?: number;
+  pointsReward?: number;
 }

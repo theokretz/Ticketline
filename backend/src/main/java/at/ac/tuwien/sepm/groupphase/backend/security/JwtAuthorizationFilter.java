@@ -4,9 +4,6 @@ import at.ac.tuwien.sepm.groupphase.backend.config.properties.SecurityProperties
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +18,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @Service
 @Order(Ordered.LOWEST_PRECEDENCE - 1)
@@ -50,6 +51,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
+    /**
+     * get the authentication token from the request header.
+     *
+     * @param request the request
+     * @return the authentication token
+     * @throws JwtException             if the token is invalid
+     * @throws IllegalArgumentException if the token is malformed
+     */
     private UsernamePasswordAuthenticationToken getAuthToken(HttpServletRequest request)
         throws JwtException, IllegalArgumentException {
         String token = request.getHeader(securityProperties.getAuthHeader());
@@ -70,19 +79,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             .parseClaimsJws(token.replace(securityProperties.getAuthTokenPrefix(), ""))
             .getBody();
 
-        String username = claims.getSubject();
+        Integer id = claims.get("user", Integer.class);
 
         List<SimpleGrantedAuthority> authorities = ((List<?>) claims
             .get("rol")).stream()
             .map(authority -> new SimpleGrantedAuthority((String) authority))
             .toList();
 
-        if (username == null || username.isEmpty()) {
-            throw new IllegalArgumentException("Token contains no user");
+        if (id == null) {
+            throw new IllegalArgumentException("Token contains no user ID");
         }
 
-        MDC.put("u", username);
+        MDC.put("u", id.toString());
 
-        return new UsernamePasswordAuthenticationToken(username, null, authorities);
+        return new UsernamePasswordAuthenticationToken(id, null, authorities);
     }
 }

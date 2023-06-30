@@ -2,7 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {AuthService} from '../../services/auth.service';
-import {AuthRequest} from '../../dtos/auth-request';
+import {AuthRequest} from '../../dtos/authentication/auth-request';
+import {UserService} from '../../services/user.service';
+import {ToastrService} from 'ngx-toastr';
 
 
 @Component({
@@ -19,7 +21,12 @@ export class LoginComponent implements OnInit {
   error = false;
   errorMessage = '';
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder,
+              private authService: AuthService,
+              private notification: ToastrService,
+              private router: Router,
+              private userService: UserService
+  ) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]]
@@ -49,16 +56,23 @@ export class LoginComponent implements OnInit {
     this.authService.loginUser(authRequest).subscribe({
       next: () => {
         console.log('Successfully logged in user: ' + authRequest.email);
-        this.router.navigate(['/message']);
+        this.userService.getUserPoints(this.authService.getUserId());
+        this.router.navigate(['/news']);
       },
       error: error => {
         console.log('Could not log in due to:');
         console.log(error);
         this.error = true;
+
+
         if (typeof error.error === 'object') {
-          this.errorMessage = error.error.error;
+          this.notification.error(error.error.detail);
         } else {
-          this.errorMessage = error.error;
+          try {
+            this.notification.error(JSON.parse(error.error).detail);
+          } catch (exception) {
+            this.notification.error(error.error);
+          }
         }
       }
     });

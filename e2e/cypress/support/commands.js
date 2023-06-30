@@ -8,14 +8,15 @@ Cypress.Commands.add('loginAdmin', () => {
     })
 })
 
-Cypress.Commands.add('createMessage', (msg) => {
+Cypress.Commands.add('createNews', (msg) => {
     cy.fixture('settings').then(settings => {
-        cy.contains('a', 'Message');
-        cy.contains('button', 'Add message').click();
+        cy.contains('a', 'News');
+        cy.contains('button', 'Add News').click();
         cy.get('input[name="title"]').type('title' +  msg);
         cy.get('textarea[name="summary"]').type('summary' +  msg);
-        cy.get('textarea[name="text"]').type('text' +  msg);
-        cy.get('button[id="add-msg"]').click();
+        cy.get('textarea[name="content"]').type('text' +  msg);
+        cy.get('textarea[name="event"]').type('1');
+        cy.get('button[id="add-news"]').click();
         cy.get('button[id="close-modal-btn"]').click();
 
         cy.contains('title' +  msg).should('be.visible');

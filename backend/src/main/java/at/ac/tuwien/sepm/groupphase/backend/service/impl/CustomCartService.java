@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.TicketMapper;
@@ -14,6 +15,7 @@ import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.FatalException;
 import at.ac.tuwien.sepm.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 import at.ac.tuwien.sepm.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository;
 import at.ac.tuwien.sepm.groupphase.backend.repository.PaymentDetailRepository;
@@ -58,7 +60,7 @@ public class CustomCartService implements CartService {
     }
 
     @Override
-    public List<CartTicketDto> getCart(Integer userId) {
+    public CartDto getCart(Integer userId) {
         LOGGER.debug("Get Cart of User {}", userId);
         ApplicationUser user = notUserRepository.findApplicationUserById(userId);
         if (user == null) {
@@ -104,7 +106,14 @@ public class CustomCartService implements CartService {
         }
         // to keep the cart consistent between reloads
         tickets.sort(Comparator.comparing(CartTicketDto::getId));
-        return tickets;
+
+        CartDto cartDto = CartDto.CartDtoBuilder.aCartDto()
+            .withUserId(userId)
+            .withUserPoints(user.getPoints())
+            .withTickets(tickets)
+            .build();
+
+        return cartDto;
     }
 
 
@@ -113,7 +122,6 @@ public class CustomCartService implements CartService {
 
         Optional<ApplicationUser> user = notUserRepository.findById(userId);
 
-        //TODO: add authentication and check if userId is the same as the logged in user
 
         if (user.isEmpty()) {
             throw new NotFoundException("User not found");
@@ -136,13 +144,15 @@ public class CustomCartService implements CartService {
         List<Reservation> reserved = new ArrayList<>();
         Map<Integer, List<Ticket>> ticketsBySector = new HashMap<>();
         for (Ticket ticket : foundTickets) {
-            // if ticket is already in cart
-            if (ticket.getReservation() != null && ticket.getReservation().getCart()) {
-                conflictMsg.add("Ticket " + ticket.getId() + " is already in cart");
+            // check if ticket performance is in the past
+            if (ticket.getPerformance().getDatetime().minusMinutes(30).isBefore(LocalDateTime.now())) {
+                conflictMsg.add("Ticket " + ticket.getId() + " is in the past or starting too soon");
                 continue;
             }
             // check if ticket is already bought
-            if (ticket.getOrder() != null && (ticket.getReservation() != null && ticket.getReservation().getExpirationTs().isBefore(LocalDateTime.now()))) {
+            if (ticket.getOrder() != null || (ticket.getReservation() != null
+                && ticket.getReservation().getExpirationTs().isAfter(LocalDateTime.now())
+                && !ticket.getReservation().getUser().getId().equals(userId))) {
                 // if ticket cannot be reserved, check if it is standing
                 Sector sector = ticket.getSeat().getSector();
                 if (sector.getStanding()) {
@@ -164,13 +174,13 @@ public class CustomCartService implements CartService {
                         continue;
                     }
                 }
-                conflictMsg.add("Ticket: " + ticket.getId() + " cannot be reserved, because it is already reserved or bought");
+                conflictMsg.add("Ticket: " + ticket.getId() + " cannot be added to cart, because it is already reserved or bought");
                 continue;
             }
             addTicketToReserved(user.get(), reserved, ticket);
         }
         if (conflictMsg.size() > 0) {
-            throw new ConflictException("At least one ticket is already reserved or bought", conflictMsg);
+            throw new ConflictException("Error adding tickets to cart", conflictMsg);
         }
         LOGGER.info("reserving tickets {}", tickets);
         reservationRepository.saveAll(reserved);
@@ -184,7 +194,7 @@ public class CustomCartService implements CartService {
      * @param ticketId the ticket id
      */
     @Override
-    public void deleteTicketFromCart(Integer userId, Integer ticketId) throws ConflictException {
+    public void deleteTicketFromCart(Integer userId, Integer ticketId) throws ConflictException, UnauthorizedException {
         LOGGER.debug("Delete Ticket {} from Cart of User {}", ticketId, userId);
         ApplicationUser user = notUserRepository.findApplicationUserById(userId);
         if (user == null) {
@@ -196,7 +206,7 @@ public class CustomCartService implements CartService {
         }
         List<String> conflictMsg = new ArrayList<>();
         if (!reservation.getUser().getId().equals(userId)) {
-            conflictMsg.add("Ticket is not in cart of this user");
+            throw new UnauthorizedException("Could not delete ticekt from cart", List.of("User is not authorized"));
         }
         if (!reservation.getCart()) {
             conflictMsg.add("Ticket is not in cart");
@@ -213,26 +223,8 @@ public class CustomCartService implements CartService {
         }
     }
 
-    @Override
-    public List<PaymentDetail> getUserPaymentDetails(Integer userId) {
-        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("Could not find User");
-        }
-        return paymentDetailRepository.findPaymentDetailsByUserId(userId);
-    }
-
-    @Override
-    public List<Location> getUserLocations(Integer userId) {
-        ApplicationUser user = notUserRepository.findApplicationUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("Could not find User");
-        }
-        return locationRepository.findAllByUserId(userId);
-    }
-
-
     private void addTicketToReserved(ApplicationUser user, List<Reservation> reserved, Ticket ticket) {
+        LOGGER.debug("Adding Ticket {} to reserved", ticket.getId());
         Integer id = ticket.getReservation() == null ? null : ticket.getReservation().getId();
         LocalDateTime expiration = ticket.getReservation() == null ? LocalDateTime.now().plusMinutes(15) : ticket.getReservation().getExpirationTs();
         Reservation reservation = Reservation.ReservationBuilder.aReservation()
@@ -244,5 +236,4 @@ public class CustomCartService implements CartService {
             .build();
         reserved.add(reservation);
     }
-
 }

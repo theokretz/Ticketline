@@ -1,5 +1,4 @@
 export class Location {
-  id: number;
   postalCode: number;
   street: string;
   city: string;
@@ -12,4 +11,12 @@ export class CheckoutLocation {
   street: string;
   city: string;
   country: string;
+}
+
+export class LocationSearch {
+  id: number;
+  postalCode?: number;
+  street?: string;
+  city?: string;
+  country?: string;
 }

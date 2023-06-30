@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
 import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
+import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 
 import java.util.List;
 
@@ -16,4 +18,11 @@ public interface ReservationService {
      * @return the list of reservations/the cart of the user
      */
     List<Reservation> findReservationsByUserIdAndCart(Integer id, Boolean cart);
+
+    /**
+     * Delete a reservation by its id.
+     *
+     * @param reservationId the id of the reservation
+     */
+    void deleteReservation(Integer reservationId, Integer userId) throws ConflictException, UnauthorizedException;
 }

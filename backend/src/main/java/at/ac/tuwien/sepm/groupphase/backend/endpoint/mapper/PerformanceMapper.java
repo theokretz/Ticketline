@@ -1,17 +1,20 @@
 package at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper;
 
 
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedOrderPerformanceDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedPerformanceDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedPerformanceSectorDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.LocationDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PerformanceTicketDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedOrderPerformanceDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.PerformanceSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Hall;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Mapper(componentModel = "spring")
@@ -59,6 +62,32 @@ public abstract class PerformanceMapper {
             .build();
     }
 
+    public DetailedPerformanceDto performanceDtotoDetailedPerformanceDtoForSearch(Performance performance) {
+        if (performance == null) {
+            return null;
+        }
+        Hall hall = performance.getHall();
+        if (hall == null) {
+            return null;
+        }
+        Location location = hall.getLocation();
+        if (location == null) {
+            return null;
+        }
+        if (performance.getEvent() == null) {
+            return null;
+        }
+
+        LocationDto locationDto = locationMapper.locationToLocationDto(location);
+        return DetailedPerformanceDto.DetailedPerformanceDtoBuilder.aDetailedPerformanceDto()
+            .withId(performance.getId())
+            .withTimestamp(performance.getDatetime())
+            .withEventName(performance.getEvent().getName())
+            .withHallName(hall.getName())
+            .withLocation(locationDto)
+            .build();
+    }
+
     public DetailedOrderPerformanceDto performanceToDetailedOrderPerformanceDto(Performance performance) {
         if (performance == null) {
             return null;
@@ -69,6 +98,39 @@ public abstract class PerformanceMapper {
             .withEvent(eventMapper.eventToDetailedEventDto(performance.getEvent()))
             .withHall(hallMapper.hallToDetailedHallDto(performance.getHall()))
             .build();
+    }
+
+    public List<PerformanceSearchDto> performanceToPerformanceSearchDto(List<Performance> performances) {
+
+        if (performances == null) {
+            return null;
+        }
+        List<PerformanceSearchDto> performanceSearchDtos = new ArrayList<>();
+        for (Performance performance : performances) {
+            Hall hall = performance.getHall();
+            if (hall == null) {
+                return null;
+            }
+            Location location = hall.getLocation();
+            if (location == null) {
+                return null;
+            }
+            if (performance.getEvent() == null) {
+                return null;
+            }
+
+            LocationDto locationDto = locationMapper.locationToLocationDto(location);
+            PerformanceSearchDto performanceSearchDto = PerformanceSearchDto.PerformanceSearchDtoBuilder.aPerformanceSearchDtoBuilder()
+                .withId(performance.getId())
+                .withTimestamp(performance.getDatetime())
+                .withEventName(performance.getEvent().getName())
+                .withHallName(hall.getName())
+                .withLocation(locationDto)
+                .withImagePath(performance.getEvent().getImagePath())
+                .build();
+            performanceSearchDtos.add(performanceSearchDto);
+        }
+        return performanceSearchDtos;
     }
 }
 

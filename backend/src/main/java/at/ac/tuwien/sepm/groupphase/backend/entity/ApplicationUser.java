@@ -1,12 +1,11 @@
 package at.ac.tuwien.sepm.groupphase.backend.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -14,10 +13,10 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-//TODO: replace this class with a correct ApplicationUser Entity implementation
 @Entity
 @Table(name = "\"user\"")
 public class ApplicationUser {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,13 +27,11 @@ public class ApplicationUser {
     private String firstName;
     @Column(nullable = false)
     private String lastName;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 16)
-    private String salt;
 
     @Column(nullable = false)
     private Integer points;
@@ -46,6 +43,9 @@ public class ApplicationUser {
     private LocalDateTime passwordResetTs;
 
     @Column(nullable = false)
+    private int failedLogin;
+
+    @Column(nullable = false)
     private Boolean locked;
 
     @OneToMany(mappedBy = "user")
@@ -54,11 +54,37 @@ public class ApplicationUser {
     @OneToMany(mappedBy = "user")
     private Set<PaymentDetail> paymentDetails;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private Set<Reservation> reservations;
 
     @OneToMany(mappedBy = "user")
     private Set<Location> locations;
+
+    @ManyToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
+    private Set<News> news;
+
+    public ApplicationUser() {
+    }
+
+    public ApplicationUser(String email, String password, Boolean admin) {
+        this.email = email;
+        this.password = password;
+        this.admin = admin;
+    }
+
+    /* @PreRemove
+    private void preRemove() {
+        for (Order order : this.orders) {
+            order.setUser(null);
+        }
+        for (PaymentDetail paymentDetail : this.paymentDetails) {
+            paymentDetail.setUser(null);
+        }
+        for (Location location : this.locations) {
+            location.setUser(null);
+        }
+    }*/
+
 
     public Integer getId() {
         return id;
@@ -70,15 +96,6 @@ public class ApplicationUser {
 
     public Boolean getAdmin() {
         return admin;
-    }
-
-    public ApplicationUser() {
-    }
-
-    public ApplicationUser(String email, String password, Boolean admin) {
-        this.email = email;
-        this.password = password;
-        this.admin = admin;
     }
 
     public void setAdmin(final Boolean admin) {
@@ -117,14 +134,6 @@ public class ApplicationUser {
         this.password = password;
     }
 
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(final String salt) {
-        this.salt = salt;
-    }
-
     public Integer getPoints() {
         return points;
     }
@@ -132,6 +141,7 @@ public class ApplicationUser {
     public void setPoints(final Integer points) {
         this.points = points;
     }
+
 
     public String getPasswordResetToken() {
         return passwordResetToken;
@@ -156,6 +166,15 @@ public class ApplicationUser {
     public void setLocked(final Boolean locked) {
         this.locked = locked;
     }
+
+    public int getFailedLogin() {
+        return failedLogin;
+    }
+
+    public void setFailedLogin(int failedLogin) {
+        this.failedLogin = failedLogin;
+    }
+
 
     public Set<Order> getOrders() {
         return orders;
@@ -190,6 +209,14 @@ public class ApplicationUser {
     }
 
 
+    public Set<News> getNews() {
+        return news;
+    }
+
+    public void setNews(Set<News> news) {
+        this.news = news;
+    }
+
     public static final class UserBuilder {
         private Integer id;
         private Boolean admin;
@@ -197,15 +224,16 @@ public class ApplicationUser {
         private String lastName;
         private String email;
         private String password;
-        private String salt;
         private Integer points;
         private String passwordResetToken;
         private LocalDateTime passwordResetTs;
         private Boolean locked;
+        private Integer failedLogin;
         private Set<Order> orders;
         private Set<PaymentDetail> paymentDetails;
         private Set<Reservation> reservations;
         private Set<Location> locations;
+        private Set<News> news;
 
         private UserBuilder() {
         }
@@ -244,11 +272,6 @@ public class ApplicationUser {
             return this;
         }
 
-        public UserBuilder withSalt(final String salt) {
-            this.salt = salt;
-            return this;
-        }
-
         public UserBuilder withPoints(final Integer points) {
             this.points = points;
             return this;
@@ -266,6 +289,11 @@ public class ApplicationUser {
 
         public UserBuilder withLocked(final Boolean locked) {
             this.locked = locked;
+            return this;
+        }
+
+        public UserBuilder withFailedLogin(final Integer failedLogin) {
+            this.failedLogin = failedLogin;
             return this;
         }
 
@@ -289,6 +317,11 @@ public class ApplicationUser {
             return this;
         }
 
+        public UserBuilder withNews(final Set<News> news) {
+            this.news = news;
+            return this;
+        }
+
         public ApplicationUser build() {
             ApplicationUser user = new ApplicationUser();
             user.setId(id);
@@ -297,15 +330,16 @@ public class ApplicationUser {
             user.setLastName(lastName);
             user.setEmail(email);
             user.setPassword(password);
-            user.setSalt(salt);
             user.setPoints(points);
             user.setPasswordResetToken(passwordResetToken);
             user.setPasswordResetTs(passwordResetTs);
             user.setLocked(locked);
+            user.setFailedLogin(failedLogin);
             user.setOrders(orders);
             user.setPaymentDetails(paymentDetails);
             user.setReservations(reservations);
             user.setLocations(locations);
+            user.setNews(news);
             return user;
         }
     }

@@ -2,7 +2,7 @@ package at.ac.tuwien.sepm.groupphase.backend.unittests;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Event;
@@ -154,13 +154,12 @@ public class CartServiceTest {
         this.user.setLastName("Besheva");
         this.user.setPassword("Password");
         this.user.setLocked(false);
-        this.user.setSalt("asdjaslkdjaösasd");
         this.user.setPoints(10000);
 
         paymentDetail = new PaymentDetail();
         paymentDetail.setCvv(222);
         paymentDetail.setCardHolder("hallo2");
-        paymentDetail.setCardNumber(23123131);
+        paymentDetail.setCardNumber("23123131");
         paymentDetail.setExpirationDate(LocalDate.now());
         paymentDetail.setUser(user);
 
@@ -262,8 +261,20 @@ public class CartServiceTest {
     }
 
     @Test
-    public void getCartShouldReturnTickets() {
-        List<CartTicketDto> list = cartService.getCart(user.getId());
+    void getCartShouldReturnTickets() {
+
+        CartDto cartDto = cartService.getCart(user.getId());
+        List<CartTicketDto> list = cartDto.getTickets();
+        assertThat(list)
+            .isNotEmpty()
+            .hasSize(2);
+    }
+
+    @Test
+    void getCartShouldReturnRightAmountOfPoints() {
+        CartDto cartDto = cartService.getCart(user.getId());
+        List<CartTicketDto> list = cartDto.getTickets();
         assertThat(list).isNotEmpty();
+        assertThat(cartDto.getUserPoints()).isEqualTo(user.getPoints());
     }
 }

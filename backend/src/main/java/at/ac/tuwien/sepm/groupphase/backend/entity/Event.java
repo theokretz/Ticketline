@@ -31,11 +31,22 @@ public class Event {
     @Column
     private String description;
 
+    @Column(length = 200)
+    private String imagePath;
+
     @ManyToMany(mappedBy = "events")
     private Set<Artist> artists;
 
     @OneToMany(mappedBy = "event")
     private Set<Performance> performances;
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 
     public Integer getId() {
         return id;
@@ -102,6 +113,7 @@ public class Event {
         private String description;
         private Set<Artist> artists;
         private Set<Performance> performances;
+        private String imagePath;
 
         private EventBuilder() {
         }
@@ -145,6 +157,11 @@ public class Event {
             return this;
         }
 
+        public EventBuilder withImagePath(String imagePath) {
+            this.imagePath = imagePath;
+            return this;
+        }
+
         public Event build() {
             Event event = new Event();
             event.setId(id);
@@ -154,6 +171,7 @@ public class Event {
             event.setDescription(description);
             event.setArtists(artists);
             event.setPerformances(performances);
+            event.setImagePath(imagePath);
             return event;
         }
     }

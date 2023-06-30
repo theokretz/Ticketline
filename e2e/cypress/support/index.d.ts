@@ -6,9 +6,9 @@ declare namespace Cypress{
         loginAdmin();
 
         /**
-         * Creates a message with a given text
-         * @param msg the text of the created message
+         * Creates a news with a given text
+         * @param msg the text of the created news
          */
-        createMessage(msg: string);
+        createNews(msg: string);
     }
 }

@@ -1,12 +1,12 @@
 package at.ac.tuwien.sepm.groupphase.backend.service;
 
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleTicketDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.checkout.CheckoutDetailsDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PaymentDetail;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepm.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepm.groupphase.backend.exception.UnauthorizedException;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public interface CartService {
      * @param userId the user id
      * @return the cart
      */
-    List<CartTicketDto> getCart(Integer userId);
+    CartDto getCart(Integer userId);
 
     /**
      * Put a list of tickets in a users cart.
@@ -39,10 +39,6 @@ public interface CartService {
      * @param userId   the user id
      * @param ticketId the ticket id
      */
-    void deleteTicketFromCart(Integer userId, Integer ticketId) throws ConflictException;
+    void deleteTicketFromCart(Integer userId, Integer ticketId) throws ConflictException, UnauthorizedException;
 
-
-    List<PaymentDetail> getUserPaymentDetails(Integer userId);
-
-    List<Location> getUserLocations(Integer userId);
 }

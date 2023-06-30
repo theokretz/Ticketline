@@ -14,6 +14,8 @@ public class MerchandiseDto {
 
     private String description;
 
+    private String imagePath;
+
     // private Set<MerchandiseOrdered> merchandiseMerchandiseOrdereds;
 
 
@@ -65,6 +67,14 @@ public class MerchandiseDto {
         this.description = description;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
     /*
     public Set<MerchandiseOrdered> getMerchandiseMerchandiseOrdereds() {
         return merchandiseMerchandiseOrdereds;
@@ -85,6 +95,7 @@ public class MerchandiseDto {
             + ", pointsReward=" + pointsReward
             + ", title=" + title
             + ", description=" + description
+            + ", imagePath=" + imagePath
             // NOT NEEDED: + ", merchandiseMerchandiseOrdereds= " + merchandiseMerchandiseOrdereds
             + '}';
     }

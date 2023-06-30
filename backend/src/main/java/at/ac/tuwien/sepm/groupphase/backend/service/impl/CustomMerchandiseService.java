@@ -29,9 +29,14 @@ public class CustomMerchandiseService implements MerchandiseService {
     }
 
     @Override
-    public List<MerchandiseDto> getMerchandise() {
+    public List<MerchandiseDto> getMerchandise(boolean withPoints) {
         LOGGER.trace("getMerchandise()");
-        List<Merchandise> entities = this.merchandiseRepository.findAll();
+        List<Merchandise> entities;
+        if (withPoints) {
+            entities = this.merchandiseRepository.findAllMerchandiseWithPoints();
+        } else {
+            entities = this.merchandiseRepository.findAll();
+        }
         return mapper.merchandiseListToMerchandiseDtoList(entities);
     }
 

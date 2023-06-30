@@ -5,7 +5,7 @@ import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.CartTicketDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedPerformanceDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.PerformanceTicketDto;
-import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.UserDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.user.UserDto;
 import at.ac.tuwien.sepm.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Hall;
@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
@@ -60,49 +61,40 @@ public class PerformanceTest {
 
 
     @Autowired
+    PerformanceService performanceService;
+    @Autowired
     private PerformanceRepository performanceRepository;
-
     @Autowired
     private EventRepository eventRepository;
-
     @Autowired
     private HallRepository hallRepository;
-
     @Autowired
     private at.ac.tuwien.sepm.groupphase.backend.repository.NotUserRepository NotUserRepository;
     @Autowired
     private LocationRepository locationRepository;
-
     @Autowired
     private PaymentDetailRepository paymentDetailRepository;
-
     @Autowired
     private SectorRepository sectorRepository;
-
     @Autowired
     private PerformanceSectorRepository performanceSectorRepository;
-
     @Autowired
     private SeatRepository seatRepository;
-
     @Autowired
     private TicketRepository ticketRepository;
-
     @Autowired
     private ReservationRepository reservationRepository;
-
-    @Autowired
-    PerformanceService performanceService;
-
     private Performance performance;
     private ApplicationUser user;
     private ApplicationUser user2;
     private Location location;
+    private Location location1;
     private Set<Location> locationSet;
     private PaymentDetail paymentDetail;
     private Set<PaymentDetail> paymentDetailSet;
     private UserDto userDto;
     private Event event;
+    private Event event2;
     private Hall hall;
     private Sector standingSector;
     private Sector seatedSector;
@@ -128,6 +120,11 @@ public class PerformanceTest {
         event.setLength(Duration.ZERO);
         eventRepository.save(event);
 
+        event2 = new Event();
+        event2.setName("The Eras Tour 3");
+        event2.setLength(Duration.ZERO);
+        eventRepository.save(event2);
+
         location = new Location();
         location.setCity("Vienna");
         location.setCountry("Austria");
@@ -137,6 +134,14 @@ public class PerformanceTest {
         locationSet = new HashSet<>();
         locationSet.add(location);
         locationRepository.save(location);
+
+        location1 = new Location();
+        location1.setCity("Vienna");
+        location1.setCountry("Austria");
+        location1.setPostalCode(1030);
+        location1.setStreet("Straße 3");
+
+        locationRepository.save(location1);
 
         hall = new Hall();
         hall.setName("Halle 2");
@@ -156,7 +161,6 @@ public class PerformanceTest {
         this.user.setLastName("Besheva");
         this.user.setPassword("Password");
         this.user.setLocked(false);
-        this.user.setSalt("asdjaslkdjaösasd");
         this.user.setPoints(10000);
 
         this.user2 = new ApplicationUser();
@@ -166,13 +170,12 @@ public class PerformanceTest {
         this.user2.setLastName("Besheva");
         this.user2.setPassword("Password");
         this.user2.setLocked(false);
-        this.user2.setSalt("asdjaslkdjaösasd");
         this.user2.setPoints(10000);
 
         paymentDetail = new PaymentDetail();
         paymentDetail.setCvv(222);
         paymentDetail.setCardHolder("hallo2");
-        paymentDetail.setCardNumber(23123131);
+        paymentDetail.setCardNumber("23123131");
         paymentDetail.setExpirationDate(LocalDate.of(2024, 10, 10));
         paymentDetail.setUser(user);
 
@@ -332,6 +335,43 @@ public class PerformanceTest {
         assertEquals(performanceTicketDto[2][2].getSectorId(), seatedSeat.getSector().getId());
         assertEquals(detailedPerformanceDto.getPerformanceSector().get(performanceTicketDto[2][2].getSectorId()).getName(),
             seatedPerformanceSector.getSector().getName());
+    }
+
+    @Test
+    void getPerformancesByEventIdOfNonExistingEventShouldThrowNotFoundException() {
+        Assertions.assertThrows(NotFoundException.class, () -> performanceService.getPerformancesOfEventById(-1));
+    }
+
+    @Test
+    void getPerformancesByEventIdShouldReturnAllPerformancesOfEvent() {
+        Assertions.assertDoesNotThrow(() -> performanceService.getPerformancesOfEventById(1));
+        List<Performance> performances = performanceService.getPerformancesOfEventById(performance.getEvent().getId());
+
+        assertEquals(1, performances.size());
+
+    }
+
+    @Test
+    void getPerformancesOfEventWithNoPerformancesShouldThrowNotFoundException() {
+        Assertions.assertThrows(NotFoundException.class, () -> performanceService.getPerformancesOfEventById(2));
+    }
+
+    @Test
+    void getPerformancesOnLocationShouldReturnAllPerformances() {
+        Assertions.assertDoesNotThrow(() -> performanceService.getPerformancesOfLocationById(1));
+        List<Performance> performances = performanceService.getPerformancesOfLocationById(performance.getHall().getLocation().getId());
+
+        assertEquals(1, performances.size());
+    }
+
+    @Test
+    void getPerformancesOnNonExistingLocationShouldThrowNotFoundException() {
+        Assertions.assertThrows(NotFoundException.class, () -> performanceService.getPerformancesOfLocationById(-1));
+    }
+
+    @Test
+    void getPerformancesOnLocationWithNoPerformancesShouldThrowNotFoundException() {
+        Assertions.assertThrows(NotFoundException.class, () -> performanceService.getPerformancesOfLocationById(2));
     }
 
 }

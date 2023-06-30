@@ -40,7 +40,8 @@ public class MerchandiseDataGenerator {
                     .withDescription(TEST_MERCHANDISE_DESCRIPTION + " " + i)
                     .withPrice(BigDecimal.valueOf(9.99 + i * 10))
                     .withPointsReward(9 + i * 10)
-                    .withPointsPrice(9 + i * 10)
+                    .withPointsPrice((10 + i * 10) * 4)
+                    .withImagePath((i % 20) + ".png")
                     .build();
                 LOGGER.debug("saving merchandise {}", merchandise);
                 merchandiseRepository.save(merchandise);

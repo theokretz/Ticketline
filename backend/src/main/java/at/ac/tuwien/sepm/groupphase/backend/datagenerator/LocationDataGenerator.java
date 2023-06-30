@@ -17,7 +17,7 @@ public class LocationDataGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final int NUMBER_OF_LOCATIONS_TO_GENERATE = 5;
+    private static final int NUMBER_OF_LOCATIONS_TO_GENERATE = 20;
     private static final String TEST_LOCATION_STREET = "STREET";
     private static final String TEST_LOCATION_CITY = "CITY";
     private static final int TEST_LOCATION_POSTAL_CODE = 1234;

@@ -1,88 +1,92 @@
+<br>
 <h1>Your Reservations</h1>
-<div *ngIf="reservations.length<=0">
+<p>Reservations will expire 30 minutes before the performance begins.</p>
+<div *ngIf="reservations.length <= 0">
   <p>You have zero open reservations.</p>
 </div>
-<div *ngIf="reservations.length>0">
-  <p>You have ({{reservations.length}}) open reservations.</p>
+<div *ngIf="reservations.length > 0">
+  <p>You have ({{ reservations.length }}) open reservations.</p>
 </div>
 
-<div *ngIf="reservations.length<=6" class="mt-4 container">
-  <div class="row">
-    <div class="col-xl-3 col-lg-4 p-2 " *ngFor="let reservation of getReservations()">
-      <div class="card" [ngClass]="{'greyed-out': clickedReservations.get(reservation.id)}">
-        <h5 class="card-header">{{reservation.eventName}}</h5>
-        <div class="card-body">
-          <h6 class="card-title text-muted ">
-            <span class="float-start">Expires</span>
-            <span class="d-block text-end">{{reservation.expirationTs | date: 'short'}}</span>
-          </h6>
-          <ul class="list-group list-group-flush">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item p-1">
-                <strong class="float-start">Row</strong>
-                <span class="d-block text-end">{{ reservation.ticket.seat.row }}</span>
-              </li>
-              <li class="list-group-item p-1">
-                <strong class="float-start">Number</strong>
-                <span class="d-block text-end">{{ reservation.ticket.seat.number }}</span>
-              </li>
-              <li class="list-group-item p-1">
-                <strong class="float-start">Section</strong>
-                <span class="d-block text-end">{{ reservation.ticket.seat.sector }}</span>
-              </li>
-            </ul>
-            <li class="list-group-item p-1 align-self-center" *ngIf="!clickedReservations.get(reservation.id)"><button (click)="addTicket(reservation)" type="button" class="btn btn-danger">Select</button></li>
-            <li class="list-group-item p-1 align-self-center" *ngIf="clickedReservations.get(reservation.id)"><button (click)="removeTicket(reservation)" type="button" class="btn btn-danger">Unselect</button></li>
 
+<div class="row my-5">
+  <div class="col-xl-3 col-lg-4 p-2" *ngFor="let reservation of reservations">
+    <div
+      class="card"
+      [ngClass]="{ 'greyed-out': clickedReservations.get(reservation.id) }"
+    >
+      <h5 class="card-header">{{ reservation.eventName }}</h5>
+      <div class="card-body">
+        <h6 class="card-title text-muted">
+          <span class="float-start">Expires</span>
+          <span class="d-block text-end">{{
+            reservation.expirationTs | date : 'short'
+            }}</span>
+        </h6>
+        <ul class="list-group list-group-flush">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item p-1">
+              <strong class="float-start">Row</strong>
+              <span class="d-block text-end">{{
+                reservation.ticket.seat.row
+                }}</span>
+            </li>
+            <li class="list-group-item p-1">
+              <strong class="float-start">Number</strong>
+              <span class="d-block text-end">{{
+                reservation.ticket.seat.number
+                }}</span>
+            </li>
+            <li class="list-group-item p-1">
+              <strong class="float-start">Section</strong>
+              <span class="d-block text-end">{{
+                reservation.ticket.seat.sector
+                }}</span>
+            </li>
           </ul>
-        </div>
+          <li class="list-group-item p-1 align-self-center">
+            <div
+              *ngIf="!clickedReservations.get(reservation.id); else unselect"
+            >
+              <button
+                (click)="deleteReservation(reservation)"
+                type="button"
+                class="btn btn-danger mx-3"
+              >
+                Delete
+              </button>
+              <button
+                (click)="selectTicket(reservation)"
+                type="button"
+                class="btn btn-primary"
+              >
+                Select
+              </button>
+            </div>
+            <ng-template #unselect>
+              <button
+                (click)="unselectTicket(reservation)"
+                type="button"
+                class="btn btn-primary"
+              >
+                Unselect
+              </button>
+            </ng-template>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 </div>
-
-<div *ngIf="reservations.length >6" class="ticket-container">
-  <div *ngIf="reservations.length === 0">
-    <h5>Your Cart is Empty</h5>
-  </div>
-  <table *ngIf="reservations.length !== 0" class="table ticket-table">
-    <thead>
-    <tr class="ticket-header">
-      <th>Event</th>
-      <th>Row</th>
-      <th>Number</th>
-      <th>Section</th>
-      <th>Expires</th>
-      <th class="min-width">Action</th>
-    </tr>
-    </thead>
-    <tbody >
-    <tr *ngFor="let reservation of reservations" class="ticket-row " [ngClass]="{'greyed-out': clickedReservations.get(reservation.id)}">
-      <td>{{reservation.eventName}}</td>
-      <td>{{reservation.ticket.seat.row}}</td>
-      <td>{{reservation.ticket.seat.number}}</td>
-      <td>{{reservation.ticket.seat.sector}}</td>
-      <td>{{reservation.expirationTs | date: 'short'}}</td>
-      <td >
-        <div class="btn-group" *ngIf="!clickedReservations.get(reservation.id)">
-          <a class="btn btn-danger" aria-label="Select Reservation" (click)="addTicket(reservation)" style="font-size: 12px;"><i class=""></i>Select</a>
-        </div>
-        <div class="btn-group" *ngIf="clickedReservations.get(reservation.id)">
-          <a class="btn btn-danger" aria-label="Unselect Reservation" (click)="removeTicket(reservation)" style="font-size: 12px;"><i class=""></i>Unselect</a>
-        </div>
-      </td>
-    </tr>
-    </tbody>
-    <br>
-  </table>
-</div>
-<div class="button-container" *ngIf="tickets.length !== 0" >
+<div class="button-container" *ngIf="tickets.length !== 0">
   <div class="btn-group">
-    <a class="btn btn-outline-danger btn-lg"
-       aria-label="checkout"
-       (click)="addTicketsToCart()">
-      <i class="bi bi-trash"></i>
-      add to cart
+    <a
+      class="btn btn-outline-danger btn-lg"
+      aria-label="checkout"
+      (click)="addTicketsToCart()"
+    >
+      <i class="bi bi-cart-check"></i>
+      Add to cart
     </a>
   </div>
 </div>

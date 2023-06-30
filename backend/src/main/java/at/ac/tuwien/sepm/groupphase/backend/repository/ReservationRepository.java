@@ -17,8 +17,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
      * @param id the id of the user
      * @return the list of reservations/the cart of the user
      */
-
-
     List<Reservation> findReservationByUserId(Integer id);
 
 
@@ -45,4 +43,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
         "ticket.performance",
     })
     Reservation findReservationByTicketId(Integer ticketId);
+
+
+    /**
+     * Find reservation by id.
+     *
+     * @param reservationId the reservation id
+     * @return the reservation
+     */
+    @EntityGraph(attributePaths = {
+        "user",
+    })
+    Reservation findReservationById(Integer reservationId);
 }

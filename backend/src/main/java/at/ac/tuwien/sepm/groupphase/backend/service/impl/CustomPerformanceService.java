@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.DetailedPerformanceDto;
+import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.search.PerformanceSearchDto;
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.mapper.PerformanceMapper;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.entity.PerformanceSector;
@@ -20,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -110,5 +113,63 @@ public class CustomPerformanceService implements PerformanceService {
             throw new FatalException(String.format("Could not map performance with id %s", id));
         }
         return perf;
+    }
+
+    @Override
+    public List<Performance> getPerformancesOfEventById(Integer id) {
+        LOGGER.debug("Find performances of the event with id{}", id);
+        List<Performance> performances = performanceRepository.findAllByEvent_Id(id);
+        if (performances.isEmpty()) {
+            throw new NotFoundException(String.format("Could not find performances of event with the given id{}", id));
+        }
+        return performances;
+    }
+
+    @Override
+    public List<Performance> getPerformancesOfLocationById(Integer id) {
+        LOGGER.debug("Find performances of location with id{}", id);
+        List<Performance> performances = performanceRepository.findAllByHallLocation_Id(id);
+        if (performances.isEmpty()) {
+            throw new NotFoundException(String.format("Could not find performances of event with the given id{}", id));
+        }
+        return performances;
+    }
+
+    @Override
+    public List<Performance> getAllPerformancesWithParameters(PerformanceSearchDto parameters) {
+        LOGGER.debug("Find performances of location with parameters{}", parameters);
+        BigDecimal lowerPrice;
+        BigDecimal upperPrice;
+        LocalDateTime dateTimeFrom;
+        LocalDateTime dateTimeTill;
+
+        if (parameters.getPrice() == null || Objects.equals(parameters.getPrice(), "")) {
+            lowerPrice = null;
+            upperPrice = null;
+        } else {
+            // subtract 10 euro from the searched price
+            lowerPrice = BigDecimal.valueOf(Double.parseDouble(parameters.getPrice()) - 10);
+            // add 10 euro to the searched price
+            upperPrice = BigDecimal.valueOf(Double.parseDouble(parameters.getPrice()) + 10);
+        }
+
+        if (parameters.getDateTime() == null) {
+            dateTimeFrom = null;
+            dateTimeTill = null;
+        } else {
+            dateTimeFrom = parameters.getDateTime().minusHours(10);
+            dateTimeTill = parameters.getDateTime().plusHours(10);
+        }
+        List<Performance> performances = performanceRepository.findAllPerformancesWithParams(
+            dateTimeFrom,
+            dateTimeTill,
+            parameters.getEventName(),
+            parameters.getHallName(),
+            lowerPrice,
+            upperPrice);
+        if (performances.isEmpty()) {
+            throw new NotFoundException(String.format("Could not find performances with the given parameters{}", parameters));
+        }
+        return performances;
     }
 }

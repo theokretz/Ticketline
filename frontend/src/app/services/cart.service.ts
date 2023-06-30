@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CartTicket } from '../dtos/ticket';
-import { Observable } from 'rxjs';
+import {  Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Globals } from '../global/globals';
 import { CheckoutPaymentDetail } from '../dtos/payment-detail';
@@ -8,6 +8,8 @@ import { Booking } from '../dtos/booking';
 import { CheckoutDetails } from '../dtos/checkout-details';
 import { CheckoutLocation } from '../dtos/location';
 import { BookingMerchandise, Merchandise } from '../dtos/merchandise';
+import { Cart } from '../dtos/cart';
+import { OrderResponse } from '../dtos/order';
 
 export interface DialogData {
   paymentDetails: CheckoutPaymentDetail[];
@@ -19,8 +21,9 @@ export interface DialogData {
 })
 export class CartService {
   items: CartTicket[];
-  private cartBaseUri: string = this.globals.backendUri;
+  cart: Observable<Cart>;
 
+  private cartBaseUri: string = this.globals.backendUri;
   constructor(private http: HttpClient, private globals: Globals) {}
 
   /**
@@ -29,12 +32,9 @@ export class CartService {
    * @param id the id of the user, whose cart should be fetched
    * @return an observable list of the tickets in the cart of the user
    */
-  getCartTickets(id: number): Observable<CartTicket[]> {
-    return this.http.get<CartTicket[]>(
-      this.cartBaseUri + '/users/' + id + '/cart'
-    );
+  getCartTickets(id: number): Observable<Cart> {
+    return this.http.get<Cart>(this.cartBaseUri + '/users/' + id + '/cart');
   }
-
   /**
    * Remove a ticket from the specified user's cart
    *
@@ -48,8 +48,11 @@ export class CartService {
     );
   }
 
-  buy(booking: Booking): Observable<any> {
-    return this.http.post<any>(this.cartBaseUri + '/bookings', booking);
+  buy(booking: Booking): Observable<OrderResponse> {
+    return this.http.post<OrderResponse>(
+      this.cartBaseUri + '/bookings',
+      booking
+    );
   }
 
   getCheckoutDetails(userId: number): Observable<CheckoutDetails> {

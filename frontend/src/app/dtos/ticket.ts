@@ -19,6 +19,9 @@ export class ReservedTicket {
 export class OrderTicket {
   id: number;
   price: number;
+  artists: string;
+  eventName: string;
+  datetime: Date;
 }
 export class BookingTicket {
   ticketId: number;
@@ -38,4 +41,18 @@ export class CartTicket {
   locationStreet: string;
   price: number;
   reservation: boolean;
+  userPoints: number;
+}
+
+export class OrderPageTicket {
+  id: number;
+  price: number;
+  number: number;
+  row: number;
+  sectorName: string;
+  standing: boolean;
+  eventName: string;
+  hallName: string;
+  performanceStart: Date;
+  artistNames: string[];
 }

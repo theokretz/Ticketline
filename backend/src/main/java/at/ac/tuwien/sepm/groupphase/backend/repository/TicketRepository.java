@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepm.groupphase.backend.repository;
 
 import at.ac.tuwien.sepm.groupphase.backend.endpoint.dto.SimpleTicketDto;
+import at.ac.tuwien.sepm.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepm.groupphase.backend.entity.Ticket;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 /**
  * The interface Ticket repository.
  */
-public interface TicketRepository extends JpaRepository<Ticket, Long> {
+public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
 
     /**
@@ -42,7 +43,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      * @param ids the ticket ids
      * @return the ticket list
      */
-    @EntityGraph(attributePaths = {"reservation", "seat", "seat.sector"})
+    @EntityGraph(attributePaths = {"reservation", "reservation.user", "seat", "seat.sector", "performance"})
     @Query("SELECT t FROM Ticket t WHERE t.id IN :ids")
     List<Ticket> findAllByIds(@Param("ids") List<Integer> ids);
 
@@ -53,7 +54,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      * @return the ticket list
      */
     @EntityGraph(attributePaths = {"performance", "reservation", "seat", "seat.sector", "performance.performanceSectors",
-        "performance.performanceSectors.sector"})
+        "performance.performanceSectors.sector", "performance.event", "performance.hall"})
     List<Ticket> findAllByIdIn(List<Integer> ids);
 
 
@@ -109,4 +110,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      */
     @EntityGraph(attributePaths = {"reservation"})
     Set<Ticket> findReservationsAndTicketsByPerformanceId(Integer id);
+
+    /**
+     * Find all tickets matching the performance id.
+     *
+     * @param performance the performance
+     * @return the ticket set
+     */
+    List<Ticket> findAllByPerformance(Performance performance);
+
 }
